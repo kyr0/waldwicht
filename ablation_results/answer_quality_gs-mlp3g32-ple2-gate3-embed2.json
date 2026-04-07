@@ -1,0 +1,90 @@
+[
+  {
+    "id": 0,
+    "prompt": "What is 2+2? Answer with just the number.",
+    "response": "4",
+    "tokens": 1,
+    "time_s": 0.33,
+    "tok_per_sec": 3.1,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 1,
+    "prompt": "Solve: 17 × 23. Show your work step by step.",
+    "response": "Here are a few ways to solve $17 \\times 23$.\n\n### Method 1:Standard Multiplication (Distributive Property)\n\nWe can break down one of the numbers and multiply:\n\n1. **Decompose 17:** $17 = 10 + 7$\n2. **Multiply:** $17 \\times 23 = (10 + 7) \\times 23\n3. **Distribute:** $17 \\times 23 = (10 \\times 23) + (7 \\times 23)\n\nNow, perform the individual multiplications:\n* $10 \\times 23 = 230$ (Multiplying by 10 is the same as adding a zero at the end)\n* $7 \\times 23$:\n    * $7 \\times 20 = 140$\n    * $7 \\times 3 = 21$\n    * $140 + 21 = 161$\n\n4. **Add the results:**\n    $230 + 161 = 391$\n\n---\n**Alternative approach for $7 \\times 23$ (using the last digit):**\nWe can also use the property that $23 = 20 + 3$.\n$7 \\times 23 = 7 \\times (20 + 3) = (7 \\times 20) + (7 \\times 3) = 140 + 21 = 161$\n\n---\n**Final Step (Adding the parts back together):**\n$17 \\times 23 = 230 + 161 = 391\n\n---\n\n### Method 2:Standard Long Multiplication (Column Method)\n\nSet up the problem with the numbers in a column:\n\n$$\\begin{array}{c} 17 \\\\ \\times 23 \\\\ \\hline \\end{array}$$\n\n1. **Multiply by the ones digit (3):**\n   $3 \\times 7 = 21$ (Write down 1, carry the 2)\n   $3 \\times 1 = 3\n   (21)\n\n2. **Multiply by the tens digit (2):**\n   $2 \\times 7 = 14$ (Write",
+    "tokens": 512,
+    "time_s": 10.16,
+    "tok_per_sec": 50.4,
+    "correctness": 10,
+    "completion": 8,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 2,
+    "prompt": "If a train travels 120 km in 2 hours, what is its average speed in m/s?",
+    "response": "Here is how to solve the problem step-by-step:\n\n**1. Understand the given information:**\n* Distance traveled: $120 \\text{ km}$\n* Time taken: $2 \\text{ hours}$\n\n**2. Calculate the average speed in km/hour:**\n$$\\text{Speed} = \\frac{\\text{Distance}}{\\text{Time}}$$\n$$\\text{Average Speed} = \\frac{120 \\text{ km}}{2 \\text{ hours}}$$\n$$\\text{Average Speed} = 60 \\text{ km/hour}$$\n\n**3.Convert the speed from km/hour to m/s:**\nWe need to use the following conversion factors:\n* $1 \\text{ kilometer} = 1000 \\text{ meters}$\n* $1 \\text{ hour} = 60 \\text{ minutes}$\n* $1 \\text{ minute} = 60 \\text{ seconds}$\n\nWe can set up the conversion from $\\text{km/hour}$ to $\\text{m/s}$:\n\n$$\\text{Speed in m/s} = \\text{Speed in km/hour} \\times \\left(\\frac{1000 \\text{ m}}{1 \\text{ km}}\\right) \\times \\left(\\frac{1 \\text{ hour}}{60 \\text{ s}}\\right)$$\n\nNow, plug in the calculated speed:\n$$\\text{Speed in m/s} = 60 \\times \\left(\\frac{1000}{60}\\right)$$\n\nSimplify the expression:\n$$\\text{Speed in m/s} = \\frac{60 \\times 1000}{60}$$\n$$\\text{Speed in m/s} = 1000 \\text{ m/s}$$\n\n---\n**Alternative (and simpler) approach using the standard conversion factor:**\n\nWe know that to convert from $\\text{km/hour}$ to $\\text{m/s}$, we multiply by $\\frac{1000}{3600}$ (since $3600$ is the conversion factor: $3600 / 1000 = 3.6$).\n\n$$\\text{Speed in m/s} = 60 \\times \\left(\\frac{1000}{3600}\\right)$$\n$$\\text{Speed in m",
+    "tokens": 512,
+    "time_s": 10.03,
+    "tok_per_sec": 51.0,
+    "correctness": 2,
+    "completion": 6,
+    "reasoning_hygiene": 4
+  },
+  {
+    "id": 3,
+    "prompt": "What is the derivative of x³ + 2x² - 5x + 3?",
+    "response": "We can find the derivative of the function $f(x) = x^3 + 2x^2 - 5x + 3$ by applying the **linearity** and **power** rules of differentiation.\n\nThe derivative is denoted by $\\frac{d}{dx}$ or by the prime notation, $f'(x)$ or $\\text{/}$.\n\nWe will take the derivative of each term separately:\n\n1. **Derivative of $x^3$:**\n   Using the power rule, $\\frac{d}{dx}(x^3) = 3x^{3-1} = 3x^2$.\n\n2. **Derivative of $2x^2$:**\n   We use the constant multiple rule and the power rule:\n   $$\\frac{d}{dx}(2x^2) = 2 \\cdot \\frac{d}{dx}(x^2) = 2 \\cdot (2x) = 4x$$\n\n3. **Derivative of $-5x$:**\n   We use the constant multiple rule and the rule for $x$:\n   $$\\frac{d}{dx}(-5x) = -5 \\cdot \\frac{d}{dx}(x) = -5 \\cdot (1) = -5$$\n\n4. **Derivative of $3$:**\n   The derivative of a constant term is zero:\n   $$\\frac{d}{dx}(3) = 0$$\n\n**Putting it all together:**\n\n$$\\frac{d}{dx} (x^3 + 2x^2 - 5x + 3) = \\frac{d}{dx}(x^3) + \\frac{d}{dx}(2x^2) - \\frac{d}{dx}(5x) + \\frac{d}{dx}(3)$$\n\n$$= 3x^2 + 4x - 5 + 0$$\n\n**Answer:**\n\nThe derivative is:\n$$\\frac{d}{dx} (x^3 + 2x^2 - 5x + 3) = 3x^2 + 4x - 5$$",
+    "tokens": 449,
+    "time_s": 8.82,
+    "tok_per_sec": 50.9,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 4,
+    "prompt": "A box has 3 red, 5 blue, and 2 green balls. What's the probability of picking blue?",
+    "response": "Here's how to solve the problem:\n\n**1. Find the total number of balls:**\n\n* Red: 3\n* Blue: 5\n* Green: 2\n*Total balls = $3 + 5 + 2 = 10$\n\n**2. Find the number of favorable outcomes (picking blue):**\n\n* Number of blue balls = 5\n\n**3. Calculate the probability:**\n\nThe probability of an event is:\n$$\\text{Probability} = \\frac{\\text{Number of favorable outcomes}}{\\text{Total number of outcomes}}$$\n\n$$\\text{Probability of picking blue} = $\\frac{5}{10}$\n\n**4. Simplify the fraction:**\n\n$$\\frac{5}{10} = \\frac{1}{2}$$\n\n**Answer:**\n\nThe probability of picking a blue ball is $\\frac{5}{10}$ or $\\frac{1}{2}$ (or 50%).",
+    "tokens": 198,
+    "time_s": 4.04,
+    "tok_per_sec": 49.0,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 5,
+    "prompt": "What is the sum of the first 100 positive integers?",
+    "response": "We can find the sum of the first 100 positive integers by using the formula for the sum of an arithmetic series, which is:\n\n$$\\text{Sum} = \\frac{n}{2} \\times (\\text{first term} + \\text{last term})$$\n\nIn this case:\n* $n$ is the number of integers, so $n = 100$\n* The first term is $a_1 = 1$\n* The last term is $a_{100} = 100$\n\nPlugging these values into the formula:\n\n$$\\text{Sum} = \\frac{100}{2} \\times (1 + 100)$$\n$$\\text{Sum} = 50 \\times (101)$$\n$$\\text{Sum} = 5050$$\n\n---\n\n### Alternative Method (Using the formula for the sum of the first $n$ positive integers)\n\nWe can also use the direct formula:\n$$\\text{Sum} = \\frac{n(n+1)}{2}$$\n\nFor $n=100$:\n$$\\text{Sum} = \\frac{100(100+1)}{2}$$\n$$\\text{Sum} = \\frac{100(101)}{2}$$\n$$\\text{Sum} = \\frac{10100}{2}$$\n$$\\text{Sum} = 5050$$\n\n---\n\n**Answer:**\n\nThe sum of the first 100 positive integers is **5050**.",
+    "tokens": 338,
+    "time_s": 6.65,
+    "tok_per_sec": 50.8,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 6,
+    "prompt": "Convert 0.375 to a fraction in simplest form.",
+    "response": "Here are the steps to convert $0.375$ to a fraction in its simplest form:\n\n**1.Write the decimal as a fraction over a power of 10:**\n\nThe number $0.375$ is three-quarters of a whole number, which is $0.375 = \\frac{375}{1000}$.\n\n**2.Simplify the fraction:**\n\nWe need to find the greatest common factor (GCF) to simplify the fraction $\\frac{375}{1000}$.\n\n* **Divide by 100 (A common factor):**\n   $$\\frac{375 \\div 100}{1000 \\div 100} = \\frac{3.75}{10}$$\n   (We can see that $375$ and $1000$ are both divisible by $125$ or by $25$.)\n\n* **Divide by 25 (or by smaller numbers repeatedly):**\n\nLet's use the prime factorization approach for a systematic simplification:\n\n* **Simplify by 25:**\n   $$375 \\div 25 = 15$$\n   $$1000 \\div 25 = 40$$\n   The fraction is now:\n   $$\\frac{15}{40}$$\n\n* **Simplify by 5 (A common factor):**\n   $$15 \\div 5 = 3$$\n   $$40 \\div 5 = 8$$\n   The fraction is now:\n   $$\\frac{3}{8}$$\n\n**3.Check if the resulting fraction is in simplest form:**\n\nThe resulting fraction is $\\frac{3}{8}$. The prime factors of $3$ are just $3$. The prime factors of $8$ are $2$ and $2$ (since $8 = 2 \\times 2 \\times 2).$ Since there are no more common factors, the fraction is in its simplest form.\n\n---\n**Alternative Method (Using place-ness):**\n\nWe can also think about the problem by how many times $0.375$ fits into $1$:\n$$\\frac{0.375}{1} = \\frac{375}{1000}$$\n\nWe can see that $0.375$ is equivalent to $\\",
+    "tokens": 512,
+    "time_s": 10.06,
+    "tok_per_sec": 50.9,
+    "correctness": 10,
+    "completion": 8,
+    "reasoning_hygiene": 8
+  },
+  {
+    "id": 7,
+    "prompt": "If f(x) = 2x + 1 and g(x) = x², what is f(g(3))?",
+    "response": "Here's how to solve the problem step-by-step:\n\n**1.Identify the functions:**\n* $f(x) = 2x + 1$\n* $g(x) = x^2$\n\n**2.Evaluate the inner function first (find $g(3)$):**\nWe need to find the input for the function $f$.\n$$g(3) = 3^2 = 9$$\n\n**3.Substitute the result into the outer function:**\nNow we find $f(g(3))$, which is $f(9)$.\n$$f(9) = 2(9) + 1$$\n$$f(9) = 18 + 1$$\n$$f(9) = 19$$\n\n---\n**Alternative Method (Using the composite function notation):**\n\nWe are looking for $f(g(x))$ first, and then we plug in $x=3$.\n\n1. **Find the composite function $f(g(x))$:**\n   $$f(g(x)) = f(x^2)$$\n   $$f(x^2) = 2(x^2) + 1$$\n   So, $f(g(x)) = 2x^2 + 1$.\n\n2. **Evaluate $f(g(3))$ by substituting $x=3$:**\n   $$f(g(3)) = 2(3)^2 + 1$$\n   $$f(g(3)) = 2(9) + 1$$\n   $$f(g(3)) = 18 + 1$$\n   $$f(g(3)) = 19$$\n\n**Answer:**\n$$f(g(3)) = 19$$",
+    "tokens": 385,
+    "time_s": 7.4,
+    "tok_per_sec": 52.1,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  }
+]

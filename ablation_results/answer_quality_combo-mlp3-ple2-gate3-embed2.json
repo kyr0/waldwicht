@@ -1,0 +1,90 @@
+[
+  {
+    "id": 0,
+    "prompt": "What is 2+2? Answer with just the number.",
+    "response": "4",
+    "tokens": 1,
+    "time_s": 0.28,
+    "tok_per_sec": 3.5,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 1,
+    "prompt": "Solve: 17 \u00d7 23. Show your work step by step.",
+    "response": "Here are the steps to solve the multiplication problem $17 \\times 23$:\n\n**Method 1: Standard Multiplication**\n\n1. **Multiply the numbers:**\n   $17 \\times 23$\n\n2. **Break down the numbers for place value:**\n   $17 = 10 + 7$\n   $23 = 20 + 3$\n\n3. **Multiply each part:**\n   $(10 \\times 23) + (7 \\times 23)$\n\n4. **Calculate the products:**\n   $10 \\times 23 = 230$\n   $7 \\times 23 = 161$\n\n5. **Add the results:**\n   $230 + 161$\n\n6. **Perform the final addition:**\n   $230 + 161 = 391$\n\n**Method 2: The Direct Step-by-Step (If we consider $17 \\times 23$ as $17 \\times (20 + 3)$)**\n\n1. **$17 \\times 20:**\n   $17 \\times 20 = 340$ (Since $17 \\times 20 = 17 \\times (2 \\times 10) = 2 \\times (17 \\times 10) = 2 \\times 170 = 340$)\n\n2. **$17 \\times 3:**\n   $17 \\times 3 = 51$\n\n3. **Add the partial products:**\n   $340 + 51$\n\n4. **Final addition:**\n   $340 + 51 = 391$\n\n**Answer:**\n$$17 \\times 23 = 391$$",
+    "tokens": 407,
+    "time_s": 6.87,
+    "tok_per_sec": 59.2,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 2,
+    "prompt": "If a train travels 120 km in 2 hours, what is its average speed in m/s?",
+    "response": "Here's how to solve the problem step-by-step:\n\n**1. Calculate the average speed in km/ and hours:**\n\n* **Distance:** 120 km\n* **Time:** 2 hours\n* **We already know the speed in this unit:**\n   $$\\text{Speed} = \\frac{\\text{Distance}}{\\text{Time}}$$\n   $$\\text{Speed} = \\frac{120 \\text{ km}}{2 \\text{ hours}}$$\n   $$\\text{Speed} = 60 \\text{ km/hour}$$\n\n**2. Convert the speed to m/s:**\n\nWe need to convert the speed from $\\text{km/hour}$ to $\\text{m/s}$. We use the conversion factor:\n* $1 \\text{ km} = 1000 \\text{ m}$\n* $1 \\text{ hour} = 3600 \\text{ seconds}$ (or $1 \\text{ hour} = 3600 \\text{ s}$)\n\nLet's convert $60 \\text{ km/hour}$ to $\\text{m/s}$:\n\n$$\\text{Speed} = 60 \\frac{\\text{km}}{\\text{hour}}$$\n\nTo find the speed in $\\text{m/s}$, we can use the relationship:\n$$\\text{Speed} = 60 \\frac{\\text{km}}{\\text{hour}} \\times \\left(\\frac{1000 \\text{ m}}{1 \\text{ km}}\\right) \\times \\left(\\frac{1 \\text{ hour}}{3600 \\text{ s}}\\right)$$\n\n$$\\text{Speed} = 60 \\times \\left(\\frac{1000}{3600}\\right) \\text{ m/s}$$\n\n$$\\text{Speed} = 60 \\times \\left(\\frac{1000}{3600}\\right) \\text{ m/s}$$\n\nSimplify the fraction $\\frac{1000}{3600}$:\n$$\\frac{1000}{3600} = \\frac{10}{36} = \\frac{5}{18}$$\n\n$$\\text{Speed} = 60 \\times \\frac{5}{18} \\text{ m/s}$$\n\n$$\\text{Speed} = \\frac{",
+    "tokens": 512,
+    "time_s": 9.08,
+    "tok_per_sec": 56.4,
+    "correctness": 9,
+    "completion": 7,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 3,
+    "prompt": "What is the derivative of x\u00b3 + 2x\u00b2 - 5x + 3?",
+    "response": "We are asked to find the derivative of the function $f(x) = x^3 + 2x^2 - 5x + 3$.\n\nWe can use the **linearity of the derivative** and the **power rule** to find the derivative of each term. The general rule for the derivative of a power with respect to $x$ is:\n$$\\frac{d}{dx} (ax^n) = a \\cdot n x^{n-1}$$\n\nWe apply this to each term:\n\n1. **Derivative of $x^3$:**\n   $$\\frac{d}{dx} (x^3) = 1 \\cdot 3 x^{3-1} = 3x^2$$\n\n2. **Derivative of $2x^2$:**\n   $$\\frac{d}{dx} (2x^2) = 2 \\cdot 2 x^{2-1} = 4x$$\n\n3. **Derivative of $-5x$:**\n   $$\\frac{d}{dx} (-5x) = -5 \\cdot 1 x^{1-1} = -5x^0 = -5$$\n\n4. **Derivative of $3$ (a constant):**\n   $$\\frac{d}{dx} (3) = 0$$\n\nCombining the derivatives, we get:\n$$\\frac{d}{dx} (x^3 + 2x^2 - 5x + 3) = 3x^2 + 4x - 5$$\n\n---\n**Alternatively, using the differentiation rules:**\n\n$$\\frac{d}{dx} = \\frac{d}{dx} (x^3) + \\frac{d}{dx} (2x^2) - \\frac{d}{dx} (5x) + \\frac{d}{dx} (3)$$\n\n$$\\frac{d}{dx} = (3x^2) + $$(2) (2) $x^{2-1} - $$(5) $x^{1-1} + $0$$\n\n$$\\frac{d}{dx} = 3x^2 + 4x - 5$$\n\n---\n**Using the standard differentiation rules:**\n\n$$\\frac{d}{dx} = \\frac{d}{dx} (x^3) + \\frac{d}{dx} (2x^2) - \\frac{d}{",
+    "tokens": 512,
+    "time_s": 8.69,
+    "tok_per_sec": 58.9,
+    "correctness": 10,
+    "completion": 8,
+    "reasoning_hygiene": 7
+  },
+  {
+    "id": 4,
+    "prompt": "A box has 3 red, 5 blue, and 2 green balls. What's the probability of picking blue?",
+    "response": "Here's how to solve the probability problem):\n\n**1. Determine the total number of balls:**\n* Red: 3\n* Blue: 5\n* Green: 2\n* **Total balls:** $3 + 5 + 2 = 10$\n\n**2. Determine the number of favorable outcomes (blue balls):**\n* The number of blue balls is 5.\n\n**3. Calculate the probability:**\n* The probability of picking a blue ball is the (Number of blue balls) / (Total number of balls).\n\n$$\\text{Probability (Blue)} = \\frac{5}{10}$$\n\n**4. Simplify the fraction:**\n$$\\frac{5}{10} = \\frac{1}{2}$$\n\n**Answer:**\n\nThe probability of picking a blue ball is $\\frac{1}{2}$ or **50%** (or $\\frac{1}{2}$).",
+    "tokens": 193,
+    "time_s": 3.34,
+    "tok_per_sec": 57.9,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 5,
+    "prompt": "What is the sum of the first 100 positive integers?",
+    "response": "This is a problem that requires the use of the formula for the sum of an arithmetic sequence, or more specifically, the sum of the first $n$ positive integers, which is a standard result.\n\nThe series is: $1, 2, 3, \\dots, 100$.\n\nWe can use the formula for the sum of the first $n$ positive integers:\n$$\\text{Sum} = \\frac{n(n+1)}{2}$$\n\nIn this case, $n = 100$.\n\n$$\\text{Sum} = \\frac{100(100+1)}{2}$$\n$$\\text{Sum} = \\frac{100(101)}{2}$$\n$$\\text{Sum} = \\frac{100100}{2}$$\n\n$$\\text{Sum} = 50050$$\n\n---\n**Alternatively, using the standard summation formula:**\n$$\\text{Sum} = 100^2 / 2 = 10000 / 2 = 5000$$\nWait, that's incorrect. Let's stick to the derived formula:\n\n$$\\text{Sum} = \\frac{n}{2} \\times (n+1)$$\n$$\\text{Sum} = \\frac{100}{2} \\times (100+1)$$\n$$\\text{Sum} = 50 \\times 101$$\n$$\\text{Sum} = 5050$$\n\nLet's re-check the calculation:\n$$\\text{Sum} = \\frac{100 \\times 101}{2} = \\frac{10100}{2} = 5050$$\n\n---\n**Final Answer based on the standard formula:**\n$$\\text{Sum} = \\frac{100(100+1)}{2} = \\frac{100(101)}{2} = \\frac{10100}{2} = 5050$$\n\nThe sum of the first 100 positive integers is **5050**.",
+    "tokens": 461,
+    "time_s": 7.65,
+    "tok_per_sec": 60.3,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 6,
+    "prompt": "Convert 0.375 to a fraction in simplest form.",
+    "response": "Here's how to convert $0.375$ to a fraction in its simplest form:\n\n**1. Understand the decimal:**\n\nThe number $0.375$ is a position-specific notation for a decimal. To convert this to a standard fraction, we first write the whole number as a fraction over a power of 10:\n\n$$0.375 = \\frac{375}{1000}$$\n\n**2. Simplify the fraction:**\n\nNow we need to find the greatest common factor (GCF) to simplify the fraction.\n\n* **Divide by 100:**\n  $$\\frac{375 \\div 100}{1000 \\div 100} = \\frac{3.75}{10} \\text{ (This is getting complicated)}$$\n\n* **Divide by 25 (A common factor):**\n  * $375 \\div 25 = 15$\n  * $1000 \\div 25 = 40$\n\n  $$\\frac{375}{1000} = \\frac{375 \\div 25}{1000 \\div 25} = \\frac{15}{40}$$\n\n* **Simplify the resulting fraction ($\\frac{15}{40}$):**\n  We can divide both the numerator and the denominator by 5:\n  $$\\frac{15 \\div 5}{40 \\div 5} = \\frac{3}{8}$$\n\n**3. (Alternative Method: Using Powers of 10):**\n\nWe know that $0.375$ is equivalent to $\\frac{375}{1000}$.\n\nWe can see that $375$ is a multiple of $100$ times $3.75$.\n$$0.375 = \\frac{375}{1000} = \\frac{375 \\div 125}{1000 \\div 125} = \\frac{3}{8}$$\n\nWe can also see that $0.375$ is a multiple of $1/4$ (since $0.375 = 0.375$ is $3/8$, and $3/8$ is $0.37",
+    "tokens": 512,
+    "time_s": 8.55,
+    "tok_per_sec": 59.9,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 7,
+    "prompt": "If f(x) = 2x + 1 and g(x) = x\u00b2, what is f(g(3))?",
+    "response": "Here's how to solve the problem step-by-step:\n\n1. **Identify the functions:**\n   * $f(x) = 2x + 1$\n   * $g(x) = x^2$\n\n2. **Calculate the inner function first, $g(3)$:**\n   * Substitute $3$ for $x$ in the definition of $g(x)$:\n     $g(3) = 3^2 = 9$\n\n3. **Calculate the composite function, $f(g(3))$:**\n   * Now we use the result from Step 2 (9) as the input for $f(x)$:\n     $f(g(3))$ is the same as $f(9)$.\n   * Substitute $9$ for $x$ in the definition of $f(x)$:\n     $f(9) = 2(9) + 1$\n   * Calculate the final result:\n     $f(9) = 18 + 1$\n     $f(9) = 19$\n\n---\n**Alternative approach (evaluating the composite function first):**\n\nWe can first find the expression for $f(g(x))$:\n$$f(g(x)) = f(x^2) = 2(x^2) + 1 = 2x^2 + 1$$\n\nNow, we evaluate this composite function at $x=3$:\n$$f(g(3)) = 2(3^2) + 1$$\n$$f(g(3)) = 2(9) + 1$$\n$$f(g(3)) = 18 + 1$$\n$$f(g(3)) = 19$$\n\n---\n\n**Answer:**\n$$f(g(3)) = 19$$",
+    "tokens": 401,
+    "time_s": 6.78,
+    "tok_per_sec": 59.2,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  }
+]

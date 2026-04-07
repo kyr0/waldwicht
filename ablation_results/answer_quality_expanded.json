@@ -1,0 +1,162 @@
+[
+  {
+    "id": 0,
+    "category": "function_calling",
+    "prompt": "You have access to a function: get_weather(city: str) -> dict. Call it to find the weather in Tokyo. Show the function call in JSON format.",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 1,
+    "category": "function_calling",
+    "prompt": "You have access to: translate(text: str, target_lang: str) -> str and summarize(text: str, max_words: int) -> str. A user says: 'Translate this to French and summarize in 20 words: The quick brown fox jumps over the lazy dog near the riverbank on a sunny afternoon.' Show both function calls in JSON.",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 2,
+    "category": "function_calling",
+    "prompt": "You have access to: search_db(query: str, limit: int) -> list and send_email(to: str, subject: str, body: str) -> bool. A user says: 'Find the top 3 orders for customer alice@example.com and email her a summary.' Show the function calls you would make, in order, as JSON.",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 3,
+    "category": "function_calling_multistep",
+    "prompt": "You have these tools:\n- list_files(directory: str) -> list[str]\n- read_file(path: str) -> str\n- write_file(path: str, content: str) -> bool\n- run_command(cmd: str) -> str\n\nA user says: 'List all Python files in /src, read the one called main.py, add a comment at the top saying # Updated 2026-04-07, write it back, and then run python /src/main.py.'\n\nShow all function calls in order as JSON.",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 4,
+    "category": "code_generation",
+    "prompt": "Write a Python function called `flatten(nested_list)` that takes an arbitrarily nested list of integers and returns a flat list. For example, flatten([1, [2, [3, 4], 5]]) should return [1, 2, 3, 4, 5].",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 5,
+    "category": "code_generation",
+    "prompt": "Write a Python function `is_palindrome(s: str) -> bool` that checks if a string is a palindrome, ignoring case and non-alphanumeric characters. Include at least 3 test cases.",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 6,
+    "category": "code_generation",
+    "prompt": "Write a Python class `LRUCache(capacity: int)` with methods `get(key)` and `put(key, value)`. It should evict the least recently used item when at capacity. Use only built-in Python data structures.",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 7,
+    "category": "code_generation",
+    "prompt": "Write a Python function `merge_sorted(a: list[int], b: list[int]) -> list[int]` that merges two sorted lists into one sorted list without using the built-in sort. What is the time complexity?",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 8,
+    "category": "translation",
+    "prompt": "Translate the following to German: 'The committee has decided to postpone the meeting until further notice due to unforeseen circumstances.'",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 9,
+    "category": "translation",
+    "prompt": "Translate the following to Spanish: 'Machine learning models require large amounts of data and computational resources for training, but inference can be optimized through quantization.'",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 10,
+    "category": "translation",
+    "prompt": "Translate the following to French: 'The restaurant on the corner serves excellent seafood, especially the grilled salmon with lemon butter sauce.'",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 11,
+    "category": "translation",
+    "prompt": "Translate the following to Japanese: 'Please confirm your reservation for two guests at 7 PM on Friday evening.'",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 12,
+    "category": "multi_step_reasoning",
+    "prompt": "A store sells apples for $1.50 each and oranges for $2.00 each. Maria buys some apples and oranges, spending exactly $13.00. She buys more apples than oranges. What are all possible combinations?",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 13,
+    "category": "multi_step_reasoning",
+    "prompt": "Three friends Alice, Bob, and Carol each have a different favorite color (red, blue, green). Alice doesn't like red. The person who likes blue is older than Bob. Carol is the youngest. What is each person's favorite color?",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 14,
+    "category": "multi_step_reasoning",
+    "prompt": "A snail climbs 3 meters up a wall during the day but slides back 2 meters each night. The wall is 10 meters high. On which day does the snail reach the top?",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 15,
+    "category": "multi_step_reasoning",
+    "prompt": "A farmer needs to cross a river with a wolf, a goat, and a cabbage. The boat can carry only the farmer and one item. The wolf will eat the goat if left alone together, and the goat will eat the cabbage. How does the farmer get everything across? Show each trip.",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 16,
+    "category": "creative_writing",
+    "prompt": "Write a haiku about a programmer debugging code late at night.",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 17,
+    "category": "creative_writing",
+    "prompt": "Write a short story (3-5 sentences) about a robot that discovers it can dream.",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 18,
+    "category": "creative_writing",
+    "prompt": "Write a professional email declining a job offer politely, mentioning you've accepted another position that better aligns with your career goals.",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  },
+  {
+    "id": 19,
+    "category": "creative_writing",
+    "prompt": "Write a product description (2-3 sentences) for a pair of wireless noise-canceling headphones aimed at frequent travelers.",
+    "correctness": null,
+    "completion": null,
+    "reasoning_hygiene": null
+  }
+]

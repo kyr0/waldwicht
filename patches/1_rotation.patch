@@ -1,0 +1,741 @@
+From 6377f15deb8b5f4c01cca37fbc88e835ff7352b3 Mon Sep 17 00:00:00 2001
+From: deceptech-packet-ninja <roland.blandon@packetninjas.net>
+Date: Mon, 30 Mar 2026 14:01:59 -0400
+Subject: [PATCH 1/2] feat: add --kv-bits, --turbo-kv-bits, /debug/memory,
+ /debug/clear_cache to server
+
+Enables KV cache quantization and TurboQuant in mlx_lm.server.
+Batching disabled when kv_bits or turbo_kv_bits is set.
+Adds /debug/memory GET endpoint for MLX memory diagnostics.
+Adds /debug/clear_cache POST endpoint to free MLX buffer cache.
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+---
+ mlx_lm/server.py | 106 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 105 insertions(+), 1 deletion(-)
+
+diff --git a/mlx_lm/server.py b/mlx_lm/server.py
+index 7fc91fa2a..new_hash 100644
+--- a/mlx_lm/server.py
++++ b/mlx_lm/server.py
+@@ -769,6 +769,10 @@
+         if not self.model_provider.is_batchable:
+             return False
+         if args.seed is not None:
++            return False
++        if getattr(self.cli_args, "kv_bits", None) is not None:
++            return False
++        if getattr(self.cli_args, "turbo_kv_bits", None) is not None:
+             return False
+ 
+         return True
+@@ -1043,11 +1047,22 @@
+             ctx.prompt_cache_count = len(prompt) - len(rest)
+             cache_key = prompt[:]
+             if cache is None:
+-                cache = make_prompt_cache(self.model_provider.model)
++                turbo_kwargs = {}
++                if getattr(self.cli_args, "turbo_kv_bits", None) is not None:
++                    turbo_kwargs["turbo_kv_bits"] = self.cli_args.turbo_kv_bits
++                    turbo_kwargs["turbo_fp16_layers"] = self.cli_args.turbo_fp16_layers
++                cache = make_prompt_cache(
++                    self.model_provider.model, **turbo_kwargs
++                )
+                 if self.model_provider.draft_model is not None:
+                     cache += make_prompt_cache(self.model_provider.draft_model)
+ 
+             # Process the prompt and generate tokens
++            kv_kwargs = {}
++            if getattr(self.cli_args, "kv_bits", None) is not None:
++                kv_kwargs["kv_bits"] = self.cli_args.kv_bits
++                kv_kwargs["kv_group_size"] = self.cli_args.kv_group_size
++                kv_kwargs["quantized_kv_start"] = self.cli_args.quantized_kv_start
+             for gen in stream_generate(
+                 model=model,
+                 tokenizer=tokenizer,
+@@ -1060,6 +1075,7 @@
+                 num_draft_tokens=args.num_draft_tokens,
+                 prompt_progress_callback=progress,
+                 prefill_step_size=self.cli_args.prefill_step_size,
++                **kv_kwargs,
+             ):
+                 rqueue.put(
+                     Response(
+@@ -1162,6 +1178,10 @@
+         """
+         Respond to a POST request from a client.
+         """
++        if self.path == "/debug/clear_cache":
++            self.handle_clear_cache()
++            return
++
+         request_factories = {
+             "/v1/completions": self.handle_text_completions,
+             "/v1/chat/completions": self.handle_chat_completions,
+@@ -1760,6 +1780,8 @@
+             self.handle_models_request()
+         elif self.path == "/health":
+             self.handle_health_check()
++        elif self.path == "/debug/memory":
++            self.handle_debug_memory()
+         else:
+             self._set_completion_headers(404)
+             self.end_headers()
+@@ -1773,6 +1795,58 @@
+         self.end_headers()
+ 
+         self.wfile.write('{"status": "ok"}'.encode())
++        self.wfile.flush()
++
++    def handle_debug_memory(self):
++        """Return MLX memory stats and prompt cache info."""
++        import json as _json
++
++        active = mx.get_active_memory()
++        peak = mx.get_peak_memory()
++        cache = mx.get_cache_memory()
++
++        pc = self.response_generator.prompt_cache
++        pc_entries = len(pc)
++        pc_bytes = pc.nbytes
++
++        data = {
++            "active_bytes": active,
++            "peak_bytes": peak,
++            "cache_bytes": cache,
++            "active_mb": round(active / 1048576, 1),
++            "peak_mb": round(peak / 1048576, 1),
++            "cache_mb": round(cache / 1048576, 1),
++            "prompt_cache_entries": pc_entries,
++            "prompt_cache_mb": round(pc_bytes / 1048576, 1),
++        }
++        self._set_completion_headers(200)
++        self.end_headers()
++        self.wfile.write(_json.dumps(data).encode())
++        self.wfile.flush()
++
++    def handle_clear_cache(self):
++        """Clear the MLX buffer cache and return before/after stats."""
++        import json as _json
++
++        before_cache = mx.get_cache_memory()
++        before_active = mx.get_active_memory()
++        mx.clear_cache()
++        after_cache = mx.get_cache_memory()
++        after_active = mx.get_active_memory()
++        freed = before_cache - after_cache
++
++        data = {
++            "before_cache_bytes": before_cache,
++            "after_cache_bytes": after_cache,
++            "freed_bytes": freed,
++            "before_cache_mb": round(before_cache / 1048576, 1),
++            "after_cache_mb": round(after_cache / 1048576, 1),
++            "freed_mb": round(freed / 1048576, 1),
++            "active_mb": round(after_active / 1048576, 1),
++        }
++        self._set_completion_headers(200)
++        self.end_headers()
++        self.wfile.write(_json.dumps(data).encode())
+         self.wfile.flush()
+ 
+     def handle_models_request(self):
+@@ -1996,8 +2070,38 @@
+         type=int,
+         default=2048,
+         help="Step size for prefill processing (default: 2048)",
++    )
++    parser.add_argument(
++        "--kv-bits",
++        type=int,
++        default=None,
++        help="Number of bits for KV cache quantization. None means no quantization.",
+     )
+     parser.add_argument(
++        "--kv-group-size",
++        type=int,
++        default=64,
++        help="Group size for KV cache quantization (default: 64)",
++    )
++    parser.add_argument(
++        "--quantized-kv-start",
++        type=int,
++        default=0,
++        help="Step to begin quantizing the KV cache (default: 0)",
++    )
++    parser.add_argument(
++        "--turbo-kv-bits",
++        type=int,
++        default=None,
++        help="TurboQuant KV cache compression bits (1-4). 3-bit gives 4.6x compression.",
++    )
++    parser.add_argument(
++        "--turbo-fp16-layers",
++        type=int,
++        default=2,
++        help="Number of first/last layers to keep in FP16 with TurboQuant (default: 2)",
++    )
++    parser.add_argument(
+         "--prompt-cache-size",
+         type=int,
+         default=10,
+
+From 6cebf087aa06ba0e73cc2be72f239ae616350845 Mon Sep 17 00:00:00 2001
+From: deceptech-packet-ninja <roland.blandon@packetninjas.net>
+Date: Mon, 30 Mar 2026 14:08:44 -0400
+Subject: [PATCH 2/2] feat: QuantizedRotatingKVCache + KVSplit (K/V different
+ bits)
+
+- QuantizedRotatingKVCache: inherits from RotatingKVCache, stores
+  quantized (data, scales, biases) tuples in a rotating buffer.
+  Fixes RotatingKVCache.to_quantized() NotImplementedError.
+  Enables --max-kv-size + --kv-bits together.
+
+- KVSplit: QuantizedKVCache and QuantizedRotatingKVCache accept
+  bits=(key_bits, value_bits) tuples for asymmetric quantization.
+  quantized_scaled_dot_product_attention uses separate params for
+  key and value matmuls. Full backward compatibility.
+
+Closes #191. Addresses #883 (OOM from unbounded KV cache).
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+---
+ mlx_lm/generate.py     |   1 +
+ mlx_lm/models/base.py  |  20 +-
+ mlx_lm/models/cache.py | 401 +++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 402 insertions(+), 20 deletions(-)
+
+diff --git a/mlx_lm/generate.py b/mlx_lm/generate.py
+index ef8dbf7bf..93b47abc4 100644
+--- a/mlx_lm/generate.py
++++ b/mlx_lm/generate.py
+@@ -31,6 +31,7 @@
+     CacheList,
+     KVCache,
+     QuantizedKVCache,
++    QuantizedRotatingKVCache,
+     RotatingKVCache,
+     load_prompt_cache,
+ )
+diff --git a/mlx_lm/models/base.py b/mlx_lm/models/base.py
+index d7c3efb28..2a15c109e 100644
+--- a/mlx_lm/models/base.py
++++ b/mlx_lm/models/base.py
+@@ -69,7 +69,15 @@ def quantized_scaled_dot_product_attention(
+     mask: Optional[mx.array],
+     group_size: int = 64,
+     bits: int = 8,
++    value_group_size: Optional[int] = None,
++    value_bits: Optional[int] = None,
+ ) -> mx.array:
++    # Default value params to key params for backward compat
++    if value_group_size is None:
++        value_group_size = group_size
++    if value_bits is None:
++        value_bits = bits
++
+     B, n_q_heads, L, D = queries.shape
+     n_kv_heads = q_keys[0].shape[-3]
+     n_repeats = n_q_heads // n_kv_heads
+@@ -96,7 +104,11 @@ def quantized_scaled_dot_product_attention(
+             scores += mask
+     scores = mx.softmax(scores, axis=-1, precise=True)
+     out = mx.quantized_matmul(
+-        scores, *q_values, transpose=False, group_size=group_size, bits=bits
++        scores,
++        *q_values,
++        transpose=False,
++        group_size=value_group_size,
++        bits=value_bits,
+     )
+ 
+     if n_repeats > 1:
+@@ -123,8 +135,10 @@ def scaled_dot_product_attention(
+             values,
+             scale=scale,
+             mask=mask,
+-            group_size=cache.group_size,
+-            bits=cache.bits,
++            group_size=getattr(cache, "key_group_size", cache.group_size),
++            bits=getattr(cache, "key_bits", cache.bits),
++            value_group_size=getattr(cache, "value_group_size", cache.group_size),
++            value_bits=getattr(cache, "value_bits", cache.bits),
+         )
+     else:
+         return mx.fast.scaled_dot_product_attention(
+diff --git a/mlx_lm/models/cache.py b/mlx_lm/models/cache.py
+index 88fa4ad32..c0d9fe9f8 100644
+--- a/mlx_lm/models/cache.py
++++ b/mlx_lm/models/cache.py
+@@ -5,7 +5,7 @@
+ 
+ import mlx.core as mx
+ import mlx.nn as nn
+-from mlx.utils import tree_flatten, tree_map, tree_unflatten
++from mlx.utils import tree_flatten, tree_map, tree_reduce, tree_unflatten
+ 
+ from .base import create_causal_mask
+ 
+@@ -234,8 +234,42 @@ def __init__(self, group_size: int = 64, bits: int = 8):
+         self.keys = None
+         self.values = None
+         self.offset = 0
+-        self.group_size = group_size
+-        self.bits = bits
++        # Support KVSplit: bits/group_size may be (key, value) tuples
++        if isinstance(bits, (tuple, list)):
++            self.key_bits, self.value_bits = bits
++        else:
++            self.key_bits = self.value_bits = bits
++        if isinstance(group_size, (tuple, list)):
++            self.key_group_size, self.value_group_size = group_size
++        else:
++            self.key_group_size = self.value_group_size = group_size
++
++    # Backward-compatible properties
++    @property
++    def bits(self):
++        if self.key_bits == self.value_bits:
++            return self.key_bits
++        return (self.key_bits, self.value_bits)
++
++    @bits.setter
++    def bits(self, v):
++        if isinstance(v, (tuple, list)):
++            self.key_bits, self.value_bits = v
++        else:
++            self.key_bits = self.value_bits = v
++
++    @property
++    def group_size(self):
++        if self.key_group_size == self.value_group_size:
++            return self.key_group_size
++        return (self.key_group_size, self.value_group_size)
++
++    @group_size.setter
++    def group_size(self, v):
++        if isinstance(v, (tuple, list)):
++            self.key_group_size, self.value_group_size = v
++        else:
++            self.key_group_size = self.value_group_size = v
+ 
+     def update_and_fetch(self, keys, values):
+         B, n_kv_heads, num_steps, k_head_dim = keys.shape
+@@ -243,15 +277,15 @@ def update_and_fetch(self, keys, values):
+         prev = self.offset
+ 
+         if self.keys is None or (prev + num_steps) > self.keys[0].shape[-2]:
+-            el_per_int = 8 * mx.uint32.size // self.bits
+             new_steps = (self.step + num_steps - 1) // self.step * self.step
+             shape = (B, n_kv_heads, new_steps)
+ 
+-            def init_quant(dim):
++            def init_quant(dim, bits, gs):
++                el_per_int = 8 * mx.uint32.size // bits
+                 return (
+                     mx.zeros((*shape, dim // el_per_int), dtype=mx.uint32),
+-                    mx.zeros((*shape, dim // self.group_size), dtype=keys.dtype),
+-                    mx.zeros((*shape, dim // self.group_size), dtype=keys.dtype),
++                    mx.zeros((*shape, dim // gs), dtype=keys.dtype),
++                    mx.zeros((*shape, dim // gs), dtype=keys.dtype),
+                 )
+ 
+             def expand_quant(x):
+@@ -268,12 +302,19 @@ def expand_quant(x):
+                     expand_quant, (self.keys, self.values)
+                 )
+             else:
+-                self.keys, self.values = init_quant(k_head_dim), init_quant(v_head_dim)
++                self.keys = init_quant(k_head_dim, self.key_bits, self.key_group_size)
++                self.values = init_quant(
++                    v_head_dim, self.value_bits, self.value_group_size
++                )
+ 
+         self.offset += num_steps
+ 
+-        keys = mx.quantize(keys, group_size=self.group_size, bits=self.bits)
+-        values = mx.quantize(values, group_size=self.group_size, bits=self.bits)
++        keys = mx.quantize(
++            keys, group_size=self.key_group_size, bits=self.key_bits
++        )
++        values = mx.quantize(
++            values, group_size=self.value_group_size, bits=self.value_bits
++        )
+         for i in range(len(self.keys)):
+             self.keys[i][..., prev : self.offset, :] = keys[i]
+             self.values[i][..., prev : self.offset, :] = values[i]
+@@ -295,11 +336,34 @@ def state(self, v):
+ 
+     @property
+     def meta_state(self):
+-        return tuple(map(str, (self.offset, self.group_size, self.bits)))
++        return tuple(
++            map(
++                str,
++                (
++                    self.offset,
++                    self.key_group_size,
++                    self.key_bits,
++                    self.value_group_size,
++                    self.value_bits,
++                ),
++            )
++        )
+ 
+     @meta_state.setter
+     def meta_state(self, v):
+-        self.offset, self.group_size, self.bits = map(int, v)
++        if len(v) == 3:
++            # Backward compat: old format (offset, group_size, bits)
++            self.offset = int(v[0])
++            self.key_group_size = self.value_group_size = int(v[1])
++            self.key_bits = self.value_bits = int(v[2])
++        else:
++            (
++                self.offset,
++                self.key_group_size,
++                self.key_bits,
++                self.value_group_size,
++                self.value_bits,
++            ) = map(int, v)
+ 
+     def is_trimmable(self):
+         return True
+@@ -378,13 +442,19 @@ def trim(self, n):
+         self.offset -= n
+         return n
+ 
+-    def to_quantized(self, group_size: int = 64, bits: int = 4) -> QuantizedKVCache:
++    def to_quantized(self, group_size=64, bits=4) -> QuantizedKVCache:
+         quant_cache = QuantizedKVCache(group_size=group_size, bits=bits)
+         quant_cache.offset = self.offset
+         if self.keys is not None:
+-            quant_cache.keys = mx.quantize(self.keys, group_size=group_size, bits=bits)
++            quant_cache.keys = mx.quantize(
++                self.keys,
++                group_size=quant_cache.key_group_size,
++                bits=quant_cache.key_bits,
++            )
+             quant_cache.values = mx.quantize(
+-                self.values, group_size=group_size, bits=bits
++                self.values,
++                group_size=quant_cache.value_group_size,
++                bits=quant_cache.value_bits,
+             )
+         return quant_cache
+ 
+@@ -546,8 +616,31 @@ def trim(self, n):
+         self._idx -= n
+         return n
+ 
+-    def to_quantized(self, group_size: int = 64, bits: int = 4) -> QuantizedKVCache:
+-        raise NotImplementedError("RotatingKVCache Quantization NYI")
++    def to_quantized(
++        self, group_size: int = 64, bits: int = 4
++    ) -> "QuantizedRotatingKVCache":
++        qcache = QuantizedRotatingKVCache(
++            max_size=self.max_size, keep=self.keep, group_size=group_size, bits=bits
++        )
++        qcache.offset = self.offset
++        qcache._idx = self._idx
++        if self.keys is not None:
++            S = self.keys.shape[2]
++            qcache.keys = list(
++                mx.quantize(
++                    self.keys,
++                    group_size=qcache.key_group_size,
++                    bits=qcache.key_bits,
++                )
++            )
++            qcache.values = list(
++                mx.quantize(
++                    self.values,
++                    group_size=qcache.value_group_size,
++                    bits=qcache.value_bits,
++                )
++            )
++        return qcache
+ 
+     def make_mask(
+         self, N: int, window_size: Optional[int] = None, return_array: bool = False
+@@ -589,6 +682,280 @@ def nbytes(self):
+         return self.keys.nbytes + self.values.nbytes
+ 
+ 
++class QuantizedRotatingKVCache(RotatingKVCache):
++    """A rotating KV cache that stores quantized (data, scales, biases) tuples.
++
++    Supports KVSplit: bits/group_size may be (key, value) tuples for
++    asymmetric quantization of keys and values.
++    """
++
++    step = 256
++
++    def __init__(self, max_size, keep=0, group_size: int = 64, bits: int = 8):
++        super().__init__(max_size=max_size, keep=keep)
++        # Support KVSplit: bits/group_size may be (key, value) tuples
++        if isinstance(bits, (tuple, list)):
++            self.key_bits, self.value_bits = bits
++        else:
++            self.key_bits = self.value_bits = bits
++        if isinstance(group_size, (tuple, list)):
++            self.key_group_size, self.value_group_size = group_size
++        else:
++            self.key_group_size = self.value_group_size = group_size
++
++    # Backward-compatible properties
++    @property
++    def bits(self):
++        if self.key_bits == self.value_bits:
++            return self.key_bits
++        return (self.key_bits, self.value_bits)
++
++    @bits.setter
++    def bits(self, v):
++        if isinstance(v, (tuple, list)):
++            self.key_bits, self.value_bits = v
++        else:
++            self.key_bits = self.value_bits = v
++
++    @property
++    def group_size(self):
++        if self.key_group_size == self.value_group_size:
++            return self.key_group_size
++        return (self.key_group_size, self.value_group_size)
++
++    @group_size.setter
++    def group_size(self, v):
++        if isinstance(v, (tuple, list)):
++            self.key_group_size, self.value_group_size = v
++        else:
++            self.key_group_size = self.value_group_size = v
++
++    @staticmethod
++    def _is_quantized(v):
++        """Check if a value is a quantized tuple/list (data, scales, biases)."""
++        return isinstance(v, (tuple, list))
++
++    def _seq_len(self):
++        """Return the current sequence length in the buffer."""
++        if self.keys is None:
++            return 0
++        if self._is_quantized(self.keys):
++            return self.keys[0].shape[2]
++        return self.keys.shape[2]
++
++    def _trim(self, trim_size, v, append=None):
++        if self._is_quantized(v):
++            parts = []
++            if trim_size > 0:
++                parts = [
++                    tree_map(lambda x: x[..., : self.keep, :], v),
++                    tree_map(lambda x: x[..., trim_size + self.keep :, :], v),
++                ]
++            else:
++                parts = [v]
++            if append is not None:
++                parts.append(append)
++            if len(parts) == 1:
++                return parts[0]
++            result = tree_map(
++                lambda *arrs: mx.concatenate(arrs, axis=2), *parts
++            )
++            return result
++        # Unquantized fallback (should not happen after first quantize)
++        return super()._trim(trim_size, v, append)
++
++    def _temporal_order(self, v):
++        """Rearrange the cache into temporal order, slicing off the end if unused."""
++        if self._is_quantized(v):
++            seq_len = v[0].shape[2]
++            if self._idx == seq_len:
++                return v
++            elif self._idx < self.offset:
++                return tree_map(
++                    lambda x: mx.concatenate(
++                        [
++                            x[..., : self.keep, :],
++                            x[..., self._idx :, :],
++                            x[..., self.keep : self._idx, :],
++                        ],
++                        axis=2,
++                    ),
++                    v,
++                )
++            else:
++                return tree_map(lambda x: x[..., : self._idx, :], v)
++        return super()._temporal_order(v)
++
++    def _update_concat(self, keys, values):
++        # Quantize the incoming keys/values
++        q_keys = list(
++            mx.quantize(keys, group_size=self.key_group_size, bits=self.key_bits)
++        )
++        q_values = list(
++            mx.quantize(
++                values, group_size=self.value_group_size, bits=self.value_bits
++            )
++        )
++
++        if self.keys is None:
++            self.keys = q_keys
++            self.values = q_values
++        else:
++            self.keys = self._temporal_order(self.keys)
++            self.values = self._temporal_order(self.values)
++            self._idx = self._seq_len()
++
++            trim_size = self._idx - self.max_size + 1
++            self.keys = self._trim(trim_size, self.keys, q_keys)
++            self.values = self._trim(trim_size, self.values, q_values)
++
++        self.offset += keys.shape[2]
++        self._idx = self._seq_len()
++        return self.keys, self.values
++
++    def _update_in_place(self, keys, values):
++        B, n_kv_heads, S, k_head_dim = keys.shape
++        v_head_dim = values.shape[3]
++        prev = self.offset
++
++        if self.keys is None or (
++            prev >= self._seq_len() and self._seq_len() < self.max_size
++        ):
++            new_size = min(self.step, self.max_size - prev)
++            shape = (B, n_kv_heads, new_size)
++
++            def _init_quant(dim, bits, gs):
++                el_per_int = 8 * mx.uint32.size // bits
++                return [
++                    mx.zeros((*shape, dim // el_per_int), dtype=mx.uint32),
++                    mx.zeros((*shape, dim // gs), dtype=keys.dtype),
++                    mx.zeros((*shape, dim // gs), dtype=keys.dtype),
++                ]
++
++            if self.keys is not None:
++                new_k = _init_quant(k_head_dim, self.key_bits, self.key_group_size)
++                new_v = _init_quant(
++                    v_head_dim, self.value_bits, self.value_group_size
++                )
++                self.keys = tree_map(
++                    lambda a, b: mx.concatenate([a, b], axis=2),
++                    self.keys,
++                    new_k,
++                )
++                self.values = tree_map(
++                    lambda a, b: mx.concatenate([a, b], axis=2),
++                    self.values,
++                    new_v,
++                )
++            else:
++                self.keys = _init_quant(
++                    k_head_dim, self.key_bits, self.key_group_size
++                )
++                self.values = _init_quant(
++                    v_head_dim, self.value_bits, self.value_group_size
++                )
++            self._idx = prev
++
++        # Trim if needed
++        trim_size = self._seq_len() - self.max_size
++        if trim_size > 0:
++            self.keys = self._trim(trim_size, self.keys)
++            self.values = self._trim(trim_size, self.values)
++            self._idx = self.max_size
++
++        # Rotate
++        if self._idx == self.max_size:
++            self._idx = self.keep
++
++        # Quantize and assign
++        q_keys = mx.quantize(
++            keys, group_size=self.key_group_size, bits=self.key_bits
++        )
++        q_values = mx.quantize(
++            values, group_size=self.value_group_size, bits=self.value_bits
++        )
++        for i in range(len(self.keys)):
++            self.keys[i][..., self._idx : self._idx + S, :] = q_keys[i]
++            self.values[i][..., self._idx : self._idx + S, :] = q_values[i]
++
++        self.offset += S
++        self._idx += S
++
++        # If the buffer is not full, slice off the end
++        if self.offset < self.max_size:
++            return (
++                tree_map(lambda x: x[..., : self.offset, :], self.keys),
++                tree_map(lambda x: x[..., : self.offset, :], self.values),
++            )
++        return self.keys, self.values
++
++    @property
++    def state(self):
++        if self.keys is None:
++            return []
++        seq_len = self._seq_len()
++        if self.offset < seq_len:
++            return (
++                tree_map(lambda x: x[..., : self.offset, :], self.keys),
++                tree_map(lambda x: x[..., : self.offset, :], self.values),
++            )
++        return self.keys, self.values
++
++    @state.setter
++    def state(self, v):
++        if v is not None and v:
++            self.keys, self.values = v
++        else:
++            self.keys = None
++            self.values = None
++
++    @property
++    def meta_state(self):
++        return tuple(
++            map(
++                str,
++                (
++                    self.keep,
++                    self.max_size,
++                    self.offset,
++                    self._idx,
++                    self.key_group_size,
++                    self.key_bits,
++                    self.value_group_size,
++                    self.value_bits,
++                ),
++            )
++        )
++
++    @meta_state.setter
++    def meta_state(self, v):
++        if len(v) == 4:
++            # Backward compat: old RotatingKVCache format
++            self.keep, self.max_size, self.offset, self._idx = map(int, v)
++        else:
++            (
++                self.keep,
++                self.max_size,
++                self.offset,
++                self._idx,
++                self.key_group_size,
++                self.key_bits,
++                self.value_group_size,
++                self.value_bits,
++            ) = map(int, v)
++
++    @property
++    def nbytes(self):
++        if self.keys is None:
++            return 0
++        return tree_reduce(lambda a, x: a + x.nbytes, (self.keys, self.values), 0)
++
++    def to_quantized(
++        self, group_size: int = 64, bits: int = 4
++    ) -> "QuantizedRotatingKVCache":
++        return self
++
++
+ class ArraysCache(_BaseCache):
+     def __new__(cls, *args, **kwargs):
+         instance = super().__new__(cls)

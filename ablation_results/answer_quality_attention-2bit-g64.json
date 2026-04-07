@@ -1,0 +1,90 @@
+[
+  {
+    "id": 0,
+    "prompt": "What is 2+2? Answer with just the number.",
+    "response": "4",
+    "tokens": 1,
+    "time_s": 0.27,
+    "tok_per_sec": 3.7,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 1,
+    "prompt": "Solve: 17 × 23. Show your work step by step.",
+    "response": "Here is how to solve $17 \\times 23$ step by step.\n\n**1. Multiplication Strategy**\n\nTo solve $17 \\times 23$, you can use the standard multiplication algorithm.\n\n* **Multiply 7 by 2:**\n   $7 \\times 2 = 14$\n* **Multiply 7 by 3:**\n   $7 \\times 2 = 14$\n* **Multiply 2 by 3:**\n   $2 \\times 3 = 6$\n* **Combine the numbers:**\n   $17 \\times 23$\n   ---\n   $3 \\times 2 = 6$\n   $10 \\times 3 = 30$\n   ---\n   **Solution:**\n   $3 \\times 2 = 6$\n   ---\n   **Solution:**\n   **17**\n\n**Solution:**\n* **Step 1:**\n   * $3 \\times 2 = 6$\n   * **Solution:**\n   * **17**\n   * **$17$**\n\n**Solution:**\n   **Correct**\n\n**Answer:**\n**17**",
+    "tokens": 258,
+    "time_s": 7.75,
+    "tok_per_sec": 33.3,
+    "correctness": 1,
+    "completion": 1,
+    "reasoning_hygiene": 1
+  },
+  {
+    "id": 2,
+    "prompt": "If a train travels 120 km in 2 hours, what is its average speed in m/s?",
+    "response": "To find the speed of a train, you need to divide the distance by the time it is traveling.\n\nThe problem states: **\"If a train travels 120 km in 2 hours, you would calculate its speed by dividing the distance by the time. Since the speed is the distance divided by the time. **\n\nThe formula for speed is:\n$$\\text{Speed} = \\frac{\\text{Distance}}{\\text{Time}}$$\n\nThe unit for speed is **meters per second ($\\text{m/s}$)**.\n\nThe unit for speed is **meters per second ($\\text{m/s}$)**.\n\n**The speed of a train is the rate at which an object is traveling. It is the distance covered by a body per unit of time.**\n\nIf you are asked to find the speed of a train, you would calculate the distance divided by the time it takes to travel.\n\nIf you are asked for the speed of a train, you would calculate the speed by dividing the distance by the time.",
+    "tokens": 212,
+    "time_s": 6.21,
+    "tok_per_sec": 34.1,
+    "correctness": 2,
+    "completion": 1,
+    "reasoning_hygiene": 1
+  },
+  {
+    "id": 3,
+    "prompt": "What is the derivative of x³ + 2x² - 5x + 3?",
+    "response": "To find the derivative of a function, we use the rules of differentiation.\n\nHere is the function you've presented: $f(x) = x^3 + 2x^2 - 5x + 3$\n\nTo find the derivative, we use the **Sum Rule** and the **Constant Rule**.\n\n**The rules of differentiation you need to know are:**\n\n1. **The Power Rule:** If $f(x) = ax^n + b$, then the derivative of $f(x)$ with respect to $x$ is $f'(x) = 3$\n2. The derivative of a constant is zero.\n3. The derivative of a sum is the sum of the derivatives\n4. The derivative of a function is the integral of the function\n    $$\\text{If } f(x) = x^n \\text{, then } f'(x) = \\text{the derivative of } x \\text{ with respect to $x$ is $f'(x) = \\text{the derivative of } x \\text{ with respect to $x$}$$\n\n---\n\n### The derivative of $f(x) = x^3 + 2x^2 - 5x + 3$\n\nIf you are asking for the derivative of the function $f(x) = x^3 + 2x^2 - 5x + 3$, the derivative is:\n\n**The derivative of $x$ with respect to $x$ is:**\n\n$$\\frac{d}{dx} \\left( x^3 + 2x^2 - 5x + 3 \\right)$$\n\n---\n\n**If you were asking for the derivative of the function, you would be looking for:**\n\n**The derivative of the function $f(x)$ with respect to $x$**\n\n---\n\n**If you were asking for the derivative of the function $f(x)$ with respect to $x$**\n\n**If you were asking for the derivative of $f(x)$ with respect to $x$**",
+    "tokens": 434,
+    "time_s": 13.13,
+    "tok_per_sec": 33.1,
+    "correctness": 1,
+    "completion": 1,
+    "reasoning_hygiene": 1
+  },
+  {
+    "id": 4,
+    "prompt": "A box has 3 red, 5 blue, and 2 green balls. What's the probability of picking blue?",
+    "response": "To calculate the probability of picking a ball, you need more information.\n\n**To tell you the probability, you need to tell me:**\n\n* **What is the box?** (e.g., \"I need to pick a ball from?\")\n* **What is the total number of balls?** (e.g., \"How many balls are in the box?\")\n\n**If you tell me what you need to calculate, I can give you the probability.**\n\n**For example, if you tell me:**\n\n* **\"What is the probability of picking a ball?\"**\n\n**I would answer:**\n\n* **\"The probability of picking a ball is a thing that exists in the box.\"**\n\n---\n\n**If you are asking for the probability, I would need to know what you are asking about.**\n\n**If you are asking about the probability of picking a ball, I would need to be told what you are asking about.**\n\n**If you are asking about the probability of picking a ball, I would need to be told what you are asking about.**\n\n**If you are asking about the probability of picking a ball, I would need to be told what you are asking about.**\n\n**If you are asking about the probability of picking a ball, I would need to be told what you are asking about.**\n\n**If you are asking about the probability of picking a ball, I would need to be told what you are asking about**",
+    "tokens": 299,
+    "time_s": 8.97,
+    "tok_per_sec": 33.3,
+    "correctness": 1,
+    "completion": 1,
+    "reasoning_hygiene": 1
+  },
+  {
+    "id": 5,
+    "prompt": "What is the sum of the first 100 positive integers?",
+    "response": "This is a question that requires a specific answer. Since you haven't provided any numbers, I will assume you are asking for the sum of the first 100 positive integers.\n\n**If you are asking for the sum of the first 100 positive integers, you would be asking for the sum of the sequence $1, 2, 3, \\dots, 100$.**\n\nIf you are asking for the sum of the first 100 positive integers, you are asking for the sum of the series:\n$$S = 1 + 2 + 3 + \\dots + 100$$\n\nThis is the sum of the first 100 positive integers.\n\nThe formula for the sum of the first $n$ positive integers is given by the formula for the sum of an arithmetic series, which is the sum of the first $n$ terms of the sequence $1, 2, 3, \\dots, n$.\n\nThe formula for the sum of the first $n$ positive integers is given by the formula for the sum of an arithmetic series, which is the sum of the first $n$ positive integers.\n\nThe sum of the first $n$ positive integers is given by the formula:\n$$S_n = 1 + 2 + 3 + \\dots + n$$\n\nThe sum of the first $n$ positive integers is given by the formula for the sum of the first $n$ positive integers.\n\nThe sum of the first $n$ positive integers is the sum of the first $n$ positive integers.\n\nThe sum of the first $n$ positive integers is the sum of the first $n$ positive integers.\n\nThe sum of the first $n$ positive integers is the sum of the first $n$ positive integers.\n\nThe sum of the first $n$ positive integers is the sum of the first $n$ positive integers.\n\nThe sum of the first $n$ positive integers is the sum of the first $n$ positive integers.\n\nThe sum of the first $n$ positive integers is the sum of the first $n$ positive integers.\n\nThe sum of the first $n$ positive integers is the sum of the first $n$ positive integers.\n\nThe sum of the first $n$ positive integers is the sum of the first $n$ positive integers.\n\nThe sum of the first $n$ positive integers is the sum of the first $n",
+    "tokens": 512,
+    "time_s": 15.21,
+    "tok_per_sec": 33.7,
+    "correctness": 1,
+    "completion": 1,
+    "reasoning_hygiene": 1
+  },
+  {
+    "id": 6,
+    "prompt": "Convert 0.375 to a fraction in simplest form.",
+    "response": "To convert a decimal to a fraction, you need to express the relationship as a fraction.\n\n**0.375 as a fraction:**\n\n1. **Identify the place value:** 0.375 is a number that represents a part of a set.\n2. **Write the decimal as a fraction:** $0.375$ is a number that can be written as a fraction by placing the digits over a denominator.\n\n**How to write 0.375 as a fraction:**\n\n* **The number is 0.375.**\n* **The place value is $\\frac{3}{10}$**\n\n**How to write 0.375 as a fraction in simplest form:**\n\n1. **Write the decimal as a fraction over 1000:**\n   $$\\frac{3}{10}$$\n2. **Convert the fraction to a decimal:**\n   $$\\frac{3}{10} = 0.375$$\n3. **Convert the decimal to a fraction in simplest form:**\n   * The decimal is $0.375$.\n   * To get the fraction, we write it as a fraction over 1000.\n   * $\\frac{3}{10}$\n   * Simplify the fraction by dividing the numerator and the denominator by 10:\n     $$\\frac{3}{10} = \\frac{3}{10}$$\n   * Simplify the fraction by dividing the numerator and the denominator by 10:\n     $$\\frac{3}{10} = 0.375$$\n   * Simplify the fraction by dividing the numerator and the denominator by 10:\n     $$\\frac{3}{10} = 0.375$$\n   * Simplify the fraction by dividing the numerator and the denominator by 10:\n     $$\\frac{3}{10} = 0.375$$\n   * Simplify the fraction by dividing the numerator and the denominator by 10:\n     $$\\frac{3}{10} = 0.375$$\n   * Simplify the fraction by dividing the numerator and the denominator by 10:\n     $$\\frac{3}{10} = 0.375$$\n   * Simplify the fraction by dividing the numerator and the denominator by 10:\n     $$\\frac{3}{10",
+    "tokens": 512,
+    "time_s": 15.23,
+    "tok_per_sec": 33.6,
+    "correctness": 1,
+    "completion": 1,
+    "reasoning_hygiene": 1
+  },
+  {
+    "id": 7,
+    "prompt": "If f(x) = 2x + 1 and g(x) = x², what is f(g(3))?",
+    "response": "This is a bit of a trick question!\n\nIf $f(x) = 2x + 1$ and $g(x) = x^2$\n\nThe question asks for $f(g(3)).$\n\nIf $f(x) = 2x + 1$ and $g(x) = x^2$\n\nThe function $f(x)$ is given as $f(x) = 2x + 1$ and $g(x) = x^2$.\n\nIf $f(x) = 2x + 1$ and $g(x) = x^2$, then $f(x)$ is a function.\n\nIf $f(x) = 2x + 1$ and $g(x) = x^2$, then $f(x)$ is a function.",
+    "tokens": 181,
+    "time_s": 5.6,
+    "tok_per_sec": 32.3,
+    "correctness": 1,
+    "completion": 1,
+    "reasoning_hygiene": 1
+  }
+]

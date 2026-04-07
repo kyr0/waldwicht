@@ -1,0 +1,90 @@
+[
+  {
+    "id": 0,
+    "prompt": "What is 2+2? Answer with just the number.",
+    "response": "4",
+    "tokens": 1,
+    "time_s": 0.26,
+    "tok_per_sec": 3.8,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 1,
+    "prompt": "Solve: 17 \u00d7 23. Show your work step by step.",
+    "response": "Here's the step-by-step solution to $17 \\times 23$:\n\n**Problem:** $17 \\times 23$\n\n**Method 1: Standard Multiplication**\n\n1. **Identify the numbers:** The numbers are 17 and 23.\n2. **Multiply the ones place:** $1 \\times 2 = 2$\n3. **Multiply the tens place:** $1 \\times 1 = 1$\n4. **Combine the results:** The result is $100$ (Wait, this is incorrect. Let's re-check the standard place values).\n\nLet's re-apply the standard place values:\n* $17$ (10s)\n* $23$ (10s)\n\n**Standard Place Value Step-by-Step:**\n\n1. **Ones place:** $1 \\times 2 = 2$\n2. **Tens place:** $1 \\times 10 = 10$\n3. **Add the partial products:** $2 + 10 = 12$\n\n**Alternative Method (Standard Form):**\n\n1. **Ones place:** $1 \\times 23 = 23\n2. **Tens place:** $10 \\times 1 = 10\n3. **Ones place:** $1 \\times 100 = 100\n4. **Check the standard place values:**\n   * $100$\n   * $10$\n   * $100 + 10 = 110$\n\n**Wait, let's re-check the standard place values:**\n* $17 \\times 23$\n* $100$ (Error in previous standard place values check)\n* $100$\n* $100 + 10 = 110$\n\nLet's re-check the standard place values:\n* $100$\n* $100 + 10 = 110$\n\nLet's re-check the standard place values:\n* $100$\n* $100 + 10 = 110$\n\nLet's re-check the standard place values:\n* $100$\n* $100 + 10 = 11",
+    "tokens": 512,
+    "time_s": 14.45,
+    "tok_per_sec": 35.4,
+    "correctness": 0,
+    "completion": 1,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 2,
+    "prompt": "If a train travels 120 km in 2 hours, what is its average speed in m/s?",
+    "response": "Here's how to solve the problem in steps:\n\n**1. Understand the relationship between distance and time to find the speed:**\n\n* **Distance:** 120 km\n* **Time:** 2 hours\n\n**2. Calculate the average speed in km/h:**\n\n* Speed is distance divided by time.\n* Speed = $120 \\text{ km} / 2 \\text{ hours} = 60 \\text{ km/h}$\n\n**3. Convert the speed from km/h to m/s:**\n\nTo convert from km/h to m/s, we use the conversion factor:\n* $1 \\text{ km} = 1000.1092-meter}$\n* $1 \\text{ hour} = 1000000} \\text{ (This is a common approximation, but for exact conversion, we use the standard factor: $1 \\text{ km} = 1000 \\text{ m} \\times 1000000 / 1000000 = 1000000 / 1000000 = 1 \\text{ m} / 1000000$\n\n* **The conversion factor:**\n   * Since $1 \\text{ km} = 1000 \\text{ m}$ (This is incorrect, the correct factor is $1 \\text{ km} = 1000 \\text{ m}$ if we use the standard conversion factor).\n   * Therefore, $1 \\text{ km} = 1000 \\text{ m}$ (If we use the standard conversion factor, $1 \\text{ km} = 1000 \\text{ m}$ is only true if we use the exact conversion factor).\n   * **Let's use the standard conversion factor:**\n     * $1 \\text{ km} = 1000 \\text{ m}$ (This is incorrect. The correct factor is $1 \\text{ km} = 1000 \\text{ m}$ if we use the standard conversion factor).\n     * **Let's use the standard conversion factor:**\n       * $1 \\text{ km} = 1000 \\text{ m}$ (This is incorrect).\n       * **Let's use the standard",
+    "tokens": 512,
+    "time_s": 14.03,
+    "tok_per_sec": 36.5,
+    "correctness": 0,
+    "completion": 1,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 3,
+    "prompt": "What is the derivative of x\u00b3 + 2x\u00b2 - 5x + 3?",
+    "response": "The derivative of $x^3 + 2x^2 - 5x + 3$ is found by taking the derivative of each term with respect to $x$ and its other terms.\n\nWe are differentiating with respect to $x$. We will use the power rule and the rule for the derivative of a constant.\n\nWe are looking for the derivative with respect to $x, so we will use the **power rule** and the **linearity of the derivative**.\n\nWe are differentiating the function $f(x) = x^3 + 2x^2 - 5x + 3$ with respect to $x.\n\nWe will find the partial or total derivative by applying the standard differentiation rules to each term:\n\n1. **Derivative of $x^3$:**\n   $$\\frac{d}{dx} (x^3) = 3x^{3-1} = 3x^2$$\n\n2. **Derivative of $2x^2:**\n   $$\\frac{d}{dx} (2x^2) = 2 \\cdot \\frac{d}{dx} (x^2) = 2 \\cdot (2x^{2-1}) = 2x^1$$\n\n3. **Derivative of $-5x:**\n   $$\\frac{d}{dx} (-5x) = -5 \\cdot \\frac{d}{dx} (x) = -5 \\cdot 1 = -5$$\n\n4. **Derivative of $3:**\n   $$\\frac{d}{dx} (3) = 0$$\n\nCombining these results:\n$$\\frac{d}{dx} (x^3 + 2x^2 - 5x + 3) = \\frac{d}{dx}(x^3) + \\frac{d}{dx}(2x^2) - \\frac{d}{dx}(5x) + \\frac{d}{dx}(3)$$\n\nWe can now find the derivative of the entire expression:\n$$\\frac{d}{dx} (x^3 + 2x^2 - 5x + 3) = 1 \\cdot (x^3) + \\frac{d}{dx}(2x^2) - \\frac{d}{dx}(5x) - \\frac{d}{dx}(3)$$\n\n**Let's re-examine the question and the standard notation for derivatives.**\n\nIf the question is",
+    "tokens": 512,
+    "time_s": 13.59,
+    "tok_per_sec": 37.7,
+    "correctness": 2,
+    "completion": 2,
+    "reasoning_hygiene": 2
+  },
+  {
+    "id": 4,
+    "prompt": "A box has 3 red, 5 blue, and 2 green balls. What's the probability of picking blue?",
+    "response": "Here's how to determine the probability of picking a blue ball:\n\n**1. Define the sample space (the set of all possible outcomes):**\n* The balls are: 3 red, 5 blue, and 2 green.\n* **Total number of balls:** $3 + 5 + 2 = 10$\n\n**2. Define the event (picking a blue):**\n* The number of blue balls is: 5\n* **Favorable outcomes:** 5\n\n**3. Calculate the probability:**\nThe probability of an event is calculated as:\n$$\\text{P}(\\text{Event}) = \\frac{\\text{Number of favorable outcomes}}{\\text{Total number of outcomes}}$$\n\n$$\\text{P}(\\text{Blue}) = \\frac{5}{10}$$\n\n**4. Simplify the fraction:**\n$$\\frac{5}{10} = \\frac{1}{2}$\n\n**Answer:**\n\nThe probability of picking a blue ball is $\\frac{5}{10}$ or $\\frac{1}{2}$ (which is also $0.5$ or $50\\%$).",
+    "tokens": 238,
+    "time_s": 6.44,
+    "tok_per_sec": 36.9,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 5,
+    "prompt": "What is the sum of the first 100 positive integers?",
+    "response": "Here are a a couple of ways to think of this problem and how to solve it.\n\n## Method 1: Using the Formula (The most standard approach)\n\nThe sum of the first $n$ positive integers is given by the formula:\n$$\\text{Sum} = \\frac{n(n+1)}{2}$$\n\nIn this case, $n = 100$.\n\n$$\\text{Sum} = \\frac{100(100+1)}{2}$$\n$$\\text{Sum} = \\frac{100(101)}{2}$$\n$$\\text{Sum} = \\frac{10000}{2}$$\n$$\\text{Sum} = 5000$$\n\n---\n\n## Method 2: Using the Summation Formula (Mathematical perspective)\n\nWe are calculating the sum: $1 + 2 + 3 + \\dots + 100$.\n\nWe use the standard formula for the sum of an arithmetic progression:\n$$\\text{Sum} = \\frac{n}{2} \\times (\\text{First term} + \\text{Last term})$$\n\nHere, $n = 100$.\n$$\\text{Sum} = \\frac{100}{2} \\times (1 + 100)$$\n$$\\text{Sum} = 50 \\times (101)$$\n$$\\text{Sum} = 5050$$\n\n**Wait, let's re-check the previous calculation.**\n\nThe previous calculation was:\n$$\\text{Sum} = \\frac{10000}{2}$$\n$$\\text{Sum} = 5000$$\n\nLet's check the terms:\n*The first term is 1.*\n*The last term is 100.*\n*The number of terms is 100.*\n\nThe correct formula for the sum is:\n$$\\text{Sum} = \\frac{n(n+1)}{2}$$\nIf $n=100$:\n$$\\text{Sum} = \\frac{100 \\times (100+1)}{2} \\text{ (Error in the setup check)}$$\n$$\\text{Sum} = \\frac{100}{2} \\times 100 \\text{ (Incorrect setup)}$$\n\nLet's re-apply the standard formula:\n$$\\text",
+    "tokens": 512,
+    "time_s": 13.17,
+    "tok_per_sec": 38.9,
+    "correctness": 0,
+    "completion": 3,
+    "reasoning_hygiene": 1
+  },
+  {
+    "id": 6,
+    "prompt": "Convert 0.375 to a fraction in simplest form.",
+    "response": "Here're the steps to convert $0.375$ to a fraction in a and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and",
+    "tokens": 512,
+    "time_s": 13.19,
+    "tok_per_sec": 38.8,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 7,
+    "prompt": "If f(x) = 2x + 1 and g(x) = x\u00b2, what is f(g(3))?",
+    "response": "Here's how to solve the problem:\n\nWe are given the functions:\n* $f(x) = 2x + 1$\n* $g(x) = x^2$\n\nWe need to find the value of $f(g(3))$. We work from the inside out:\n\n1. **Start with the inside function, $g(3)$:**\n   $$g(3) = 3^2 = 9$$\n\n2. **Now substitute this result (9) into the function $f(x)$: **\n   $$f(g(3)) = f(9)$$\n\n3. **Calculate the final result:**\n   $$f(9) = 2(9) + 1$$\n   $$f(9) = 18 + 1$$\n   $$f(g(3)) = 19$$\n\n**Answer:**\n$$f(g(3)) = 19$$",
+    "tokens": 203,
+    "time_s": 5.64,
+    "tok_per_sec": 36.0,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  }
+]

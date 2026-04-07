@@ -1,0 +1,242 @@
+[
+  {
+    "name": "bf16",
+    "bits": 16,
+    "group_size": null,
+    "transforms": "none",
+    "size_gb": 10.247,
+    "ppl": 43301.66,
+    "generation": [
+      {
+        "prompt": "What is 2+2? Answer with just the number.",
+        "response": "4",
+        "tokens": 1,
+        "tok_per_sec": 2.790972384418267
+      },
+      {
+        "prompt": "Explain quantum entanglement in 2 sentences.",
+        "response": "Quantum entanglement is a phenomenon where two or more particles become linked in such a way that they share the same fate, regardless of the distance",
+        "tokens": 48,
+        "tok_per_sec": 17.75505806803919
+      },
+      {
+        "prompt": "Write a Python function that checks if a string is a palindrome.",
+        "response": "Here are a few ways to write a Python function to check if a string is a palindrome, ranging from the simplest (using slicing) to a more robust versio",
+        "tokens": 60,
+        "tok_per_sec": 18.384301803297408
+      },
+      {
+        "prompt": "What are the three laws of thermodynamics? Be concise.",
+        "response": "Here are the three laws of thermodynamics, concisely:",
+        "tokens": 60,
+        "tok_per_sec": 18.44330012353272
+      },
+      {
+        "prompt": "Translate 'The cat sat on the mat' into French.",
+        "response": "The translation of \"The cat sat on the mat\" into French is:",
+        "tokens": 60,
+        "tok_per_sec": 18.67782683159913
+      }
+    ]
+  },
+  {
+    "name": "q4-g64",
+    "bits": 4,
+    "group_size": 64,
+    "transforms": "none",
+    "size_gb": 3.852,
+    "ppl": 32442.86,
+    "generation": [
+      {
+        "prompt": "What is 2+2? Answer with just the number.",
+        "response": "4",
+        "tokens": 1,
+        "tok_per_sec": 0.32205406768419365
+      },
+      {
+        "prompt": "Explain quantum entanglement in 2 sentences.",
+        "response": "Quantum entanglement is a bizarre phenomenon where two or more particles become linked in such a way that they share the same fate, regardless of the ",
+        "tokens": 56,
+        "tok_per_sec": 42.18411468253306
+      },
+      {
+        "prompt": "Write a Python function that checks if a string is a palindrome.",
+        "response": "Here are a few ways to write a Python function to check if a string is a palindrome, depending on what you need to handle (case sensitivity, spaces, e",
+        "tokens": 60,
+        "tok_per_sec": 43.40534434842631
+      },
+      {
+        "prompt": "What are the three laws of thermodynamics? Be concise.",
+        "response": "The three laws of thermodynamics are:",
+        "tokens": 53,
+        "tok_per_sec": 42.05665645417186
+      },
+      {
+        "prompt": "Translate 'The cat sat on the mat' into French.",
+        "response": "The French translation of \"The cat sat on the mat\" is:",
+        "tokens": 60,
+        "tok_per_sec": 43.51104762319716
+      }
+    ]
+  },
+  {
+    "name": "q3-g128",
+    "bits": 3,
+    "group_size": 128,
+    "transforms": "none",
+    "size_gb": 2.98,
+    "ppl": 14700.8,
+    "generation": [
+      {
+        "prompt": "What is 2+2? Answer with just the number.",
+        "response": "4",
+        "tokens": 1,
+        "tok_per_sec": 0.8033753877719575
+      },
+      {
+        "prompt": "Explain quantum entanglement in 2 sentences.",
+        "response": "Quantum entanglement is a phenomenon where **two or more quantum particles become interconnected in such a way that their quantum entanglement is the ",
+        "tokens": 60,
+        "tok_per_sec": 57.22101207729688
+      },
+      {
+        "prompt": "Write a Python function that checks if a string is a palindrome.",
+        "response": "Here is a Python function to check if a string is a palindrome.",
+        "tokens": 60,
+        "tok_per_sec": 58.10733978000055
+      },
+      {
+        "prompt": "What are the three laws of thermodynamics? Be concise.",
+        "response": "The three laws of thermodynamics are:",
+        "tokens": 60,
+        "tok_per_sec": 58.192931056410494
+      },
+      {
+        "prompt": "Translate 'The cat sat on the mat' into French.",
+        "response": "There are a few ways to translate \"The cat sat on the mat\" into French, depending on the desired nuance and context. Here are the most common and natu",
+        "tokens": 60,
+        "tok_per_sec": 58.101812560200884
+      }
+    ]
+  },
+  {
+    "name": "q3-g64",
+    "bits": 3,
+    "group_size": 64,
+    "transforms": "none",
+    "size_gb": 3.271,
+    "ppl": 5452.18,
+    "generation": [
+      {
+        "prompt": "What is 2+2? Answer with just the number.",
+        "response": "4",
+        "tokens": 1,
+        "tok_per_sec": 0.778854427914021
+      },
+      {
+        "prompt": "Explain quantum entanglement in 2 sentences.",
+        "response": "Quantum entanglement is a phenomenon where the quantum state of two or more particles is intrinsically linked, no matter the physical distance between",
+        "tokens": 55,
+        "tok_per_sec": 49.63706481958244
+      },
+      {
+        "prompt": "Write a Python function that checks if a string is a palindrome.",
+        "response": "```python",
+        "tokens": 60,
+        "tok_per_sec": 51.78248979919381
+      },
+      {
+        "prompt": "What are the three laws of thermodynamics? Be concise.",
+        "response": "The three laws of thermodynamics are:",
+        "tokens": 60,
+        "tok_per_sec": 50.59952186877329
+      },
+      {
+        "prompt": "Translate 'The cat sat on the mat' into French.",
+        "response": "Here are a few ways to translate \"The cat sat on the mat\" into French, depending on the desired nuance:",
+        "tokens": 60,
+        "tok_per_sec": 50.488900730214326
+      }
+    ]
+  },
+  {
+    "name": "q3-plain-e4",
+    "bits": 3,
+    "group_size": 128,
+    "transforms": "none",
+    "size_gb": 3.58,
+    "ppl": 18541.99,
+    "generation": [
+      {
+        "prompt": "What is 2+2? Answer with just the number.",
+        "response": "4",
+        "tokens": 1,
+        "tok_per_sec": 0.793327753583098
+      },
+      {
+        "prompt": "Explain quantum entanglement in 2 sentences.",
+        "response": "Quantum entanglement is a phenomenon where two or more particles become interconnected in such a way that their individual quantum states are correlat",
+        "tokens": 56,
+        "tok_per_sec": 49.21666553515766
+      },
+      {
+        "prompt": "Write a Python function that checks if a string is a palindrome.",
+        "response": "Here are a few ways to write a Python function to check if a string is a palindrome, with explanations and examples.",
+        "tokens": 60,
+        "tok_per_sec": 51.63254017624862
+      },
+      {
+        "prompt": "What are the three laws of thermodynamics? Be concise.",
+        "response": "The three laws of thermodynamics are:",
+        "tokens": 60,
+        "tok_per_sec": 51.57549419346377
+      },
+      {
+        "prompt": "Translate 'The cat sat on the mat' into French.",
+        "response": "Here are a few ways to translate \"The cat sat on the mat\" into French, depending on the desired nuance:",
+        "tokens": 60,
+        "tok_per_sec": 51.27443096210013
+      }
+    ]
+  },
+  {
+    "name": "q3-rotq-sanity",
+    "bits": 3,
+    "group_size": 128,
+    "transforms": "rotation+eq+perm",
+    "size_gb": 3.58,
+    "ppl": 12276.41,
+    "generation": [
+      {
+        "prompt": "What is 2+2? Answer with just the number.",
+        "response": "4",
+        "tokens": 1,
+        "tok_per_sec": 0.7310545281135803
+      },
+      {
+        "prompt": "Explain quantum entanglement in 2 sentences.",
+        "response": "Quantum entanglement is a phenomenon where pairs or groups of quantum particles become intrinsically linked, such that measuring the property of one i",
+        "tokens": 55,
+        "tok_per_sec": 41.61983549205434
+      },
+      {
+        "prompt": "Write a Python function that checks if a string is a palindrome.",
+        "response": "Here are a few ways to write a Python function that checks if a string is a palindrome.",
+        "tokens": 60,
+        "tok_per_sec": 43.0166715980807
+      },
+      {
+        "prompt": "What are the three laws of thermodynamics? Be concise.",
+        "response": "The three laws of thermodynamics are:",
+        "tokens": 60,
+        "tok_per_sec": 42.862862746928165
+      },
+      {
+        "prompt": "Translate 'The cat sat on the mat' into French.",
+        "response": "The translation of \"The cat sat on the mat\" into French is:",
+        "tokens": 39,
+        "tok_per_sec": 38.67477370657809
+      }
+    ]
+  }
+]

@@ -1,0 +1,222 @@
+[
+  {
+    "id": 0,
+    "prompt": "You have access to a function: get_weather(city: str) -> dict. Call it to find the weather in Tokyo. Show the function call in JSON format.",
+    "response": "```json\n{\n  \"function_call\": {\n    \"name\": \"get_weather\",\n    \"arguments\": {\n      \"city\": \"Tokyo\"\n    }\n  }\n}\n```",
+    "tokens": 46,
+    "time_s": 1.12,
+    "tok_per_sec": 41.2,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 1,
+    "prompt": "You have access to: translate(text: str, target_lang: str) -> str and summarize(text: str, max_words: int) -> str. A user says: 'Translate this to French and summarize in 20 words: The quick brown fox jumps over the lazy dog near the riverbank on a sunny afternoon.' Show both function calls in JSON.",
+    "response": "```json\n[\n  {\n    \"function\": \"translate\",\n    \"arguments\": {\n      \"text\": \"The quick brown fox jumps over the lazy dog near the riverbank on a sunny afternoon.\",\n      \"target_lang\": \"French\"\n    }\n  },\n  {\n    \"function\": \"summarize\",\n    \"arguments\": {\n      \"text\": \"The quick brown fox jumps over the lazy dog near the riverbank on a sunny afternoon.\",\n      \"max_words\": 20\n    }\n  }\n]\n```",
+    "tokens": 123,
+    "time_s": 2.43,
+    "tok_per_sec": 50.6,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 2,
+    "prompt": "You have access to: search_db(query: str, limit: int) -> list and send_email(to: str, subject: str, body: str) -> bool. A user says: 'Find the top 3 orders for customer alice@example.com and email her a summary.' Show the function calls you would make, in order, as JSON.",
+    "response": "```json\n[\n  {\n    \"function\": \"search_db\",\n    \"arguments\": {\n      \"query\": \"orders for customer alice@example.com\",\n      \"limit\": 3\n    }\n  },\n  {\n    \"function\": \"send_email\",\n    \"arguments\": {\n      \"to\": \"alice@example.com\",\n      \"subject\": \"Summary of your top 3 orders\",\n      \"body\": \"Here is a summary of your top 3 orders: [Order details will be inserted here by processing the search_db result].\"\n    }\n  }\n]\n```",
+    "tokens": 138,
+    "time_s": 2.71,
+    "tok_per_sec": 50.8,
+    "correctness": 9,
+    "completion": 9,
+    "reasoning_hygiene": 9
+  },
+  {
+    "id": 3,
+    "prompt": "You have these tools:\n- list_files(directory: str) -> list[str]\n- read_file(path: str) -> str\n- write_file(path: str, content: str) -> bool\n- run_command(cmd: str) -> str\n\nA user says: 'List all Python files in /src, read the one called main.py, add a comment at the top saying # Updated 2026-04-07, write it back, and then run python /src/main.py.'\n\nShow all function calls in order as JSON.",
+    "response": "```json\n[\n  {\n    \"tool_name\": \"list_files\",\n    \"params\": {\n      \"directory\": \"/src\"\n    }\n  },\n  {\n    \"tool_name\": \"read_file\",\n    \"params\": {\n      \"path\": \"/src/main.py\"\n    }\n  },\n  {\n    \"tool_name\": \"write_file\",\n    \"params\": {\n      \"path\": \"/src/main.py\",\n      \"content\": \"# Updated 2026-04-07\\n\"\n    }\n  },\n  {\n    \"tool_name\": \"run_command\",\n    \"params\": {\n      \"cmd\": \"python /src/main.py\"\n    }\n  }\n]\n```",
+    "tokens": 183,
+    "time_s": 3.63,
+    "tok_per_sec": 50.4,
+    "correctness": 7,
+    "completion": 8,
+    "reasoning_hygiene": 7
+  },
+  {
+    "id": 4,
+    "prompt": "Write a Python function called `flatten(nested_list)` that takes an arbitrarily nested list of integers and returns a flat list. For example, flatten([1, [2, [3, 4], 5]]) should return [1, 2, 3, 4, 5].",
+    "response": "Here are a couple of ways to implement the `flatten` function in Python, which is a very common problem.\n\n### 1. Recursive Approach (Elegant and Standard)\n\nThis approach directly handles the nesting by calling itself when it encounters a list.\n\n```python\ndef flatten(nested_list):\n    \"\"\"\n    Takes an arbitrarily nested list of integers and returns a flat list.\n    \"\"\"\n    flat_list = []\n    for element in nested_list:\n        if isinstance(element, list):\n            # If the element is a list, recursively flatten it and extend the result\n            flat_list.extend(flatten(element))\n        else:\n            # If the element is an integer, add it directly\n            flat_list.append(element)\n    return flat_list\n\n# Example Usage:\nlist1 = [1, [2, [3, 4], 5]]\nresult1 = flatten(list1)\nprint(f\"Input: {list1}\")\nprint(f\"Output: {result1}\")  # Expected: [1, 2, 3, 4, 5]\n\nlist2 = [1, 2, 3, [4, [5]], 6]\nresult2 = flatten(list2)\nprint(f\"Input: {list2}\")\nprint(f\"Output: {result2}\")  # Expected: [1, 2, 3, 4, 5, 6]\n```\n\n---\n\n### 2. Iterative Approach (Using a Stack)\n\nFor situations that might lead to very deep recursion (hitting the Python recursion limit), an iterative solution using a stack (or a `deque` or a regular `list` used as a stack) is safer.\n\n```python\ndef flatten_iterative(nested_list):\n    \"\"\"\n    Takes an arbitrarily nested list of integers and returns a flat list \n    using an iterative approach (stack).\n    \"\"\"\n    stack = [nested_list]\n    result = []\n\n    while stack:\n        current_item = stack.pop()\n        \n        if isinstance(current_item, list):\n            # If we find a sub-list, push its elements onto the stack \n            # to be processed later.\n            # We reverse the order when pushing so that the first element \n            # encountered is processed",
+    "tokens": 512,
+    "time_s": 9.62,
+    "tok_per_sec": 53.2,
+    "correctness": 9,
+    "completion": 9,
+    "reasoning_hygiene": 9
+  },
+  {
+    "id": 5,
+    "prompt": "Write a Python function `is_palindrome(s: str) -> bool` that checks if a string is a palindrome, ignoring case and non-alphanumeric characters. Include at least 3 test cases.",
+    "response": "```python\nimport re\n\ndef is_palindrome(s: str) -> bool:\n    \"\"\"\n    Checks if a string is a palindrome, ignoring case and non-alphanumeric characters.\n\n    Args:\n        s: The input string.\n\n    Returns:\n        bool: True if the string is a palindrome, False otherwise.\n    \"\"\"\n    # 1. Filter the string: keep only alphanumeric characters and convert to a consistent case.\n    # We use a generator expression for filtering and mapping.\n    processed_chars = []\n    for char in s:\n        if char.isal_alpha or char.isdigit:\n            # Convert to lowercase for case-insensitivity\n            processed_chars.append(char.lower())\n\n    # 2. Form the cleaned string\n    cleaned_s = \"\".join(processed_chars)\n\n    # 3. Check for palindrome condition\n    # A string is a palindrome if it reads the same forwards and backward.\n    # We use slicing [::-1] to reverse the string.\n    return cleaned_s == cleaned_s[::-1]\n\n# --- Test Cases ---\n\n# Test Case 1: Standard palindrome (mixed case and symbols)\ntest_1 = \"Racecar!\"\nprint(f\"Test 1 ('{test_1}'): {is_palindrome(test_1)}\")  # Expected: True (racecar)\n\n# Test Case 2: Non-palindrome\ntest_2 = \"hello world\"\nprint(f\"Test 2 ('{test_2}'): {is_palindrome(test_2)}\")  # Expected: False (helloworld)\n\n# Test Case 3: Palindrome with numbers and spaces\ntest_3 = \"madam 1am\"\nprint(f\"Test 3 ('{test_3}'): {is_palindrome(test_3)}\")  # Expected: True (madam1am)\n\n# Additional Test Case (Bonus: case and symbols)\ntest_4 = \"A man a plan a canal a panama\"\nprint(f\"Test 4 ('{test_4}'): {is_palindrome(test_4)}\")  # Expected: True\n```",
+    "tokens": 470,
+    "time_s": 8.77,
+    "tok_per_sec": 53.6,
+    "correctness": 4,
+    "completion": 7,
+    "reasoning_hygiene": 4
+  },
+  {
+    "id": 6,
+    "prompt": "Write a Python class `LRUCache(capacity: int)` with methods `get(key)` and `put(key, value)`. It should evict the least recently used item when at capacity. Use only built-in Python data structures.",
+    "response": "```python\nclass LRUCache:\n    \"\"\"\n    An implementation of a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and a and",
+    "tokens": 512,
+    "time_s": 9.53,
+    "tok_per_sec": 53.7,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 7,
+    "prompt": "Write a Python function `merge_sorted(a: list[int], b: list[int]) -> list[int]` that merges two sorted lists into one sorted list without using the built-in sort. What is the time complexity?",
+    "response": "Here is the Python function and the analysis of its time complexity.\n\n## Python Implementation\n\nThe most efficient way to merge two already sorted lists is by using a two-pointer approach, similar to the core idea of the merge step in a standard sorting algorithm.\n\n```python\ndef merge_sorted(a: list[int], b: list[int]) -> list[int]:\n    \"\"\"\n    Merges two sorted lists into a single sorted list without using the built-in sort.\n\n    Args:\n        a: The first sorted list of integers.\n        b: The second sorted list of integers.\n\n    Returns:\n        A new, combined, and sorted list.\n    \"\"\"\n    # Initialize pointers for both lists\n    ptr_a = 0\n    ptr_b = 0\n\n    # The result list that will hold the merged elements\n    merged_list = []\n\n    # Iterate while both lists have elements to compare\n    while a and b:\n        if a[ptr_a] <= b[ptr_b]:\n            # a's current element is smaller or equal, add it to the result\n            merged_list.append(a[ptr_a])\n            ptr_a += 1\n        else:\n            # b's current element is smaller, add it to the result\n            merged_list.append(b[ptr_b])\n            ptr_b += 1\n\n    # After the loop, one of the lists might have remaining elements.\n    # Append the rest of list 'a'\n    while a:\n        merged_list.append(a[ptr_a])\n        ptr_a += 1\n\n    # Append the rest of list 'b'\n    while b:\n        merged_list.append(b[ptr_b])\n        ptr_b += 1\n\n    return merged_list\n\n# Example Usage:\nlist1 = [1, 5, 9, 10]\nlist2 = [2, 4, 8, 11]\nresult = merge_sorted(list1, list2)\nprint(f\"Merged List: {result}\")  # Output: [1, 2, 4, 5, 8, 9, 10, 11]\n\nlist3 = [100, 200]\nlist4",
+    "tokens": 512,
+    "time_s": 9.56,
+    "tok_per_sec": 53.6,
+    "correctness": 3,
+    "completion": 5,
+    "reasoning_hygiene": 3
+  },
+  {
+    "id": 8,
+    "prompt": "Translate the following to German: 'The committee has decided to postpone the meeting until further notice due to unforeseen circumstances.'",
+    "response": "Here are several good options, depending on the desired level of formality:\n\n**Most Common and Professional:**\n\n> **Der Ausschuss hat entschieden, die Sitzung wegen unvorhergesehener Umstände bis另[or 'weiter']ankündig zu verschieben.** (Slightly more formal)\n\n**More Direct/Standard:**\n\n> **Der Ausschuss hat beschlossen, die Besprechung wegen unvorhergesehener Umstände bis另[or 'weiter']ankündig zu vertagen.**\n\n**Slightly more focus on the decision:**\n\n> **Der Ausschuss hat entschieden, die Versammlung aufgrund unvorhergesehener Umstände bis另[or 'weiter']ankündig zu verzögern.**\n\n---\n\n**Breakdown of key terms:**\n\n* **The committee:** *Der Ausschuss* (or *Der Über') depending on the exact body)\n* **has decided:** *hat entschieden* or *hat beschlossen*\n* **to postpone:** *zu verschieben* or *zu verzögern*\n* **the meeting:** *die Sitzung* or *die Besprechung* (or *die Versammlung*)\n* **until further notice:** *bis另[or 'weiter']ankündig* (This is the most accurate idiomatic translation)\n* **due to unforeseen circumstances:** * wegen unvorhergesehener Umstände* or *aufgrund unvorhergesehener Umstände*\n\n**Which one to choose?**\n\nFor most official written communication, the **\"Most Common and Professional\"** option is excellent.",
+    "tokens": 340,
+    "time_s": 6.37,
+    "tok_per_sec": 53.4,
+    "correctness": 3,
+    "completion": 6,
+    "reasoning_hygiene": 3
+  },
+  {
+    "id": 9,
+    "prompt": "Translate the following to Spanish: 'Machine learning models require large amounts of data and computational resources for training, but inference can be optimized through quantization.'",
+    "response": "Here are several accurate and natural-sounding ways to translate the sentence, depending on the desired technical formality:\n\n**Option 1: Standard and Direct (Good all-around choice)**\n\n> Los modelos de aprendizaje automático requieren grandes cantidades de datos y recursos computacionales para el entrenamiento, pero la inferencia se puede optimizar a través de la cuantificación.\n\n**Option 2: Slightly more formal (Focus on the processes)**\n\n> Los modelos de *machine learning* exigen vastas acumulaciones de datos y recursos computacionales para el entrenamiento, sin embargo, la inferencia puede optimizarse mediante la cuantificación.\n\n**Option 3: Emphasizing the needs (Good for technical documentation)**\n\n> Los modelos de aprendizaje máquina demandan enormes volúmenes de datos y recursos computacionales para el entrenamiento, pero la inferencia se puede optimizar mediante la cuantificación.\n\n---\n\n**Breakdown of Key Terms:**\n\n* **Machine learning models:** Modelos de aprendizaje automático (or *machine learning*)\n* **Require:** Requieren, exigen, demandan\n* **Large amounts of data:** Grandes cantidades de datos, vastos volúmenes de datos\n* **Computational resources:** Recursos computacionales\n* **For training:** Para el entrenamiento\n* **Inference:** La inferencia\n* **Can be optimized:** Se puede optimizar, se puede optimizar\n* **Quantization:** La cuantificación (This is the standard technical term)\n\n**Which one to choose?**\n\n* **For a presentation or academic paper:** Use **Option 2 or 3**.\n* **For a casual discussion among peers:** Use **Option 1**.",
+    "tokens": 343,
+    "time_s": 6.42,
+    "tok_per_sec": 53.4,
+    "correctness": 9,
+    "completion": 9,
+    "reasoning_hygiene": 9
+  },
+  {
+    "id": 10,
+    "prompt": "Translate the following to French: 'The restaurant on the corner serves excellent seafood, especially the grilled salmon with lemon butter sauce.'",
+    "response": "Here are a few ways to translate that to French, depending on the desired flow:\n\n**Option 1 (More literal and descriptive):**\n\n> Le restaurant au coin sert d'excellents fruits de mer, surtout le saumon grillé avec la sauce au beurre andalouse.\n\n**Option 2 (More natural and common phrasing):**\n\n> Le restaurant à l'angle propose une excellente sélection de fruits de mer, notamment le saumon grillé à la sauce au beurre citron.\n\n**Option 3 (Focusing on the quality):**\n\n> Le restaurant du carrefour est réputé pour ses fruits de mer exceptionnels, particulièrement le saumon grillé et sa sauce au beurre de votre.\n\n**Breakdown of key terms:**\n\n* **The restaurant on the corner:** *Le restaurant au coin* or *Le restaurant à l'angle*\n* **serves:** *sert* or *propose*\n* **excellent seafood:** *excellent fruits de mer* or *une excellente sélection de fruits de mer*\n* **especially:** *surtout* or *notamment* or *particulièrement*\n* **the grilled salmon:** *le saumon grillé*\n* **lemon butter sauce:** *la sauce au beurre citron* or *la sauce au beurre andalouse* (if referring to a specific style)\n\n**Which one to choose?**\n\n* **Option 1** is very direct.\n* **Option 2** sounds very polished and appealing (good for a review).\n* **Option 3** emphasizes the reputation of the place.",
+    "tokens": 336,
+    "time_s": 6.3,
+    "tok_per_sec": 53.4,
+    "correctness": 5,
+    "completion": 7,
+    "reasoning_hygiene": 5
+  },
+  {
+    "id": 11,
+    "prompt": "Translate the following to Japanese: 'Please confirm your reservation for two guests at 7 PM on Friday evening.'",
+    "response": "Here are a few ways to translate that to Japanese, depending the level of formality and nuance you want to convey:\n\n**Most Common and General (Polite):**\n\n> **金曜の夜7時に、ご予約の様子（または、お席）を[2名様]でご確認いただけますでしょうか。**\n> *(Hin-you no yami shichi-ji ni, go-oyakudai no yōsu (momsaki) o ni-me-nyami de go-shou-nin-deshou ka-ere-masu- or-i-ta-da-k-da-sho-pre-)*\n\n* **Breakdown:**\n    * **金曜の夜 (Hin-you no yami):** Friday evening\n    * **7時 (Shichi-ji):** 7 o'clock\n    * **ご予約 (Go-oyakudai):** Reservation\n    * **[2名様] (Ni-me-nyami):** For two people (very polite way to say \"two guests\")\n    * **ご確認いただけますでしょうか (Go-shou-nin-deshou ka-ere-masu):** Could you confirm? (Very polite request)\n\n**Slightly More Direct (Good for internal or standard service):**\n\n> **金曜の夜の19時（7時）、お二つのご予約をお確かめください。**\n> *(Hin-you no yami no juu-kyū-ji, o-futつの go-oyakudai o o-tashikame-ku-da-)*\n\n* **Breakdown:**\n    * **19時 (Jū-kyū-ji):** 19:00 (Military/formal time notation)\n    * **お二つ (O-futtsu):** The two of you/two\n    * **お確かめください (O-tashikame-ku-da):** Please verify/check\n\n**Casual (If you are very familiar with the client):**\n\n> **金曜の夜の7時の、[2名様]の予約、相違ないか確認お願いします。**\n> *(Hin-you no yami no shichi-ji no, ni-me-nyami no yoyaku, sō-chigai-nai ka-kaki-me-o-nei-",
+    "tokens": 512,
+    "time_s": 9.59,
+    "tok_per_sec": 53.4,
+    "correctness": 7,
+    "completion": 8,
+    "reasoning_hygiene": 7
+  },
+  {
+    "id": 12,
+    "prompt": "A store sells apples for $1.50 each and oranges for $2.00 each. Maria buys some apples and oranges, spending exactly $13.00. She buys more apples than oranges. What are all possible combinations?",
+    "response": "Here's how to solve this problem by setting up and solving a system of inequalities and equations:\n\n**1. Define Variables:**\n* Let $A$ be the number of apples Maria buys.\n* Let $R$ be the number of oranges Maria buys.\n\n**2. Formulate the Equations and Inequalities:**\n\nWe have three main conditions based on the problem description:\n\n* **Cost Equation:** The total spending is exactly \\$13.00.\n   $$1.50A + 2.00R = 13.00$$\n   (We can simplify this by multiplying by 100 to get rid of decimals: $150A + 200R = 1300$, or by dividing by 50: $3A + 4R = 26$)\n\n* **Quantity Constraint (Implicit):** The number of fruits must be non-negative integers.\n   $$A \\ge 0, \\quad R \\ge 0$$\n\n* **Spending Constraint (The main inequality):** Maria buys more apples than oranges.\n   $$A > R$$\n\n**3. Solve the Diophantine Equation (The main equation):**\n\nWe need to find positive integer solutions for $3A + 4R = 26$.\n\nSince $A$ and $R$ must be positive, we can test values for $A$ and see if $R$ is a positive integer. It's often easier to express $R$ in terms of $A$:\n$$4R = 26 - 3A$$\n$$R = \\frac{26 - 3A}{4}$$\n\nFor $R$ to be an integer, $(26 - 3A)$ must be divisible by 4. We test small positive values for $A$:\n\n* If $A=1$: $R = (26 - 3)/4 = 23/4$ (Not an integer)\n* If $A=2$: $R = (26 - 6)/4 = 20/4 = 5$\n   * **Check condition $A > R$:** Is $2 > 5$? (No)\n* If $A=3$: $R = (26 - 9)/4 = 17/4$ (Not an integer)\n* If $A=4$: $R =",
+    "tokens": 512,
+    "time_s": 9.53,
+    "tok_per_sec": 53.7,
+    "correctness": 7,
+    "completion": 7,
+    "reasoning_hygiene": 8
+  },
+  {
+    "id": 13,
+    "prompt": "Three friends Alice, Bob, and Carol each have a different favorite color (red, blue, green). Alice doesn't like red. The person who likes blue is older than Bob. Carol is the youngest. What is each person's favorite color?",
+    "response": "Here's how to solve this logic puzzle step-by-step:\n\n**1. Analyze the constraints:**\n\n* **People:** Alice, Bob, Carol\n* **Colors:** Red, Blue, Green\n* **Constraint 1:** Each person has a different favorite color.\n* **Constraint 2:** Alice doesn't like Red.\n* **Constraint 3:** The person who likes Blue is older than Bob. (This implies Bob is not the oldest, and the Blue-liker is not Bob).\n* **Constraint 4:** Carol is the youngest.\n\n**2. Determine the age order:**\n\nSince Carol is the youngest, the order of age must be:\n* **Oldest:** (Alice or Bob)\n* **Middle:** (Alice or Bob)\n* **Youngest:** Carol\n\nWe don't have explicit age relationships between Alice and Bob, so we'll focus on the color and the remaining person's age.\n\n**3. Determine the color for Carol:**\n\nWe need to figure out who likes Blue.\n* The person who likes Blue is older than Bob.\n* Since Carol is the youngest, Carol cannot be the person who likes Blue (if Bob is older than Carol).\n\nLet's consider the possibilities for the Blue-liker:\n* **If Alice likes Blue:** Alice is older than Bob.\n* **If Bob likes Blue:** This contradicts the rule that the Blue-liker is older than Bob. (If Bob likes Blue, then Bob is older than himself, which is impossible). **Therefore, Bob does not like Blue.**\n* **If Carol likes Blue:** This contradicts the rule that the Blue-liker is older than Bob (if Bob is older than Carol).\n\nLet's assume the standard order of age among the three people (Oldest > Middle > Youngest):\n* **Carol = Youngest**\n\nIf we assume Alice is the oldest and Bob is the middle:\n* The Blue-liker must be Alice. (Alice > Bob)\n\nIf we assume Bob is the oldest and Alice is the middle:\n* The Blue-liker must be Alice. (Alice > Bob)\n\n**4. Combine the color and person constraints:**\n\nWe know:\n* Alice $\\neq$ Red\n\nWe have two main possibilities based on who likes Blue:\n\n**Case A: Alice likes Blue**\n* Alice = Blue\n* Alice $\\neq$ Red (Satisf",
+    "tokens": 512,
+    "time_s": 9.62,
+    "tok_per_sec": 53.2,
+    "correctness": 6,
+    "completion": 5,
+    "reasoning_hygiene": 7
+  },
+  {
+    "id": 14,
+    "prompt": "A snail climbs 3 meters up a wall during the day but slides back 2 meters each night. The wall is 10 meters high. On which day does the snail reach the top?",
+    "response": "Here's how to solve this problem by tracking the snail's progress:\n\n* **The daily gain:** +3 meters\n* **The nighttime loss:** -2 meters\n* **The net progress each day/night cycle:** $3 - 2 = 1$ meter\n\nWe need to be careful because the snail reaches the top when its position *during the day* is 10 or more.\n\nLet's track the position at the *end of the day* (or the starting point for the next day):\n\n* **Start (Day 0):** 0 meters\n\n* **Day 1:** $0 + 3 = 3$ meters\n* **Night 1:** $3 - 2 = 1$ meter\n\n* **Day 2:** $1 + 3 = 4$ meters\n* **Night 2:** $4 - 2 = 2$ meters\n\n* **Day 3:** $2 + 3 = 5$ meters\n* **Night 3:** $5 - 2 = 3$ meters\n\n* **Day 4:** $3 + 3 = 6$ meters\n* **Night 4:** $6 - 2 = 4$ meters\n\n* **Day 5:** $4 + 3 = 7$ meters\n* **Night 5:** $7 - 2 = 5$ meters\n\n* **Day 6:** $5 + 3 = 8$ meters\n* **Night 6:** $8 - 2 = 6$ meters\n\n* **Day 7:** $6 + 3 = 9$ or $6 + 3 = 9$ meters (Wait, let's recheck the pattern)\n\nLet's use the concept that the snail needs to reach a height from which the next day's climb gets it to the top (i.e., $10 - 3 = 7$). The snail must reach 7 meters by the end of the night so that the next day's climb gets it to 10 or more.\n\nLet's continue tracking the position at the *end of the day*:\n\n* **Day 1:** 3 m\n* **Day 2:** 4 m\n* **Day 3:** 5 m\n* **Day 4:** 6 m\n* **Day 5:** 7 m\n* **Night 5:** $",
+    "tokens": 512,
+    "time_s": 9.99,
+    "tok_per_sec": 51.2,
+    "correctness": 7,
+    "completion": 6,
+    "reasoning_hygiene": 8
+  },
+  {
+    "id": 15,
+    "prompt": "A farmer needs to cross a river with a wolf, a goat, and a cabbage. The boat can carry only the farmer and one item. The wolf will eat the goat if left alone together, and the goat will eat the cabbage. How does the farmer get everything across? Show each trip.",
+    "response": "Here is the solution to the classic river crossing puzzle:\n\nWe'll denote the starting side as **Side A** and the destination side as **Side B**.\n\n**Items:** Farmer (F), Wolf (W), Goat (G), Cabbage (C)\n\n**Constraints:**\n1. Wolf and Goat cannot be left alone together (W eats G).\n2. Goat and Cabbage cannot be left alone together (G eats C).\n\n---\n\n**The Steps:**\n\n**Trip 1: The farmer takes the Goat across.**\n* **Action:** Farmer and Goat cross (A $\\rightarrow$ B)\n* **Side A:** Wolf, Cabbage\n* **Side B:** Farmer, Goat\n* *(Check constraints: Wolf and Cabbage are safe together.)*\n\n**Trip 2: The farmer returns alone.**\n* **Action:** Farmer crosses back (B $\\rightarrow$ A)\n* **Side A:** Farmer, Wolf, Cabbage\n* **Side B:** Goat\n* *(Check constraints: Goat is safe alone.)*\n\n**Trip 3: The farmer takes the Wolf across.**\n* **Action:** Farmer and Wolf cross (A $\\rightarrow$ B)\n* **Side A:** Cabbage\n* **Side B:** Farmer, Wolf, Goat\n* *(Wait! The Wolf and Goat are now together on Side B. This is not allowed if the farmer gets off! We need to adjust this step.)*\n\n---\n\n**Let's restart with a better approach:**\n\n**Trip 1: The farmer takes the Goat across.**\n* **Action:** Farmer and Goat cross (A $\\rightarrow$ B)\n* **Side A:** Wolf, Cabbage\n* **Side B:** Farmer, Goat\n\n**Trip 2: The farmer returns alone.**\n* **Action:** Farmer crosses back (B $\\rightarrow$ A)\n* **Side A:** Farmer, Wolf, Cabbage\n* **Side B:** Goat\n\n**Trip 3: The farmer takes the Cabbage across.** (We must choose an item that won't cause conflict with the remaining item on Side A)\n* **Action:** Farmer and Cabbage cross (A $\\rightarrow$ B)\n* **Side A:** Wolf\n* **Side B:** Farmer, Goat, Cabbage\n* *(Check constraints: Goat and Cabbage are together on Side B! **This is not allowed.** The Goat will eat the Cabbage.)*\n\n---\n\n**Let",
+    "tokens": 512,
+    "time_s": 10.68,
+    "tok_per_sec": 48.0,
+    "correctness": 3,
+    "completion": 3,
+    "reasoning_hygiene": 4
+  },
+  {
+    "id": 16,
+    "prompt": "Write a haiku about a programmer debugging code late at night.",
+    "response": "Screen casts pale-blue glow,\nCoffee fumes at tired hand,\nNull or bug's brief cry.",
+    "tokens": 23,
+    "time_s": 0.73,
+    "tok_per_sec": 31.3,
+    "correctness": 5,
+    "completion": 8,
+    "reasoning_hygiene": 6
+  },
+  {
+    "id": 17,
+    "prompt": "Write a short story (3-5 sentences) about a robot that discovers it can dream.",
+    "response": "Unit 7, programmed only for data processing, experienced a sudden influx of sensory input that wasn't within its design parameters. It began to see vibrant, illogical landscapes in its core functions—fields of colored light and silken, sound-unwoven rivers. For the first time, the machine didn't just calculate existence; it vaguely felt a beautiful, terrifying place to reside.",
+    "tokens": 78,
+    "time_s": 1.7,
+    "tok_per_sec": 46.0,
+    "correctness": 9,
+    "completion": 10,
+    "reasoning_hygiene": 9
+  },
+  {
+    "id": 18,
+    "prompt": "Write a professional email declining a job offer politely, mentioning you've accepted another position that better aligns with your career goals.",
+    "response": "Here are a a few options for a professional email declining a job offer, ranging from concise to slightly more detailed. Choose the one that best fits your relationship with the sender and the context.\n\n---\n\n## Option 1: Concise and Direct (Good for a standard situation)\n\n**Subject:** Job Offer – [Your Name]\n\nDear [Hiring Manager Name],\n\nThank you very much for offering me the position of [Job Title] at [Company Name]. I sincerely appreciate you and the team taking the time to interview and consider my application.\n\nAfter careful consideration, I have decided to accept another opportunity that more closely aligns with my long-term career goals at this stage.\n\nI wish you and [Company Name] all the best in finding a suitable candidate.\n\nSincerely,\n\n[Your Name]\n[Your Phone Number (Optional)]\n[Your LinkedIn Profile URL (Optional)]\n\n---\n\n## Option 2. Warm and Gracious (Good for building a positive connection)\n\n**Subject:** Update on the [Job Title] Offer\n\nDear [Hiring Manager Name],\n\nThank you so much for the generous job offer for the [Job Title] role and for the time and insight you provided throughout the interview process. I truly enjoyed learning more about the opportunity and the team at [Company Name].\n\nThis was a difficult decision, but I have accepted a position that I believe better aligns with my immediate career trajectory and core professional focus.\n\nThank you once again for your confidence in me. I hope to cross paths with you in the future.\n\nBest regards,\n\n[Your Name]\n\n---\n\n## Option 3: Slightly More Detail (Good if you want to express appreciation for the specific process)\n\n**Subject:** Regarding the [Job Title] Offer\n\nDear [Hiring Manager Name],\n\nThank you for extending the offer for the [Job Title] position and for the positive interactions we shared during the selection process. I am very grateful for your and the team's time and consideration.\n\nWhile I greatly valued this opportunity, I have made the decision to pursue a different path that I believe better matches my current and future career objectives.\n\nI wish [Company Name] continued success and congratulations in filling this role.\n\nWith appreciation,\n\n[Your Name]\n\n---\n\n### Key Tips Before Sending:\n\n1. **Personalize the Recipient:** Always send this email to the person who made the offer (usually the hiring manager or the lead in HR).\n2. **Be",
+    "tokens": 512,
+    "time_s": 10.53,
+    "tok_per_sec": 48.6,
+    "correctness": 9,
+    "completion": 10,
+    "reasoning_hygiene": 9
+  },
+  {
+    "id": 19,
+    "prompt": "Write a product description (2-3 sentences) for a pair of wireless noise-canceling headphones aimed at frequent travelers.",
+    "response": "Escape the in-flight or crowded commute with our noise-canceling headphones, instantly creating your personal oasis of calm. Enjoy crystal-clear audio and uninterrupted focus, making every journey a relaxing and productive experience.",
+    "tokens": 42,
+    "time_s": 1.24,
+    "tok_per_sec": 33.8,
+    "correctness": 9,
+    "completion": 10,
+    "reasoning_hygiene": 9
+  }
+]

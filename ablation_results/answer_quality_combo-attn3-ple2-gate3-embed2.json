@@ -1,0 +1,90 @@
+[
+  {
+    "id": 0,
+    "prompt": "What is 2+2? Answer with just the number.",
+    "response": "4",
+    "tokens": 1,
+    "time_s": 0.26,
+    "tok_per_sec": 3.8,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 1,
+    "prompt": "Solve: 17 \u00d7 23. Show your work step by step.",
+    "response": "Here are the steps to solve $17 \\times 23$:\n\n**Method 1: Standard Multiplication (Long Form)**\n\n1. **Multiply the top and bottom numbers:**\n   $$\\begin{array}{c} 17 \\\\ \\times 23 \\\\ \\hline \\end{array} \\end{array}$$\n\n2. **Multiply 17 by the ones digit (7):**\n   $$7 \\times 17 = 119 \\quad \\text{(We can carry over the or just write down the partial product)}$$\n   * $7 \\times 7 = 49$ (Write down 9, carry over 4)\n   * $7 \\times 1 = 7$ (Add the carry-over)\n   $$\\begin{array}{c} \\text{4} \\\\ 17 \\\\ \\times 23 \\\\ \\hline 119 \\end{array}$$\n\n3. **Multiply 17 by the tens digit (2):**\n   $$20 \\times 17 = 340 \\quad \\text{(We can write down the partial product)}$$\n   * $2 \\times 7 = 14$ (Write down 4, carry over 1)\n   $$\\begin{array}{c} 10 \\\\ 17 \\\\ \\times 23 \\\\ \\hline 340 \\\\ 119 \\end{array}$$\n\n4. **Add the partial products:**\n   $$340 + 119 = 459$$\n\n**The result is 459.**\n\n---\n\n**Method 2: Break it down (Distributive Property)**\n\nWe can rewrite $17 \\times 23$ as $(10 + 7) \\times 10 + 17 \\times 3$ (or $10 \\times 23) $\n\n1. **Break down 17:**\n   $$17 \\times 23 = (10 + 7) \\times 23$$\n\n2. **Distribute over the terms:**\n   $$= 10 \\times 23 + 7 \\times 23$$\n\n3. **Calculate the parts:**\n   * $10 \\times 23 = 230$\n   * $7 \\times 23$:\n     * $",
+    "tokens": 512,
+    "time_s": 10.64,
+    "tok_per_sec": 48.1,
+    "correctness": 7,
+    "completion": 5,
+    "reasoning_hygiene": 8
+  },
+  {
+    "id": 2,
+    "prompt": "If a train travels 120 km in 2 hours, what is its average speed in m/s?",
+    "response": "Here's how to solve the problem:\n\n**1. Understand the Goal:**\nWe need to convert the speed from $\\text{km/hour}$ to $\\text{m/s}$.\n\n**2. Conversion Factors:**\n* To convert kilometers ($\\text{km}$) to meters ($\\text{m}$), you multiply by 1000.\n* To convert hours ($\\text{hours}$) to seconds ($\\text{seconds}$), you divide by 3600 (since there are 60 minutes in an hour, and 60 seconds in a minute, $60 \\times 60 = 3600$).\n\n**3 Set up the Calculation:**\n$$\\text{Speed in m/s} = \\frac{\\text{Distance in km}}{\\text{Time in hours}} \\times \\text{Conversion factor}$$\n\n$$\\text{Speed} = \\frac{120 \\text{ km}}{2 \\text{ hours}} \\times \\frac{1000 \\text{ m}}{1 \\text{ km}} \\times \\frac{1 \\text{ hour}}{3600 \\text{ s}}$$\n\n**4 Perform the Calculation:**\n\n* **Calculate the speed in km/hour:**\n  $$\\frac{120}{2} = 60 \\text{ km/hour}$$\n\n* **Convert to m/s:**\n  $$60 \\text{ km/hour} \\times \\frac{1000 \\text{ m}}{1 \\text{ h}} = 60,000 \\text{ m/s}$$\n\n**Answer:**\nThe average speed of the train is **60,000 m/s**.",
+    "tokens": 361,
+    "time_s": 8.28,
+    "tok_per_sec": 43.6,
+    "correctness": 0,
+    "completion": 10,
+    "reasoning_hygiene": 2
+  },
+  {
+    "id": 3,
+    "prompt": "What is the derivative of x\u00b3 + 2x\u00b2 - 5x + 3?",
+    "response": "To find the derivative of the function $x^3 + 2x^2 - 5x + 3$, we use the **linearity of the derivative** and the **power rule for differentiation**.\n\nThe rule for the derivative of a sum is:\n$$\\frac{d}{dx} (f(x) + g(x)) = \\frac{d}{dx} f(x) + \\frac{d}{dx} g(x)$$\n\nWe will find the derivative of each term separately:\n\n1. **Derivative of $x^3$:**\n   Using the power rule $\\frac{d}{dx} (x^n) = nx^{n-1}$:\n   $$\\frac{d}{dx} (x^3) = 3 \\cdot x^{3-1} = 3x^2$$\n\n2. **Derivative of $2x^2$:**\n   We use the constant multiple rule $\\frac{d}{dx} (c \\cdot f(x)) = c \\cdot \\frac{d}{dx} f(x)$:\n   $$\\frac{d}{dx} (2x^2) = 2 \\cdot \\frac{d}{dx} (x^2) = 2 \\cdot (2x^{2-1}) = 2 \\cdot (2x^1) = 4x$$\n\n3. **Derivative of $-5x$:**\n   We use the constant multiple rule:\n   $$\\frac{d}{dx} (-5x) = -5 \\cdot \\frac{d}{dx} (x) = -5 \\cdot (x^{1-1}) = -5x^0 = -5$$\n\n4. **Derivative of $3$:**\n   The derivative of a constant is always $0$:\n   $$\\frac{d}{dx} (3) = 0$$\n\nNow, we combine the results:\n$$\\frac{d}{dx} (x^3 + 2x^2 - 5x + 3) = \\frac{d}{dx} (x^3) + \\frac{d}{dx} (2x^2) - \\frac{d}{dx} (5x) + \\frac{d}{dx} (3)$$\n$$= 3x^2 + 4x - 5 + 0$$\n\n**The derivative is:**\n$$3x^2 + ",
+    "tokens": 512,
+    "time_s": 12.43,
+    "tok_per_sec": 41.2,
+    "correctness": 10,
+    "completion": 9,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 4,
+    "prompt": "A box has 3 red, 5 blue, and 2 green balls. What's the probability of picking blue?",
+    "response": "Here's how to figure out the probability of picking a blue ball:\n\n**1. Find the total number of balls:**\n* Red balls: 3\n* Blue balls: 5\n* Green balls: 2\n* **Total balls:** $3 + 5 + 2 = 10$\n\n**2 Find the number of favorable outcomes (picking blue):**\n* Number of blue balls: 5\n\n**3 Calculate the probability:**\nThe probability of an event is calculated as:\n\n$$\\text{Probability} = \\frac{\\text{Number of favorable outcomes}}{\\text{Total number of outcomes}}$$\n\n$$\\text{P(Blue)} = \\frac{5}{10}$$\n\n**4 Simplify the fraction:**\n$$\\text{P(Blue)} = \\frac{1}{2}$$\n\n**Answer:**\n\nThe probability of picking blue is $\\frac{5}{10}$ or $\\frac{1}{2}$ (which is also **0.5** or **50%**).",
+    "tokens": 213,
+    "time_s": 6.19,
+    "tok_per_sec": 34.4,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 5,
+    "prompt": "What is the sum of the first 100 positive integers?",
+    "response": "Here's how to find the sum of the first 100 positive integers:\n\n**Understanding the problem**\n\nWe are looking for the sum: $1 + 2 + 3 + \\dots + 100$.\n\n**Method 1: Using the formula for the sum of an arithmetic series**\n\nThe formula for the sum of the first $n$ positive integers (or the first $n$ non-negative integers) is:\n$$\\text{Sum} = \\frac{n(n+1)}{2}$$\n\nIn this case, $n = 100$.\n\n$$\\text{Sum} = \\frac{100(100+1)}{2}$$\n$$\\text{Sum} = \\frac{100(101)}{2}$$\n$$\\text{Sum} = \\frac{10100}{2}$$\n$$\\text{Sum} = 5050$$\n\n**Method 2: Using the formula for the sum of the first $n$ positive integers (Standard approach)**\n\nThe general formula for the sum of the first $n$ positive integers is:\n$$\\text{Sum} = \\frac{n(n+1)}{2}$$\n\nIf we consider the standard sum $1$ to $100$:\n$$\\text{Sum} = \\frac{100}{1} \\times \\frac{100+1}{2}$$\n$$\\text{Sum} = 100 \\times \\frac{101}{2}$$\n$$\\text{Sum} = 50 \\times 101$$\n$$\\text{Sum} = 5050$$\n\n**Answer:**\n\nThe sum of the first 100 positive integers is **5050**.",
+    "tokens": 377,
+    "time_s": 10.53,
+    "tok_per_sec": 35.8,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 6,
+    "prompt": "Convert 0.375 to a fraction in simplest form.",
+    "response": "Here's how to convert $0.375$ to a fraction:\n\n**Method 1: Place the decimal over a power of 10**\n\n1. **Identify the place value of the last digit:** The last digit in $0.375$ is $5$, which is in the thousandths place (divides by 1000).\n2. **Write the number without the decimal as the numerator:** The number without the decimal is $375$.\n3. **Write the power of 10 as the denominator:** The power of 10 is $1000$.\n\nSo, $0.375$ is equal to $\\frac{375}{1000}$.\n\n**Simplify the fraction:**\n\nTo convert this to the simplest form, find the greatest common divisor (GCD) of the numerator and the denominator.\n\n* **Divisibility by 5:** Both numbers end in 5 or 0, so they are both divisible by 5.\n    * $375 \\div 5 = 75$\n    * $1000 \\div 5 = 200$\n    * The fraction is $\\frac{75}{200}$.\n\n* **Divisibility by 5 again:** The new numbers are $75$ and $200$. Both are still divisible by 5.\n    * $75 \\div 5 = 15$\n    * $200 \\div 5 = 40$\n    * The fraction is $\\frac{15}{40}$.\n\n* **Divisibility by 5 (One last time):** The numbers are $15$ and $40$.\n    * $15 \\div 5 = 3$\n    * $40 \\div 5 = 8$\n    * The fraction is $\\frac{3}{8}$.\n\n**Answer:**\n$$0.375 = \\frac{3}{8}$$",
+    "tokens": 432,
+    "time_s": 13.14,
+    "tok_per_sec": 32.9,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 7,
+    "prompt": "If f(x) = 2x + 1 and g(x) = x\u00b2, what is f(g(3))?",
+    "response": "Here's how to solve the problem:\n\n**The functions are:**\n* $f(x) = 2x + 1$\n* $g(x) = x^2$\n\n**We need to find $f(g(3))$**\n\nTo evaluate this, you work from the inside out:\n\n1. **Start with the inner function, $g(3)$:**\n   $$g(3) = 3^2 = 9$$\n\n2. **Now, use that result in the outer function, $f(x)$ (Replace $x$ with the result from Step 1):**\n   $$f(g(3)) = f(9)$$\n\n3. **Evaluate $f(9)$:**\n   $$f(9) = 2(9) + 1$$\n   $$f(9) = 18 + 1$$\n   $$f(9) = 19$$\n\n**Answer:**\n$$f(g(3)) = 19$$",
+    "tokens": 219,
+    "time_s": 7.21,
+    "tok_per_sec": 30.4,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  }
+]

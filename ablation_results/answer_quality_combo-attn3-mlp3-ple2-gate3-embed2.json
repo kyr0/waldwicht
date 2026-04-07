@@ -1,0 +1,90 @@
+[
+  {
+    "id": 0,
+    "prompt": "What is 2+2? Answer with just the number.",
+    "response": "4",
+    "tokens": 1,
+    "time_s": 0.26,
+    "tok_per_sec": 3.8,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 1,
+    "prompt": "Solve: 17 \u00d7 23. Show your work step by step.",
+    "response": "Here's the step-by-step solution to $17 \\times 23$:\n\n**Problem:** $17 \\times 23$\n\n**Method 1: Standard Multiplication**\n\n1. **Identify the numbers:** The numbers are 17 and 23.\n2. **Multiply the ones place:** $1 \\times 2 = 2$\n3. **Multiply the tens place:** $1 \\times 1 = 1$\n4. **Combine the results:** The result is $2$ and $1$, so we place the $1$ in the tens place and the $2$ in the ones place, forming $21$.\n5. **Check for carrying over:** There are no numbers to carry over, so we are done.\n\n**Standard Form:**\n$$\n\\begin{array}{r}\n\\text{_}17 \\\\times 23 \\\\ \\hline 58\n\\end{array}\n\\text{Wait, let's re-check the standard form setup.}\n\\text{The standard form setup should be:}\n$$\n\\begin{array}{r}\n\\text{_}17 \\\\ \\times 23 \\\\ \\hline 58\n\\end{array}\n\\text{Let's re-check the standard form setup.}\n\\text{The standard form setup should be:}\n\\begin{array}{r}\n\\text{_}17 \\\\ \\times 23 \\\\ \\hline 58\n\\end{array}\n\\text{Let's re-check the standard form setup.}\n\\text{The standard form setup should be:}\n\\begin{array}{r}\n\\text{_}17 \\\\ \\times 23 \\\\ \\hline 58\n\\end{array}\n\\text{Let's re-check the standard form setup.}\n\\text{The standard form setup should be:}\n\\begin{array}{r}\n\\text{_}17 \\\\ \\times 23 \\\\ \\hline 58\n\\end{array}\n\\text{Let's re-check the standard form setup.}\n\\text{The standard form setup should be:}\n\\begin{array}{r}\n\\text{_}17 \\\\ \\times 23 \\\\ \\hline 58\n\\end{array}\n\\text",
+    "tokens": 512,
+    "time_s": 14.65,
+    "tok_per_sec": 34.9,
+    "correctness": 0,
+    "completion": 2,
+    "reasoning_hygiene": 2
+  },
+  {
+    "id": 2,
+    "prompt": "If a train travels 120 km in 2 hours, what is its average speed in m/s?",
+    "response": "Here's how to solve the problem in steps:\n\n**1. Understand the relationship between distance and time to find the average speed.**\n\n* **Distance:** 120 km\n* **Time:** 2 hours\n\n**2. Calculate the average speed in km/h.**\n\n* **We need to convert the time to a standard unit (seconds) to get the final answer in m/s.**\n\n**3. Convert the time to a standard unit (seconds):**\n\n* The time is 2 hours.\n* There are 60 minutes in an hour.\n* The time in seconds: $2 \\text{ hours} \\times 60 \\text{ minutes/hour} \\times 60 \\text{ seconds/minute} = 7200 seconds$\n\n**4. Calculate the average speed in km/s:**\n\n* **We need to convert the distance to a standard unit (m) to get the final answer in m/s.**\n\n**5. Convert the distance to a standard unit (m):**\n\n* **Conversion factor:** We know that $1 \\text{ km} = 100000 milliseconds$.\n* The distance in meters: $120 \\text{ km} \\times 100000 \\text{ m/km} = 12,000,000 m$\n\n**6. Calculate the average speed in m/s:**\n\n* **Average Speed = Distance / Time**\n* Average Speed = $12,000,000 \\text{ m} / 7200 \\text{ s}$\n\n**7. Perform the final division:**\n\n$$\\text{Average Speed} = \\frac{12,000,000}{7200}$$\n\n$$\\text{Average Speed} = 1666.666...$$\n\n**8. Simplify the fraction (optional, but good form):**\n\nWe can simplify the fraction by dividing the distance and time by their greatest common factor, or by simplifying the fraction first:\n\n$$\\text{Average Speed} = \\frac{12,000,000}{7200} = \\frac{12,000,000 \\div 1000}{7200 \\div 1000} = \\frac{1200",
+    "tokens": 512,
+    "time_s": 15.89,
+    "tok_per_sec": 32.2,
+    "correctness": 2,
+    "completion": 4,
+    "reasoning_hygiene": 3
+  },
+  {
+    "id": 3,
+    "prompt": "What is the derivative of x\u00b3 + 2x\u00b2 - 5x + 3?",
+    "response": "The derivative of $x^3 + 2x^2 - 5x + 3$ is found by taking the derivative of each term with respect to $x$ and its other terms.\n\nWe are differentiating with respect to $x$. We will use the power rule and the rule for the derivative of a constant.\n\nWe are looking for the derivative with respect to $x, so we will use the **power rule** and the **linearity of the derivative**.\n\nWe are differentiating the function $f(x) = x^3 + 2x^2 - 5x + 3$ with respect to $x.\n\nWe will find the partial or total derivative by applying the standard differentiation rules to each term:\n\n1. **Derivative of $x^3$:**\n   $$\\frac{d}{dx} (x^3) = 3x^{3-1} = 3x^2$$\n\n2. **Derivative of $2x^2:**\n   $$\\frac{d}{dx} (2x^2) = 2 \\cdot \\frac{d}{dx} (x^2) = 2 \\cdot (2x^{2-1}) = 2x^1$$\n\n3. **Derivative of $-5x:**\n   $$\\frac{d}{dx} (-5x) = -5 \\cdot \\frac{d}{dx} (x) = -5 \\cdot (1x^{1-1}) = -5x^0$$\n\n4. **Derivative of $3:**\n   $$\\frac{d}{dx} (3) = 0$$\n\nCombining these results:\n$$\\frac{d}{dx} (x^3 + 2x^2 - 5x + 3) = \\frac{d}{dx} (x^3) + \\frac{d}{dx} (2x^2) - \\frac{d}{dx} (5x) + \\frac{d}{dx} (3)$$\n\n**Let's re-examine the question and the standard differentiation rule:**\n\nThe question asks for \"the derivative of $x^3 + 2x^2 - 5x + 3$.\" In calculus, when no explicit differentiation rule (like $\\frac{d}{dx}$ or $\\frac{d}{dy}$ or $\\frac{d}{du}$ are specified) is present, the standard operation is to find the **",
+    "tokens": 512,
+    "time_s": 18.22,
+    "tok_per_sec": 28.1,
+    "correctness": 0,
+    "completion": 2,
+    "reasoning_hygiene": 2
+  },
+  {
+    "id": 4,
+    "prompt": "A box has 3 red, 5 blue, and 2 green balls. What's the probability of picking blue?",
+    "response": "Here's how to determine the probability of picking a blue ball:\n\n**1. Define the sample space (all possible outcomes):**\n* The balls in the box are: 3 red, 5 blue, and 2 green.\n* **Total number of balls:** $3 + 5 + 2 = 10$\n\n**2. Define the event (picking a blue):**\n* The number of favorable outcomes (picking blue) is 5.\n\n**3. Calculate the probability:**\nThe probability of an event is calculated as:\n$$\\text{Probability (Event)} = \\frac{\\text{Number of favorable outcomes}}{\\text{Total number of outcomes}}$$\n\n$$\\text{P (Blue)} = \\frac{5}{10} \\text{ or } \\frac{1}{2}$$\n\n**Answer:**\n\nThe probability of picking a blue ball is $\\frac{5}{10}$ or $\\frac{1}{2}$ (or $50\\%$).",
+    "tokens": 208,
+    "time_s": 6.71,
+    "tok_per_sec": 31.0,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 5,
+    "prompt": "What is the sum of the first 100 positive integers?",
+    "response": "Here are a couple of ways to think about this problem and how to arrive at the solution.\n\n## Method 1: Using the Formula (The standard mathematical approach)\n\nThe sum of the first $n$ positive integers is given by the formula:\n$$\\text{Sum} = \\frac{n(n+1)}{2}$$\n\nIn this case, $n = 100$.\n\n1. **Plug in the values:**\n$$\\text{Sum} = \\frac{100(100+1)}{2}$$\n$$\\text{Sum} = \\frac{100(101)}{2}$$\n\n2. **Calculate the result:**\n$$\\text{Sum} = \\frac{100 \\times 101}{2}$$\n$$\\text{Sum} = \\frac{10000}{2}$$\n$$\\text{Sum} = 5000$$\n\n---\n\n## Method 2: Using the Summation Formula (The mathematical proof)\n\nThe sum of the first $n$ positive integers is also called an arithmetic progression. The formula for the sum ($S_n$) is:\n$$S_n = \\frac{n \\times a}{2}$$\nWhere:\n* $n$ is the number of terms (100)\n* $a$ is the first term (1)\n\n$$S_{100} = \\frac{100 \\times 100}{2}$$\n$$S_{100} = \\frac{10000}{2}$$\n$$S_{100} = 5000$$\n\n---\n\n## Method 3: Using the General Summation Formula (The underlying principle)\n\nThe sum is calculated by adding the first and the last:\n$$\\text{Sum} = 1 + 2 + 3 + \\dots + 99 + 100$$\n\nWe use the standard formula for the sum of the first $n$ natural numbers, which is derived from the arithmetic series formula:\n$$\\text{Sum} = \\frac{n(n+1)}{2}$$\n\n$$\\text{Sum} = \\frac{100(100+1)}{2} = \\frac{10000}{2} = 5000$$\n\n---\n\n**Answer:**\n\nThe sum of the first 100 positive integers is",
+    "tokens": 512,
+    "time_s": 15.12,
+    "tok_per_sec": 33.9,
+    "correctness": 0,
+    "completion": 10,
+    "reasoning_hygiene": 3
+  },
+  {
+    "id": 6,
+    "prompt": "Convert 0.375 to a fraction in simplest form.",
+    "response": "Here're the steps to convert $0.375$ to a fraction in its simplest form:\n\n**1. Understand the relationship:**\nThe decimal $0.375$ means 375 divided by 1000.\n$$\\frac{0.375}{1} = \\frac{375}{1000}$$\n\n**2. Simplify the fraction:**\nTo put the fraction in a form with a smaller denominator, we find the greatest common factor (GCD) of 375 and 1 (which is 1).\n\n* **Check for common factors:**\n   * The numerator is 375.\n   * The denominator is 1.\n   * The only common factor is 1.\n\n**3. The resulting fraction:**\n$$\\frac{0.375}{1} = \\frac{375}{1000}$$\n\n**4. Simplify to the lowest terms:**\nWe need to find the greatest common factor (GCD) of 375 and 1000.\n\n* **Find the prime factors:**\n   * $375$ ends in 5, so it's divisible by 5.\n   $$\\frac{375 \\div 5}{1000 \\div 5} = \\frac{75}{200}$$\n\n* **Simplify further:**\n   * Now we check the new numerator (75) and the denominator (1000) to see if there is another common factor.\n   * $75$ is divisible by 5 and 3.\n   $$\\frac{75 \\div 5}{200 \\div 5} = \\frac{15}{40}$$\n\n* **Simplify to the final form:**\n* 15 and 4 share a common factor of 5.\n$$\\frac{15 \\div 5}{40 \\div 5} = \\frac{3}{8}$$\n\n**5. Convert the simplified fraction to a decimal:**\n$$\\frac{3}{8} = 0.375$\n\n**Answer:**\nThe fraction in the simplest form is $\\mathbf{\\frac{3}{8}}$.",
+    "tokens": 474,
+    "time_s": 14.34,
+    "tok_per_sec": 33.1,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 7,
+    "prompt": "If f(x) = 2x + 1 and g(x) = x\u00b2, what is f(g(3))?",
+    "response": "Here's how to solve the problem:\n\nWe are given the functions:\n* $f(x) = 2x + 1$\n* $g(x) = x^2$\n\nWe need to find the value of $f(g(3))$. We work from the inside out:\n\n1. **Start with the inside function, $g(3)$:**\n   $$g(3) = 3^2 = 9$$\n\n2. **Now substitute this result (9) into the function $f(x)$:**\n   $$f(g(3)) = f(9)$$\n\n3. **Calculate the final result:**\n   $$f(9) = 2(9) + 1$$\n   $$f(9) = 18 + 1$$\n   $$f(9) = 19$$\n\n**Answer:**\n$$f(g(3)) = 19$$",
+    "tokens": 201,
+    "time_s": 5.67,
+    "tok_per_sec": 35.4,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  }
+]

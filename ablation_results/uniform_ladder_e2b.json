@@ -1,0 +1,46 @@
+[
+  {
+    "name": "uniform-6bit-g64",
+    "bits": 6,
+    "group_size": 64,
+    "ppl": 53963.5,
+    "exact_match": 5,
+    "exact_match_pct": 7.8,
+    "avg_token_overlap": 0.498,
+    "n_samples": 64,
+    "size_gb": 4.501512514
+  },
+  {
+    "name": "uniform-5bit-g64",
+    "bits": 5,
+    "group_size": 64,
+    "ppl": 42559.2,
+    "exact_match": 6,
+    "exact_match_pct": 9.4,
+    "avg_token_overlap": 0.49,
+    "n_samples": 64,
+    "size_gb": 3.863149106
+  },
+  {
+    "name": "uniform-4bit-g64",
+    "bits": 4,
+    "group_size": 64,
+    "ppl": 32442.9,
+    "exact_match": 5,
+    "exact_match_pct": 7.8,
+    "avg_token_overlap": 0.502,
+    "n_samples": 64,
+    "size_gb": 3.224790412
+  },
+  {
+    "name": "uniform-3bit-g64",
+    "bits": 3,
+    "group_size": 64,
+    "ppl": 5452.2,
+    "exact_match": 64,
+    "exact_match_pct": 100.0,
+    "avg_token_overlap": 1.0,
+    "n_samples": 64,
+    "size_gb": 2.586427826
+  }
+]

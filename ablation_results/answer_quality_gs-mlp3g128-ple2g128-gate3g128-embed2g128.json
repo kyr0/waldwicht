@@ -1,0 +1,90 @@
+[
+  {
+    "id": 0,
+    "prompt": "What is 2+2? Answer with just the number.",
+    "response": "4",
+    "tokens": 1,
+    "time_s": 0.28,
+    "tok_per_sec": 3.6,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 1,
+    "prompt": "Solve: 17 × 23. Show your work step by step.",
+    "response": "We need to find the result of the multiplication problem $17 \\times 23$.\n\nWe can perform the multiplication in a few ways:\n\n**Method 1: Standard multiplication (Long multiplication)**\n\n$$\\begin{array}{bc 곱} { } 23 \\\\ a17 \\times 23 \\\\ \\hline \\dots \\dots \\\\ \\hline \\end{ that's multiplying involves summing digits of one and the other and then a summing involves a place value which is added to the a result to which we then also involves a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a",
+    "tokens": 512,
+    "time_s": 7.74,
+    "tok_per_sec": 66.2,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 2,
+    "prompt": "If a train travels 120 km in 2 hours, what is its average speed in m/s?",
+    "response": "Here is the step-故Here is the step-by-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故Here is the step-故",
+    "tokens": 512,
+    "time_s": 7.76,
+    "tok_per_sec": 66.0,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 3,
+    "prompt": "What is the derivative of x³ + 2x² - 5x + 3?",
+    "response": "To find the derivative of the function with that in that expression, we need to apply the rules of differentiation.\n\nWe have the function:\n$$f(x) = x^3 + 2x^2 - 5x + 3$$\n\nWe will use the following differentiation rules:\n\n1. **The power rule for a term:** The derivative of a power of a variable to the form $x$' for a function of $x$ is $\\frac{d}{dx}(x^n) = n x^{n-1}$.\n\n2. **The constant multiple and sum rule:** The derivative of a constant and a sum is the sum of the derivatives.\n\n3. **The constant and a multiple rule:** The derivative of a constant and a multiple of a function in a and a and a function to the power of a variable is the a and a function to the derivative of the function to the other constant.\nFor a derivative of a sum of functions, we can apply the differentiation to each term and then combine them with the appropriate power and constant rule.\n\n4. **The differentiation rule:** The derivative of a sum is the derivative of a sum.\n\n5. **The differentiation rule:** The derivative of a sum of functions to a power is the sum of the derivatives to a power.\n$$\\frac{d}{dx} (u + v) = \\frac{du}{dx} + \\frac{dv}{dx}$$\n\n6. **The differentiation rule:** The derivative of a sum of functions to a multiple is the a and a function to the derivative.\n$$\\frac{d}{dx} (cF) = c \\frac{df}{dx}$$\n\nWe apply the differentiation rule to each term of the function separately:\n\n$$\\frac{d}{dx} [x^3] = \\frac{d}{dx} x^3$$\n$$\\frac{d}{dx} [2x^2] = \\frac{d}{dx} 2x^2$$\n$$\\frac{d}{dx} [-5x] = \\frac{d}{dx} -5x$$\n$$\\frac{d}{dx} [3] = \\frac{d}{dx} 3$$\n\nNow we apply the differentiation rules to each term:\n\n$$\\frac{d}{dx} (x^3) = \\frac{d}{dx} (x^3)$$\n$$\\frac{d}{dx} (2x^2) = \\",
+    "tokens": 512,
+    "time_s": 7.93,
+    "tok_per_sec": 64.6,
+    "correctness": 0,
+    "completion": 2,
+    "reasoning_hygiene": 2
+  },
+  {
+    "id": 4,
+    "prompt": "A box has 3 red, 5 blue, and 2 green balls. What's the probability of picking blue?",
+    "response": "Here is the step-deg that includes the solution:\n\n**1. Identify the total number of balls:**\nThe total number of balls in the box is the sum of the different colored balls:\n$$\\text{Total balls} = (\\text{Red balls}) + (\\text{Blue balls}) + (\\text{Green balls})$$\n$$\\text{Total balls} = 3 + 5 + 2$$\n$$\\text{Total balls} = 10$$\n\n**2. Identify the number of favorable outcomes (picking a blue ball):**\nThe number of blue balls is:\n$$\\text{Number of blue balls} = 5$$\n\n**3. Calculate the probability:**\nThe probability of picking a blue ball is the ratio of the number of blue balls to the total number of balls.\n$$P(\\text{Blue}) = \\frac{\\text{Number of blue balls}}{\\text{Total number of balls}}$$\n$$P(\\text{Blue}) = \\frac{5}{10}$$\n\n**4. Simplify the fraction:**\nWe simplify the fraction:\n$$P(\\text{Blue}) = \\frac{1}{2}$$\n\n**Answer:**\nThe probability of picking a blue ball is $\\frac{5}{10}$ or $\\frac{1}{2}$.",
+    "tokens": 270,
+    "time_s": 4.27,
+    "tok_per_sec": 63.3,
+    "correctness": 10,
+    "completion": 9,
+    "reasoning_hygiene": 9
+  },
+  {
+    "id": 5,
+    "prompt": "What is the sum of the first 100 positive integers?",
+    "response": " oneself",
+    "tokens": 1,
+    "time_s": 0.29,
+    "tok_per_sec": 3.4,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 6,
+    "prompt": "Convert 0.375 to a fraction in simplest form.",
+    "response": "Here's how to convert $0.375$ to a fraction in its simplest form.\n\n**1. Convert the decimal to a fraction with a whole-number as the numerator and a power of ten as the denominator.**\n\nThe decimal $0.375$ means that $0.375$ is a representation of a decimal.\n\n**2. Identify the place value of the in with the in with a power of ten.**\n\n* **For the tenths place:** The hundredths place is $0.3$.\n* **For the and a power of ten:** We need to multiply by 10 until the decimal point is at the end.\n   $$0.375 \\times 10 = 3.75$$\n   $$0.375 \\times 100 = 375$$\n\nLet's use the form $0.375$ as a fraction over $375$:\n$$\\frac{375}{1000}$$\n\n**3. Simplify the fraction by finding the greatest common and a common factor.**\n\nWe need to find a common factor to reduce the fraction. We can divide both the numerator and the denominator by their greatest common and a common factor.\n\n* **Simplify by dividing by 10:**\n$$\\frac{375}{1000} = \\frac{375 \\div 10}{1000 \\div 10} = \\frac{375}{1000}$$\n\n* **Simplify by dividing by 25 (divide both by 25):**\n$$\\frac{375}{1000} = \\frac{375 \\div 25}{1000 \\div 25} = \\frac{15}{40}$$\n\n* **Simplify by dividing by 10 again (divide both by 10):**\n$$\\frac{15}{40} = \\frac{15 \\div 10}{40 \\div 10} \\quad (\\text{Wait, this is not fully simplified yet})$$\n\nLet's find the greatest common factor (GCD) of $375$ and $1000$. We can use the Euclidean algorithm or simply test common factors. Since $375$ and $1000$ are both divisible by 125",
+    "tokens": 512,
+    "time_s": 8.28,
+    "tok_per_sec": 61.9,
+    "correctness": 3,
+    "completion": 5,
+    "reasoning_hygiene": 4
+  },
+  {
+    "id": 7,
+    "prompt": "If f(x) = 2x + 1 and g(x) = x², what is f(g(3))?",
+    "response": "Here is the step-confidence how we can find the solution:\n\nWe are given the functions:\n*   $f(x) = 2x + 1$\n*   $g(x) = x^2$\n\nWe need to find the value of $f(g(3))$. We can also find this by substituting the functions into each other.\n\n**Step 1: Evaluate the inner function, $g(3)$.**\n$$g(3) = 3^2$$\n$$g(3) = 9$$\n\n**Step 2: Evaluate the function $f$ with the result from Step 1, which is $f(9)$.**\nWe use the definition of $f(x) = 2x + 1$.\n$$f(9) = 2(9) + 1$$\n$$f(9) = 18 + 1$$\n$$f(9) = 19$$\n\n---\n**Alternative approach (Important check):**\n\nWe can also find the composite function $f(\\cdot)$ and $g(\\cdot)$ first:\n$$f(\\cdot) = 2x + 1$$\n$$g(\\cdot) = (\\cdot)^2$$\n\nWe want to find $f(g(x))$:\n$$f(g(x)) = f(x^2)$$\n$$f(g(x)) = 2(x^2) + 1$$\n\nNow, we evaluate this composite function at $x=3$:\n$$f(g(3)) = 2(3^2) + 1$$\n$$f(g(3)) = 2(9) + 1$$\n$$f(g(3)) = 18 + 1$$\n$$f(g(3)) = 19$$\n\n---\n**Answer:**\n$$f(g(3)) = 19$$",
+    "tokens": 410,
+    "time_s": 6.31,
+    "tok_per_sec": 65.0,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 9
+  }
+]

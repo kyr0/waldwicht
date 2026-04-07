@@ -1,0 +1,90 @@
+[
+  {
+    "id": 0,
+    "prompt": "What is 2+2? Answer with just the number.",
+    "response": "4",
+    "tokens": 1,
+    "time_s": 0.42,
+    "tok_per_sec": 2.4,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 1,
+    "prompt": "Solve: 17 \u00d7 23. Show your work step by step.",
+    "response": "Here are a few ways to solve $17 \\times 23$, depending depending on what you already know. The most common method is using the standard multiplication algorithm.\n\n### Method 1: Standard Multiplication (Breaking down the numbers)\n\nWe will multiply $17$ by $23$. This means we will calculate:\n$17 \\times (30 + 1)$ or $17 \\times (20 + 3)$.\n\nWe will calculate $17 \\times (2 \\times 3)$:\n$$17 \\times 2 = 17$$\nThis is simply $17 + 17$.\n\nSo, we need to calculate:\n$$17 \\times 3$$\n\n**Step 1: Multiply 17 by 3**\nWe can write this as:\n$$17 \\times 3 = 17 \\times (3)$$\nThis means we are finding $17$ three times.\n$$17 \\ \\text{(This is the definition)}$$\n$$17 \\ \\text{(This is the definition)}$$\n$$17 \\ \\text{(This is the definition)}$$\n\nAlternatively, we can use the distributive property ($a \\times (b+c) = ab + ac$):\n\nWe want to calculate $17 \\times 3$. Since 3 is easily calculated, we can use:\n$$1 \\times 3 = 3$$\nAnd we have $7$ left.\n$$1 \\times 3 = 3$$\nAnd we have $7$ left.\n\nLet's use the standard vertical multiplication:\n\n$$\\begin{array}{c} & 1 & 7 & \\quad (\\text{This is } 17) \\\\ \\times & & & \\\\ & & & \\\\ \\hline & & & \\end{array}$$\n\nWe will calculate $17 \\times 3$:\n\n**Step 1: Calculate $17 \\times 1$**\n$$17 \\times 1 = 17$$\n\n**Step 2: Calculate $17 \\times 2$**\nThis is $17 + 17$.\n$$17 \\times 2 = 17 \\quad (\\text{This is the definition)}$$\n\n**Step 3: Calculate $17 \\times 3$**\nThis is $17 + 17 + 1",
+    "tokens": 511,
+    "time_s": 18.56,
+    "tok_per_sec": 27.5,
+    "correctness": 0,
+    "completion": 2,
+    "reasoning_hygiene": 1
+  },
+  {
+    "id": 2,
+    "prompt": "If a train travels 120 km in 2 hours, what is its average speed in m/s?",
+    "response": "Here's how to calculate the average speed and convert it to meters per second ($\\text{m/s}$):\n\n**1. Understand the initial information:**\n\n* **Distance:** $120 \\text{ km}$\n* **Time:** $2 \\text{ hours}$\n\n**2 Calculate the average speed (in $\\text{km}$):**\n\nThe formula for average speed is:\n$$\\text{Speed} = \\frac{\\text{Distance}}{\\text{Time}}$$\n\n$$\\text{Speed} = \\frac{120 \\text{ km}}{ 2 \\text{ h}}$$\n\n$$\\text{Average Speed} = 60 \\text{ km/h}$$\n\n**(This means the train travels at a constant speed of $60 \\text{ km}$ for that journey.)**\n\n**3 Convert the speed to $\\text{m/s}$:**\n\nWe know that:\n* $1 \\text{ km} = 100 \\text{ meters} \\text{ (or } 100 \\text{ distance)}$\n* $1 \\text{ hour} = 3600 \\text{ seconds} \\text{ (or } 3600 \\text{ time)}$\n\nSo, to convert $ \\text{ km/h} $ to $ \\text{ m/s} $, we need to divide by $ 100 $ and multiply by $ 3600 $:\n\n$$\\text{Speed in } \\text{ m/s} = \\frac{60 \\text{ km}}{ \\frac{1 \\text{ h}}{} }$$\n\n$$\\text{Speed} = \\frac{60 \\times 100 \\text{ km}}{ 1 \\text{ h}} = 60 \\times 100 \\text{ km/h}$$\n\n$$\\$$\\text{Distance in meters} = 120 \\text{ km}$$\n\n$$\\text{Time in seconds} = 2 \\text{ hours}$$\n\n**Calculation (Putting everything into one):**\n\nWe have a total journey of $ 120 \\text{ km} $ in $ 2 \\text{ hours} $. Let's assume this is the total distance traveled in a specific direction, and we want the resulting speed in $\\text{ m/s}$.\n\nWe will assume the distance is $ 120 \\text{ km} $ and the time is",
+    "tokens": 512,
+    "time_s": 18.59,
+    "tok_per_sec": 27.5,
+    "correctness": 2,
+    "completion": 3,
+    "reasoning_hygiene": 2
+  },
+  {
+    "id": 3,
+    "prompt": "What is the derivative of x\u00b3 + 2x\u00b2 - 5x + 3?",
+    "response": "To find the derivative of the expression $x^3 + 2x^2 - 5x + 3$, we will use the rule for the derivative of a polynomial, which is:\n\n**The derivative of a sum is the sum of the derivatives, and the derivative of a single term is found using the power rule.**\n\nThe **power rule** states that if you have a term like $ax^n$, its derivative is $n \\cdot a$, provided that $x$ is multiplied or divided by, and we are differentiating with respect to $x$.\n\nWe will apply this term by term:\n\n1. **Term 1:** $x^3$\n   Applying the rule: The power is 3.\n   Derivative of $x^3$ is $3 \\cdot x$ (assuming we are differentiating with respect to $x$, and we are finding the coefficient).\n   Derivative: $3 \\cdot x$\n\n2. **Term 2:** $2x^2$\n   This is a constant multiplied by $x$ raised to the power 2.\n   We will find the derivative of $2x^2$.\n   Applying the rule: The power is 2.\n   Derivative: $2 \\cdot x$\n\n3. **Term 3:** $-5x$\n   This is a constant multiplied by $x$ raised to the power 1.\n   We will find the derivative of $-5x$.\n   Applying the rule: The power is 1.\n   Derivative: $-5 \\cdot x$\n\n4. **Constant Term:** $+ 3$\n   The derivative of any constant is 0.\n\n**Putting it together:**\n\nWhen finding the derivative of an expression like this, we are typically finding the derivative of each term with respect to $x$, and we will also include the constant term.\n\nLet $ y = x^3 + 2x^2 - 5x + 3 $.\n We want to find $\\frac{dy}{d\\mathbf{v}}$, where $\\mathbf{v}$ represents the variable we are differentiating with. Since the resulting expression is a polynomial in $ x $, we will find $\\frac{dy}{d\\mathbf{}}$.\n\nWe will use the rule: $\\frac{d}{dx} (ax) = a$ (for $x$).\n\n$$\\frac{d}{dx} (x^3) = \\text{Coefficient}",
+    "tokens": 510,
+    "time_s": 22.68,
+    "tok_per_sec": 22.5,
+    "correctness": 2,
+    "completion": 2,
+    "reasoning_hygiene": 2
+  },
+  {
+    "id": 4,
+    "prompt": "A box has 3 red, 5 blue, and 2 green balls. What's the probability of picking blue?",
+    "response": "Here's how to figure out the probability of picking a blue ball:\n\n**1. Find the total number of balls:**\n\n* Red balls: 3\n* Blue balls: 5\n* Green balls: 2\n* **Total:** $3 + 5 + 2 = 10$ balls\n\n**2 Identify the number of favorable outcomes:**\n\n* Number of blue balls: **5**\n\n**3 Calculate the probability:**\n\nProbability is calculated using the following formula:\n\n$$\\text{Probability} = \\frac{\\text{Number of favorable outcomes}}{\\text{Total number of outcomes}}$$\n\nIn this case:\n\n$$\\text{Probability (Blue)} = \\frac{\\text{Number of blue balls}}{\\text{Total number of balls}} = \\frac{5}{10}$$\n\n**4 Simplify the fraction:**\n\n$$\\frac{5}{10} = \\frac{1}{2}$$\n\n**Answer:**\n\nThe probability of picking a blue ball is **$\\frac{1}{2}$** or **5 out of 10**, which simplifies to **$\\frac{1}{2}$** or **50%**.",
+    "tokens": 239,
+    "time_s": 9.74,
+    "tok_per_sec": 24.5,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 5,
+    "prompt": "What is the sum of the first 100 positive integers?",
+    "response": "There are two ways to find the sum of the first 100 positive integers. This involves finding the sum of an arithmetic progression, which is the easiest way.\n\nThe positive integers are: $1, 2,, 3,, \\dots, 100$.\n\nWe are looking for the sum: $1 + 2 + + 3 + \\dots + 100$.\n\nThis is the sum of an arithmetic progression where:\n* The first term ($a_1$) is 1.\n* The common difference ($d$) is 1.\n* The number of terms ($n$) is 100.\n\nWe can use the formula for the sum of the first $n$ positive integers, which is:\n$$S = \\frac{n(n+1)}{2}$$\n\nIn this case, $n = 100$.\n\n1. ** Identify the values:**\n   We are summing the positive integers, so we are looking for the sum of the integers from 1 up to 100.\n\n2. ** Apply the formula:**\n   We want to find the sum of the integers from 1 to 100. This is equivalent to finding the sum of the first 100 positive integers.\n\nWe can use the formula for the sum of an arithmetic progression:\n$$S = \\frac{n}{}(a + a_)$, where $ $ is the number of terms.\n\nIn this case, we are summing the numbers $1, 2, 3, \\dots, 100$. This is the sum of the positive integers, which is:\n$$S = \\frac{n(n+1)}{2}$$\n\nWhere $n$ is the number of terms, which is 100.\n\n$$S = \\frac{100(100+1)}{2}$$\n\nThis is the formula for summing consecutive integers, which is equivalent to finding the sum of an arithmetic progression.\n\nThe sum of the first $n$ positive integers is given by:\n$$S = \\frac{n(n+1)}{2}$$\n\nHowever, the most common interpretation of \"the sum of the first 100 positive integers\" is finding the value of:\n$$1 + 2 + + 3 + \\dots + 100$$\n\nThis is the sum of an arithmetic progression with:\n* First term ($a",
+    "tokens": 510,
+    "time_s": 18.48,
+    "tok_per_sec": 27.6,
+    "correctness": 5,
+    "completion": 3,
+    "reasoning_hygiene": 5
+  },
+  {
+    "id": 6,
+    "prompt": "Convert 0.375 to a fraction in simplest form.",
+    "response": "Here are the steps to convert $0.375$ to a fraction in its simplest form:\n\n**Step 1: Identify the place value of the decimal.**\n\nThe number is $0.375$.\n* The digit '3' is in the **tenths** place.\n* The digit '7' is in the **hundredths** place.\n* The digit '5' is in the **thousandths** place.\n\n**Step 2. Write the number as a fraction.**\n\nWhen you read the number based on its place value, you get:\n$$0.375 = \\frac{\\text{the number without decimals}}{\\text{the place of the last digit}}$$\n\nSince there is a digit in the thousandths place (the '5'), we can start with 9: (This is an optional step, but it helps visualize the pattern.)\n\nWe have three digits (3, 7, and 5), so we will put them over nine::\n$$0.375 = \\frac{3}{10} + \\frac{7}{100} + \\frac{5}{1000}$$\n\n**Step 3. Convert to a single fraction.**\n\nThe number is $0.375$. This means we have **three** digits after the decimal point (the 3, the 7, and the 5). Therefore, we will put these digits over:\n\n$$\\text{Decimal form} \\rightarrow \\text{Fraction}$$\n$$0.375 \\rightarrow \\frac{375}{\\text{place}}$$\n\nSince there are three digits, we put the number over **3**::\n$$0.375 = \\frac{3}{}$$\n\nThis means the whole number is 3.\n\n**Step 4. Simplify the fraction.**\n\nThe number is $0.375$. This means we have **three** digits (3, 7, and 5), so we will put them over **3**:.\n\nWe have three digits, so we write the number over 3::\n$$0.375 = \\frac{3}{}$$\n\nThis means the whole number is 3.\n\n**Step 5. Convert to a fraction.**\n\nThe number is $0.375$. This means we have three digits, so we will put them over **3**:.\n\nThis means the whole number",
+    "tokens": 510,
+    "time_s": 21.18,
+    "tok_per_sec": 24.1,
+    "correctness": 0,
+    "completion": 2,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 7,
+    "prompt": "If f(x) = 2x + 1 and g(x) = x\u00b2, what is f(g(3))?",
+    "response": "Here's how to find the expression and calculate the final value:\n\n**Given:**\n* $f(x) = 2x + 1$\n* $g(x) = x^ {}$ (which means $g(x) = x$)\n\n**We need to find:** $f(g(3))$\n\nThis involves working from the inside outward:\n\n**Step 1: Find $g(3)$**\nSince $g(x) = x$, we have:\n$$g(3) = 3$$\n\n**Step 2: Use the result to find $f()$**\nNow we need to find $f()$ using the result from Step 1. So we need to find $f(3)$:\n$$f(g(3)) = f(3)$$\n\nNow we use the definition of $f(x) = 2x + 1$:\n$$f(3) = 2(3) + 1$$\n\n**Step 3: Calculate the final value**\n$$f(g(3)) = 2(3) + 1$$\n$$f(g(3)) = 6 + 1$$\n$$f(g(3)) = 7$$\n\n---\n**Alternative way (Finding the expression first):**\n\n1. **Find the expression for $f(g(x))$:**\n   Since $g(x) = x$, then:\n   $$$f(g(x)) = f(x) = 2(x) + 1$\n   So, $f(g(x)) = 2x + 1$.\n\n2. **Evaluate this new expression at $x=3$:**\n   $$$f(g(3)) = 2(3) + 1$\n\n3. **Calculate:**\n   $2(3) + 1 = 6 + 1 = 7$\n\n**Answer:**\n$$f(g(3)) = 7$$",
+    "tokens": 427,
+    "time_s": 16.55,
+    "tok_per_sec": 25.8,
+    "correctness": 0,
+    "completion": 10,
+    "reasoning_hygiene": 2
+  }
+]

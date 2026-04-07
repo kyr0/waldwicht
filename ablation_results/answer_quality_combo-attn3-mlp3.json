@@ -1,0 +1,90 @@
+[
+  {
+    "id": 0,
+    "prompt": "What is 2+2? Answer with just the number.",
+    "response": "4",
+    "tokens": 1,
+    "time_s": 0.31,
+    "tok_per_sec": 3.2,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 1,
+    "prompt": "Solve: 17 \u00d7 23. Show your work step by step.",
+    "response": "Here are a few ways to solve $17 \\times 23$:\n\n**Method 1: Standard Multiplication**\n\n1. **Set up the multiplication:**\n   $$17 \\times 23$$\n\n2. **Multiply the numbers:**\n   * Multiply the tens digit of 17 (which is 1) by the other number (23):\n     $$1 \\times 23 = 23$$\n   * Multiply the tens digit of 17 (which is 1) by itself (this is not needed for the standard algorithm, but it's the setup):\n     $$1 \\times 17 = 17$$\n\n3. **Add the partial products:**\n   $$23 + 17$$\n\n4. **Calculate the final sum:**\n   $$23 + 17 = 40$$\n\n**Method 2: Distributive Property (Breaking down the numbers)**\n\n1. **Break down 17:**\n   $$17 = 10 + 7$$\n\n2. **Apply the distributive property:**\n   $$17 \\times 23 = (10 + 7) \\times 23 = (10 \\times 23) + (7 \\times 23)$$\n\n3. **Calculate the parts:**\n   * $10 \\times 23 = 230$\n   * $7 \\times 23 = 161$\n\n4. **Add the parts:**\n   $$230 + 161$$\n\n5. **Final Calculation:**\n   $$230 + 161 = 391$$\n\n**Method 3: Standard Algorithm (Vertical Setup)**\n\n1. **Set up the multiplication:**\n   $$\\begin{array}{r} 17 \\\\ \\times 23 \\\\ \\hline \\end{array}$$\n\n2. **Multiply the ones column (17):**\n   * $1 \\times 23 = 23$\n   $$\\begin{array}{r} 17 \\\\ \\times 23 \\\\ \\hline 23 \\end{array}$$\n\n3. **Multiply the tens column (10 and 23):**\n   * $1 \\times 23 = 23$\n   $$23 + 23 = 46$$\n\n4. **",
+    "tokens": 512,
+    "time_s": 8.89,
+    "tok_per_sec": 57.6,
+    "correctness": 2,
+    "completion": 3,
+    "reasoning_hygiene": 3
+  },
+  {
+    "id": 2,
+    "prompt": "If a train travels 120 km in 2 hours, what is its average speed in m/s?",
+    "response": "Here's how to solve the problem:\n\n**1. Understand the relationship between speed and distance:**\n\nThe fundamental formula for speed is:\n$$\\text{Speed} = \\frac{\\text{Distance}}{\\text{Time}}$$\n\n**2. Identify the given values:**\n\n* **Distance:** 120 km\n* **Time:** 2 hours\n\n**3. Calculate the average speed in km/h:**\n\n$$\\text{Speed} = \\frac{120 \\text{ km}}{2 \\text{ hours}} = 60 \\text{ km/h}$$\n\n**4. Convert the speed from km/h to m/s:**\n\nTo convert from km/h to m/s, we use the conversion factor:\n$$1 \\text{ km} = 1000 \\text{ meters}$$\n$$1 \\text{ hour} = \\frac{3600 \\text{ seconds}}{1 \\text{ hour}} \\implies 1 \\text{ hour} = \\frac{1 \\text{ hour}}{1 \\text{ hour}} \\text{ (This is not helpful for direct conversion)}$$\n\nWe need to convert the units to match the required unit (m/s).\n\n* **Distance in meters:**\n   $$120 \\text{ km} \\times \\frac{1000 \\text{ m}}{1 \\text{ km}} = 120,000 \\text{ meters}$$\n\n* **Time in seconds:**\n   $$2 \\text{ hours} \\times \\frac{3600 \\text{ seconds}}{1 \\text{ hour}} = 7200 \\text{ seconds}$$\n\n**5. Calculate the speed in m/s:**\n\n$$\\text{Speed} = \\frac{120,000 \\text{ meters}}{7200 \\text{ seconds}}$$\n\n$$\\text{Speed} = \\frac{120,000}{7200}$$\n\n**6. Simplify the fraction:**\n\n$$\\text{Speed} = \\frac{1200}{72}$$\n\nDivide both by 10:\n$$\\text{Speed} = \\frac{120}{7.2}$$\n\nDivide both by 12:\n$$\\text{Speed} = \\frac{10}{6} = \\frac{5}{3}$$\n\n**7. Final Calculation:**",
+    "tokens": 512,
+    "time_s": 8.93,
+    "tok_per_sec": 57.3,
+    "correctness": 2,
+    "completion": 8,
+    "reasoning_hygiene": 3
+  },
+  {
+    "id": 3,
+    "prompt": "What is the derivative of x\u00b3 + 2x\u00b2 - 5x + 3?",
+    "response": "To find the derivative of the function $f(x) = x^3 + 2x^2 - 5x + 3$, we need to take the derivative of each term with respect to $x$ and apply the linearity of differentiation.\n\nWe will differentiate term by term:\n\n1. **Derivative of $x^3$:**\n   Using the power rule, the derivative of $x^3$ is $3x^{3-1} = 3x^2$.\n\n2. **Derivative of $2x^2$:**\n   Using the power rule, the derivative of $2x^2$ is $2 \\cdot (2x^{2-1}) = 2 \\cdot (2x^1) = 4x$.\n\n3. **Derivative of $-5x$:**\n   The derivative of $-5x$ is $-5 \\cdot \\frac{d}{dx}(x) = -5 \\cdot 1 = -5$.\n\n4. **Derivative of $3$ (or the constant term):**\n   The derivative of a constant is zero.\n\n5. **Derivative of $3$:**\n   The derivative of $3$ is $0$.\n\nCombining these results, the derivative of $x^3 + 2x^2 - 5x + 3$ is:\n$$\\frac{d}{dx}(x^3) + \\frac{d}{dx}(2x^2) - \\frac{d}{dx}(5x) + \\frac{d}{dx}(3)$$\n$$= 3x^2 + 2(2x) - 5 - 0$$\n$$= 3x^2 + 4x - 5$$\n\n**Therefore, the derivative is $x^3 + 4x - 5$.**",
+    "tokens": 386,
+    "time_s": 7.37,
+    "tok_per_sec": 52.4,
+    "correctness": 5,
+    "completion": 10,
+    "reasoning_hygiene": 7
+  },
+  {
+    "id": 4,
+    "prompt": "A box has 3 red, 5 blue, and 2 green balls. What's the probability of picking blue?",
+    "response": "Here's how to determine the probability of picking a blue ball:\n\n**1. Determine the total number of balls:**\n* Red balls: 3\n* Blue balls: 5\n* Green balls: 2\n* **Total balls:** $3 + 5 + 2 = 10$\n\n**2. Determine the number of favorable outcomes (picking a blue ball):**\n* There are 5 blue balls.\n\n**3. Determine the total number of possible outcomes:**\n* There are 10 balls in total.\n\n**4. Calculate the probability:**\nThe probability of an event is calculated as:\n$$\\text{Probability} = \\frac{\\text{Number of favorable outcomes}}{\\text{Total number of outcomes}}$$\n\n$$\\text{P(Blue)} = \\frac{5}{10}$$\n\n**5. Simplify the fraction:**\n$$\\text{P(Blue)} = \\frac{5}{10} = \\frac{1}{2}$$\n\n**Answer:**\n\nThe probability of picking a blue ball is $\\frac{5}{10}$ or $\\frac{1}{2}$ (or 50%).",
+    "tokens": 241,
+    "time_s": 4.4,
+    "tok_per_sec": 54.8,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 5,
+    "prompt": "What is the sum of the first 100 positive integers?",
+    "response": "Here are a few ways to think about this, using the formula for the sum of an arithmetic series.\n\n### Method 1: Using the Formula\n\nThe sum of the first $n$ positive integers is given by the formula:\n$$\\text{Sum} = \\frac{n(n+1)}{2}$$\n\nIn this case, $n = 100$.\n\n$$\\text{Sum} = \\frac{100(100+1)}{2}$$\n$$\\text{Sum} = \\frac{100(101)}{2}$$\n$$\\text{Sum} = \\frac{100(101)}{2}$$\n$$\\text{Sum} = \\frac{10100}{2}$$\n$$\\text{Sum} = 5050$$\n\n---\n\n### Method 2: Using the Arithmetic Series Formula (or Gauss's formula)\n\nThe sum of the first $n$ positive integers is equivalent to the sum of the first $n$ terms of an arithmetic sequence where the first term is 1 and the common difference is 1.\n\nThe formula for the sum of an arithmetic series is:\n$$S_n = \\frac{n}{2} (a_1 + a_n)$$\n\nHere, $n = 100$, $a_1 = 1$, and $a_n = 100$.\n\n$$S_{100} = \\frac{100}{2} (1 + 100)$$\n$$S_{100} = 50 (101)$$\n$$S_{100} = 5050$$\n\n---\n\n### Method 3: Using the Arithmetic Series Formula (Direct Calculation)\n\nThis is the standard method for summing consecutive integers:\n$$1 + 2 + 3 + 4 + \\dots + 99 + 100$$\n\nWe pair the first and last term:\n* $1 + 100 = 101$\n* $2 + 99 = 101$\n* $3 + 98 = 101$\n* ...\n\nSince there are 100 terms, we can pair them up perfectly. We have $100$ terms, and they form $50$ pairs, each summing to 101.\n\n$$\\text{Number of",
+    "tokens": 512,
+    "time_s": 8.89,
+    "tok_per_sec": 57.6,
+    "correctness": 8,
+    "completion": 6,
+    "reasoning_hygiene": 9
+  },
+  {
+    "id": 6,
+    "prompt": "Convert 0.375 to a fraction in simplest form.",
+    "response": "Here's how to convert $0.375$ to a fraction in simplest form:\n\n**1. Understand the relationship:**\nThe decimal $0.375$ means 375 out of 1000.\n$$\\frac{0.375 = \\frac{375}{1000}}$$\n\n**2. Simplify the fraction:**\nTo simplify, we need to find the greatest common divisor (GCD) of the numerator (375) and the denominator (1000).\n\n* **Divide by 25:**\n   * $375 \\div 25 = 15$\n   * $1000 \\div 25 = 40$\n   $$\\frac{375 \\div 25}{1000 \\div 25} = \\frac{15}{40}$$\n\n* **Divide by 5:**\n   * $15 \\div 5 = 3$\n   * $40 \\div 5 = 8$\n   $$\\frac{15 \\div 5}{40 \\div 5} = \\frac{3}{8}$$\n\n**3. Final Answer:**\nThe simplified fraction is $\\frac{3}{8}$.\n\n**Check:**\nIf you convert $\\frac{3}{8}$ back to a decimal:\n$$3 \\div 8 = 0.375$$\n\n**Answer:** $\\frac{3}{8}$",
+    "tokens": 319,
+    "time_s": 5.89,
+    "tok_per_sec": 54.2,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 7,
+    "prompt": "If f(x) = 2x + 1 and g(x) = x\u00b2, what is f(g(3))?",
+    "response": "Here's how to solve the problem step-by-step:\n\n**Given the functions:**\n* $f(x) = 2x + 1$\n* $g(x) = x^2$\n\n**We need to find $f(g(3))$**\n\n**Step 1: Evaluate the inner function, $g(3)$**\nSince $g(x) = x^2$, we substitute $x=3$:\n$$g(3) = 3^2 = 9$$\n\n**Step 2: Evaluate the outer function, $f(g(3))$**\nNow we substitute the result from Step 1 into the function $f(x)$:\n$$f(g(3)) = f(9)$$\nSince $f(x) = 2x + 1$, we substitute $x=9$:\n$$f(9) = 2(9) + 1$$\n\n**Step 3: Calculate the final result**\n$$f(9) = 18 + 1$$\n$$f(9) = 19$$\n\n**Answer:**\n$$f(g(3)) = 19$$",
+    "tokens": 253,
+    "time_s": 4.8,
+    "tok_per_sec": 52.7,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  }
+]

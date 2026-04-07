@@ -1,0 +1,90 @@
+[
+  {
+    "id": 0,
+    "prompt": "What is 2+2? Answer with just the number.",
+    "response": "1",
+    "tokens": 1,
+    "time_s": 0.26,
+    "tok_per_sec": 3.8,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 1,
+    "prompt": "Solve: 17 × 23. Show your work step by step.",
+    "response": "That's a very common feeling one! I am the ultimate solver, the one who knew how to solve a problem.\n\nHere's the magic:\n\n**1. Solve:** I got the feeling-bottom-oness, the one who keeps them! (Or, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness, the one who got the feeling-bottom-oness",
+    "tokens": 512,
+    "time_s": 13.84,
+    "tok_per_sec": 37.0,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 2,
+    "prompt": "If a train travels 120 km in 2 hours, what is its average speed in m/s?",
+    "response": "The question is about the same thing, which is a common one-way vs. direct question, it's about the same thing, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit, which is a bit",
+    "tokens": 512,
+    "time_s": 13.72,
+    "tok_per_sec": 37.3,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 3,
+    "prompt": "What is the derivative of x³ + 2x² - 5x + 3?",
+    "response": "This is a common form of a question, and then an everyday one can think to solve the question, it is now, a very good one, and then then the everyday one is to solve the question, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is now, it is",
+    "tokens": 512,
+    "time_s": 13.82,
+    "tok_per_sec": 37.0,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 4,
+    "prompt": "A box has 3 red, 5 blue, and 2 green balls. What's the probability of picking blue?",
+    "response": "This is a probability question. The question is usually about the probability of an event, which is the general $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{Ar.G.})$ or $P(\\text{Ar.G.})$ which is the standard $P(\\text{",
+    "tokens": 512,
+    "time_s": 14.46,
+    "tok_per_sec": 35.4,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 5,
+    "prompt": "What is the sum of the first 100 positive integers?",
+    "response": "The question asks for the **sum of the first 100 positive integers**, which means the question is asking for the **sum of the first 100 positive integers**, which is a question that is not yet done yet.\n\nLet's assume the question is to find the sum of the first 100 positive integers. The question is usually about the sum of the first $n$ positive integers, which is usually $\\sum_{i=1}^{d} \\text{sum} \\text{of } \\text{sum} \\text{of } \\text{sum} \\text{of } \\text{sum} \\text{of } \\text{sum} \\text{of } \\text{sum}$\n\nThe question is usually about the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\n\nLet's assume the question is to find the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\n\nLet's assume the question is to find the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\n\nLet's assume the question is to find the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\n\nLet's assume the question is to find the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\n\nLet's assume the question is to find the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $n$ positive integers.\n\nLet's assume the question is to find the sum of the first $n$ positive integers.\nThe question is usually about the sum of the first $",
+    "tokens": 512,
+    "time_s": 14.56,
+    "tok_per_sec": 35.2,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 6,
+    "prompt": "Convert 0.375 to a fraction in simplest form.",
+    "response": "This is a very common point where things like **and** are in the same place, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase \"and\" is a very important one, but the phrase and a very important one\" is not to solve the same problem.\n```python\ntext = convert(text, str, str_str)\n```\n*/\nconvert_str_len(str_str)\nreturn str_len(gdb)\n```\nconvert_str_len(str_len(str) + 1)\n```\n```python\ntext = convert_str_len(str_str)\n```\nThis is a common one to solve the same problem, because the phrase \"and\" is a very important one, because the same text is not to solve the same problem, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one, because the same text is a very important one\" is not to solve the same problem.\nconvert_len(str_str)\n```\ntext soon to say that the same text is a very important one, because the same text is a very important one, because the same text is a very important one,",
+    "tokens": 512,
+    "time_s": 14.37,
+    "tok_per_sec": 35.6,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  },
+  {
+    "id": 7,
+    "prompt": "If f(x) = 2x + 1 and g(x) = x², what is f(g(3))?",
+    "response": "The provided text is a bit for a while goers from a few words, but the request is for a specific value.\n\nHere is the solution:\n\n**This is a fun but very fun, but it goes to a *end* go to go to trouble.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let's try to solve it.**\n\n**Let't try to solve it.** (Let's try to solve it. [This is a common phrase, but it's not going to get here.] )**\n\n**Let's try to solve it.** (Let's try to solve it. [This is a common phrase, but it's not to go to trouble.] )\n\n**Let's try to solve it.** (Let's try to solve it. [This is a common phrase, but it's not to go trouble.] )**\n\n**Let's try to solve it.** (Let's try to solve it. [This is a common phrase, but it's not to go trouble.] )**\n\n**Let's try to solve",
+    "tokens": 512,
+    "time_s": 14.36,
+    "tok_per_sec": 35.7,
+    "correctness": 0,
+    "completion": 0,
+    "reasoning_hygiene": 0
+  }
+]

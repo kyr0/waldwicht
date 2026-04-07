@@ -1,0 +1,90 @@
+[
+  {
+    "id": 0,
+    "prompt": "What is 2+2? Answer with just the number.",
+    "response": "4",
+    "tokens": 1,
+    "time_s": 0.29,
+    "tok_per_sec": 3.5,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 1,
+    "prompt": "Solve: 17 \u00d7 23. Show your work step by step.",
+    "response": "Here are a few different ways to solve $17 \\times 23$, step-by-step:\n\n---\n\n### Method 1: Standard Multiplication (Distributive Property)\n\nThis method involves multiplying 17 by 23 directly.\n\n**Step 1: Multiply by the ones digit (7)**\nMultiply 23 by 7:\n$$23 \\times 7$$\n$$20 \\times 7 = 140$$\n$$3 \\times 7 = 21$$\n$$140 + 21 = 161$$\nSo, $7 \\times 23 = 161$.\n\n**Step 2: Multiply by the tens digit (10)**\nMultiply 23 by 10 (or just 23 and add a zero):\n$$23 \\times 10 = 230$$\n\n**Step 3: Add the results**\nAdd the results from Step 1 and Step 2:\n$$161 + 230$$\n$$161 + 230 = 391$$\n\n**Answer:** $17 \\times 23 = 391$\n\n---\n\n### Method 2: Using the Distributive Property (Breaking Down Numbers)\n\nWe can rewrite 17 as $(10 + 7)$ and multiply it out.\n\n**Step 1: Apply the Distributive Property**\n$$17 \\times 23 = (10 + 7) \\times 23$$\n$$17 \\times 23 = (10 \\times 23) + (7 \\times 23)$$\n\n**Step 2: Calculate the parts**\nCalculate $10 \\times 23$:\n$$10 \\times 23 = 230$$\n\nCalculate $7 \\times 23$ (We calculated this in Method 1):\n$$7 \\times 23 = 161$$\n\n**Step 3: Add the parts**\n$$230 + 161 = 391$$\n\n**Answer:** $17 \\times 23 = 391$\n\n---\n\n### Method 3: Using the Distributive Property (Breaking Down the Other Number)\n\nWe can rewrite 23 as $(20 + 3)$ and multiply it out",
+    "tokens": 512,
+    "time_s": 15.7,
+    "tok_per_sec": 32.6,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 2,
+    "prompt": "If a train travels 120 km in 2 hours, what is its average speed in m/s?",
+    "response": "Here is how to solve the problem step-by-step:\n\n**1. Calculate the average speed in km/h:**\n\nThe formula for speed is:\n$$\\text{Speed} = \\frac{\\text{Distance}}{\\text{Time}}$$\n\nGiven:\n* Distance = $120 \\text{ km}$\n* Time = $2 \\text{ hours}$\n\n$$\\text{Speed} = \\frac{120 \\text{ km}}{2 \\text{ hours}} = 60 \\text{ km/h}$$\n\n**2. Convert the speed from km/h to m/s:**\n\nTo convert $\\text{km/h}$ to $\\text{m/s}$, we need to use the following conversion factors:\n* $1 \\text{ km} = 1000 \\text{ m}$\n* $1 \\text{ hour} = 3600 \\text{ seconds}$\n\nNow, apply these to the speed ($60 \\text{ km/h}$):\n\n$$\\text{Speed in m/s} = 60 \\frac{\\text{km}}{\\text{h}} \\times \\frac{1000 \\text{ m}}{1 \\text{ km}} \\times \\frac{1 \\text{ h}}{3600 \\text{ s}}$$\n\n$$\\text{Speed in m/s} = \\frac{60 \\times 1000}{3600}$$\n\n$$\\text{Speed in m/s} = \\frac{60000}{3600}$$\n\nSimplify the fraction:\n$$\\text{Speed in m/s} = \\frac{600}{36}$$\n\nDivide both numerator and denominator by 12:\n$$\\text{Speed in m/s} = \\frac{50}{3}$$\n\n**3. Calculate the final decimal value (optional but helpful):**\n\n$$\\text{Speed in m/s} \\approx 16.67 \\text{ m/s}$$\n\n---\n\n**Answer:**\n\nThe average speed of the train is **$\\frac{50}{3}$ m/s** (or approximately **$16.67 \\text{ m/s}$**).",
+    "tokens": 476,
+    "time_s": 14.66,
+    "tok_per_sec": 32.5,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 3,
+    "prompt": "What is the derivative of x\u00b3 + 2x\u00b2 - 5x + 3?",
+    "response": "To find the derivative of the polynomial $f(x) = x^3 + 2x^2 - 5x + 3$, we will use the rules of differentiation, primarily the **Sum/Difference Rule**, the **Constant Multiple Rule**, and the **Power Rule**.\n\nThe **Power Rule** states that the derivative of $x^n$ is $n x^{n-1}$.\nThe **Constant Multiple Rule** states that the derivative of $c \\cdot g(x)$ is $c \\cdot g'(x)$.\nThe derivative of a constant is zero.\n\nWe apply the derivative operator $\\frac{d}{dx}$ to each term separately:\n\n1. **Derivative of $x^3$:**\n   Using the Power Rule ($n=3$):\n   $$\\frac{d}{dx}(x^3) = 3x^{3-1} = 3x^2$$\n\n2. **Derivative of $2x^2$:**\n   Using the Constant Multiple Rule and the Power Rule ($n=2$):\n   $$\\frac{d}{dx}(2x^2) = 2 \\cdot \\frac{d}{dx}(x^2) = 2 \\cdot (2x^{2-1}) = 2 \\cdot (2x) = 4x$$\n\n3. **Derivative of $-5x$:**\n   Using the Constant Multiple Rule and the Power Rule ($x = x^1$, so $n=1$):\n   $$\\frac{d}{dx}(-5x) = -5 \\cdot \\frac{d}{dx}(x^1) = -5 \\cdot (1x^{1-1}) = -5 \\cdot (1) = -5$$\n\n4. **Derivative of $3$:**\n   The derivative of a constant is zero:\n   $$\\frac{d}{dx}(3) = 0$$\n\nNow, we combine these results using the **Sum/Difference Rule** (the derivative of a sum is the sum of the derivatives):\n$$f'(x) = \\frac{d}{dx}(x^3) + \\frac{d}{dx}(2x^2) + \\frac{d}{dx}(-5x) + \\frac{d}{dx}(3)$$\n$$f'(x) = 3x^2 + 4x - 5 + 0$$\n\n**Therefore, the derivative",
+    "tokens": 512,
+    "time_s": 15.36,
+    "tok_per_sec": 33.3,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 4,
+    "prompt": "A box has 3 red, 5 blue, and 2 green balls. What's the probability of picking blue?",
+    "response": "Here's how to calculate the probability of picking a blue ball:\n\n**1. Find the total number of balls:**\n* Red balls: 3\n* Blue balls: 5\n* Green balls: 2\n* **Total balls** = $3 + 5 + 2 = 10$\n\n**2. Identify the number of favorable outcomes (blue balls):**\n* Number of blue balls = 5\n\n**3. Calculate the probability:**\nThe probability of an event is calculated as:\n$$\\text{Probability} = \\frac{\\text{Number of favorable outcomes}}{\\text{Total number of possible outcomes}}$$\n\n$$\\text{Probability (Blue)} = \\frac{\\text{Number of blue balls}}{\\text{Total number of balls}} = \\frac{5}{10}$$\n\n**4. Simplify the fraction:**\n$$\\frac{5}{10} = \\frac{1}{2}$$\n\n**Answer:**\n\nThe probability of picking a blue ball is **$\\frac{5}{10}$** or **$\\frac{1}{2}$** (or **0.5** or **50%**).",
+    "tokens": 240,
+    "time_s": 7.35,
+    "tok_per_sec": 32.6,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 5,
+    "prompt": "What is the sum of the first 100 positive integers?",
+    "response": "Here's how to find the sum of the first 100 positive integers:\n\n**Understanding the Problem**\n\nWe are looking for the sum: $1 + 2 + 3 + \\dots + 100$.\n\n**Using the Formula (Arithmetic Series)**\n\nThis is an arithmetic series, and we can use the formula for the sum of the first $n$ positive integers:\n$$S_n = \\frac{n(n+1)}{2}$$\n\nIn this case, $n = 100$.\n\n**Calculation**\n\n1. **Substitute n:**\n   $$S_{100} = \\frac{100(100+1)}{2}$$\n\n2. **Simplify:**\n   $$S_{100} = \\frac{100(101)}{2}$$\n\n3. **Perform the multiplication:**\n   $$S_{100} = \\frac{10100}{2}$$\n\n4. **Perform the division:**\n   $$S_{100} = 5050$$\n\n**Answer**\n\nThe sum of the first 100 positive integers is **5050**.",
+    "tokens": 254,
+    "time_s": 7.87,
+    "tok_per_sec": 32.3,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 6,
+    "prompt": "Convert 0.375 to a fraction in simplest form.",
+    "response": "Here's how to convert the decimal 0.375 to a fraction:\n\n**1. Identify the place value:**\nThe decimal $0.375$ has three digits after the decimal point. This means we can write it as a fraction over a power of 10 that corresponds to the number of decimal places.\n\n**2. Write as a fraction over a power of 10:**\nSince there are three decimal places, we can write $0.375$ as:\n$$\\frac{375}{1000}$$\n\n**3. Simplify the fraction:**\nNow we need to find the greatest common divisor (GCD) to simplify the fraction. Both the numerator (375) and the denominator (1000) are divisible by 25 (since they end in 00, 25, 50, or 75).\n\n* **Divide by 25:**\n   * $375 \\div 25 = 15$\n   * $1000 \\div 25 = 40$\n   The fraction is now $\\frac{15}{40}$.\n\n* **Divide by 5:**\n   * $15 \\div 5 = 3$\n   * $40 \\div 5 = 8$\n   The fraction is now $\\frac{3}{8}$.\n\n**Alternative Method (Using Powers of 10):**\n\nSince $0.375$ is a terminating decimal, we can write it as:\n$$0.375 = \\frac{375}{1000}$$\n\nTo simplify, find the Greatest Common Divisor (GCD). Both numbers are divisible by 125:\n* $375 \\div 125 = 3$\n* $1000 \\div 125 = 8$\n\n**Answer:**\nThe fraction in simplest form is **$\\frac{3}{8}$**.",
+    "tokens": 427,
+    "time_s": 13.51,
+    "tok_per_sec": 31.6,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  },
+  {
+    "id": 7,
+    "prompt": "If f(x) = 2x + 1 and g(x) = x\u00b2, what is f(g(3))?",
+    "response": "Here's how to find $f(g(3))$ step-by-step:\n\n**1. Find the value of the inner function, $g(3)$:**\nThe function $g(x)$ is defined as $g(x) = x^2$.\nSubstitute $x=3$ into the function:\n$$g(3) = 3^2 = 9$$\n\n**2. Use the result to find the outer function, $f(g(3))$ (which is now $f(9)$):**\nThe function $f(x)$ is defined as $f(x) = 2x + 1$.\nSubstitute the result from step 1 ($9$) into the function:\n$$f(9) = 2(9) + 1$$\n$$f(9) = 18 + 1$$\n$$f(9) = 19$$\n\n**Answer:**\n$f(g(3)) = 19$",
+    "tokens": 212,
+    "time_s": 6.9,
+    "tok_per_sec": 30.7,
+    "correctness": 10,
+    "completion": 10,
+    "reasoning_hygiene": 10
+  }
+]

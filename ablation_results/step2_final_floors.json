@@ -1,0 +1,32 @@
+{
+  "uniform_floor": 4,
+  "component_floors": {
+    "ple_embeddings": 2,
+    "attention": 3,
+    "mlp": 3,
+    "ple_gate_proj": 3,
+    "main_embed_lmhead": 2
+  },
+  "optimal_config": {
+    "ple_embeddings": {
+      "bits": 2,
+      "group_size": 64
+    },
+    "attention": {
+      "bits": 3,
+      "group_size": 64
+    },
+    "mlp": {
+      "bits": 3,
+      "group_size": 64
+    },
+    "ple_gate_proj": {
+      "bits": 3,
+      "group_size": 64
+    },
+    "main_embed_lmhead": {
+      "bits": 2,
+      "group_size": 64
+    }
+  }
+}
