@@ -9,15 +9,22 @@ PID_FILE    := .waldwicht.pid
 LOG_FILE    := waldwicht-proxy.log
 HOST        := 127.0.0.1
 PORT        := 8432
-MODEL       := prism-ml/Waldwicht-8B-mlx-1bit
+MODEL       := kyr0/Gemma-4-Waldwicht-Winzling
 DRAFT_MODEL :=
 MAX_BACKENDS := 2
 MAX_MEM_UTIL := 80
 
 .PHONY: setup start stop status log test test-tools bench download patch unpatch clean models
 
-setup: _install_uv _ensure_metal_toolchain _venv _deps patch download
+setup: _clean _install_uv _venv _deps _ensure_metal_toolchain
 	@echo "\n[OK] Setup complete. Run 'make start' to launch the server."
+	@echo "    For local models:  make start MODEL=/path/to/model"
+	@echo "    For HF models:     make download && make start"
+
+_clean:
+	@echo "=> Cleaning previous setup (if any) ..."
+	rm -rf $(VENV)
+	rm -rf mlx/build
 
 _install_uv:
 	@if ! command -v $(UV) &>/dev/null; then \
@@ -44,20 +51,28 @@ _venv:
 	fi
 
 _deps:
+	@echo "=> Xcode command line tools ..."
+	@xcode-select -p &>/dev/null || (echo "=> Installing Xcode command line tools ..."; xcode-select --install)
 	@echo "=> Installing Python dependencies ..."
-	$(UV) pip install --quiet 'mlx-lm==0.31.1' openai python-dotenv
-	@echo "=> Installing PrismML MLX fork (1-bit quant + Metal space-path fix) ..."
-	$(UV) pip install --quiet ./mlx
+	$(UV) pip install --quiet setuptools openai python-dotenv httpx uvicorn starlette pydantic
+	@echo "=> Installing Waldwicht MLX fork (editable, from source) ..."
+	PYPI_RELEASE=1 $(UV) pip install --quiet -e ./mlx --no-build-isolation
+	@echo "=> Installing mlx-lm fork (editable, Gemma4 support + local MLX) ..."
+	$(UV) pip install --quiet -e ./mlx-lm --no-build-isolation
 
 MLX_LM_DIR = $$($(PYTHON) -c "import mlx_lm; print(mlx_lm.__path__[0])")
 
-patch: unpatch
-	@echo "=> Applying rotation patch to mlx_lm ..."
-	cd $(MLX_LM_DIR) && patch -p2 --forward < $(CURDIR)/patches/1_rotation.patch
-	@echo "=> Applying turbo quant patch to mlx_lm ..."
-	cd $(MLX_LM_DIR) && patch -p2 --forward < $(CURDIR)/patches/2_turbo_quant.patch
-	@find $(MLX_LM_DIR) -name '*.rej' -delete 2>/dev/null || true
-	@find $(MLX_LM_DIR) -name '*.orig' -delete 2>/dev/null || true
+patch:
+	@if echo $(MLX_LM_DIR) | grep -q 'site-packages'; then \
+		echo "=> Applying rotation patch to mlx_lm ..."; \
+		cd $(MLX_LM_DIR) && patch -p2 --forward < $(CURDIR)/patches/1_rotation.patch; \
+		echo "=> Applying turbo quant patch to mlx_lm ..."; \
+		cd $(MLX_LM_DIR) && patch -p2 --forward < $(CURDIR)/patches/2_turbo_quant.patch; \
+		find $(MLX_LM_DIR) -name '*.rej' -delete 2>/dev/null || true; \
+		find $(MLX_LM_DIR) -name '*.orig' -delete 2>/dev/null || true; \
+	else \
+		echo "=> Using local mlx-lm fork — patches already included, skipping."; \
+	fi
 
 download:
 	@echo "=> Pre-downloading model $(MODEL) ..."
@@ -85,6 +100,7 @@ start:
 			--kv-bits 8 \
 			--quantized-kv-start 128 \
 			--max-tokens 65536 \
+			--chat-template-args '{"enable_thinking":true}' \
 			>> $(LOG_FILE) 2>&1 & \
 		echo $$! > $(PID_FILE); \
 		echo "=> Proxy PID: $$(cat $(PID_FILE))  (log: $(LOG_FILE))"; \
@@ -176,14 +192,18 @@ models:
 
 # -- unpatch ----------------------------------------------------------
 unpatch:
-	@echo "=> Reinstalling mlx-lm (clean, unpatched) ..."
-	$(UV) pip install --quiet --force-reinstall --no-deps 'mlx-lm==0.31.1'
-	@echo "=> Removing leftover patch artifacts ..."
-	@find $(MLX_LM_DIR)/models -name 'turboquant_*.py' -delete 2>/dev/null || true
-	@rm -f $(MLX_LM_DIR)/test_turboquant.py 2>/dev/null || true
-	@find $(MLX_LM_DIR) -name '*.rej' -delete 2>/dev/null || true
-	@find $(MLX_LM_DIR) -name '*.orig' -delete 2>/dev/null || true
-	@echo "=> mlx_lm restored to clean state."
+	@if echo $(MLX_LM_DIR) | grep -q 'site-packages'; then \
+		echo "=> Reinstalling mlx-lm (clean, unpatched) ..."; \
+		$(UV) pip install --quiet --force-reinstall --no-deps mlx-lm; \
+		echo "=> Removing leftover patch artifacts ..."; \
+		find $(MLX_LM_DIR)/models -name 'turboquant_*.py' -delete 2>/dev/null || true; \
+		rm -f $(MLX_LM_DIR)/test_turboquant.py 2>/dev/null || true; \
+		find $(MLX_LM_DIR) -name '*.rej' -delete 2>/dev/null || true; \
+		find $(MLX_LM_DIR) -name '*.orig' -delete 2>/dev/null || true; \
+		echo "=> mlx_lm restored to clean state."; \
+	else \
+		echo "=> Using local mlx-lm fork — nothing to unpatch."; \
+	fi
 
 # -- clean ------------------------------------------------------------
 clean:

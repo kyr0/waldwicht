@@ -1,0 +1,11 @@
+@@ -769,6 +769,10 @@
+         if not self.model_provider.is_batchable:
+             return False
+         if args.seed is not None:
++            return False
++        if getattr(self.cli_args, "kv_bits", None) is not None:
++            return False
++        if getattr(self.cli_args, "turbo_kv_bits", None) is not None:
+             return False
+ 
+         return True

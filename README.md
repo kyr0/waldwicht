@@ -13,11 +13,17 @@ The Waldwicht inference server supports 8-bit KV cache quantization, alongside T
 
 <img src="docs/waldwicht_demo_aichat.gif" alt="Waldwicht demo in aichat terminal UI" width="600"/>
 
-## Requirements
+## Requirements / Setup
 
-- macOS on Apple Silicon (tested on Macbook Air M4 24GB, macOS 15.7.3 with Metal SDK 26)
-- Xcode Metal Toolchain (`setup` installs it automatically)
-- Python 3.12
+- macOS on Apple Silicon / M-series processor _(tested on Macbook Air M4 24GB, macOS 15.7.3)_
+
+Open a Terminal and run:
+
+```sh
+make setup   # install uv, venv, deps, download model
+```
+
+**Note**: The setup process includes downloading the `Waldwicht-Winzling` model from HuggingFace, which is around 3 GB in size. Make sure you have a stable internet connection and enough disk space. **The first-time installation process may take around 10-15 minutes, especially on the first run when it compiles the MLX extensions.**
 
 ## Available Models
 
@@ -60,10 +66,12 @@ make stop    # stop the server
 Open a Terminal, and run:
 
 ```bash
-docker run -p 3000:3000 \
-  -e OPENAI_BASE_URL=http://localhost:8432/v1 \
-  -v chat-ui-data:/data \
-  ghcr.io/huggingface/chat-ui-db:latest
+docker run -d -p 3000:3000 \
+  -e OPENAI_API_KEY= \
+  -e BASE_URL=http://localhost:8432/v1 \
+  -e CUSTOM_MODELS="-all" \
+  -e CODE=demo \
+  yidadaa/chatgpt-next-web
 ```
 
 ### Any other software
@@ -144,6 +152,46 @@ For example (max predictability):
 | `top_p` | `0.85` | Nucleus sampling cutoff (lower = narrower vocabulary) |
 | `seed` | - | Random seed for reproducible output |
 | `stream` | `false` | Stream response as SSE events |
+
+## Thinking / Reasoning Mode
+
+Waldwicht-family models support a reasoning mode where the model produces a `<think>...</think>` block before the final answer. This is **enabled by default** in the server via `--chat-template-args '{"enable_thinking":true}'`.
+
+> **Note**: Reasoning mode requires `temperature > 0` — greedy decoding (`temperature: 0`) suppresses the thinking token.
+
+### Disabling thinking per-request
+
+Send `chat_template_kwargs` in the request body:
+
+```sh
+curl http://localhost:8432/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "kyr0/Gemma-4-Waldwicht-Winzling",
+    "messages": [{"role": "user", "content": "What is 2+2?"}],
+    "chat_template_kwargs": {"enable_thinking": false}
+  }'
+```
+
+With the OpenAI Python SDK:
+
+```python
+client.chat.completions.create(
+    model=MODEL,
+    messages=[{"role": "user", "content": "What is 2+2?"}],
+    extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+)
+```
+
+### Disabling thinking globally
+
+Remove or change the `--chat-template-args` line in the Makefile's `start` target, or override on the command line:
+
+### Using a local model
+
+```sh
+make start MODEL=/path/to/model  # path to a directory containing the model files (config.json, tokenizer.model, etc.)
+```
 
 ## Server Configuration
 

@@ -1,0 +1,12 @@
+__pycache__
+.venv
+.DS_Store
+*.log
+bonsai.log
+.bonsai.pid
+node_modules
+dist
+build
+*.pid
+.vscode
+.env

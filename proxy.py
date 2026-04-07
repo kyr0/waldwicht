@@ -642,8 +642,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="waldwicht-proxy: reverse proxy for mlx_lm")
 
     parser.add_argument("--host", default="127.0.0.1", help="Proxy listen host")
-    parser.add_argument("--port", type=int, default=8430, help="Proxy listen port")
-    parser.add_argument("--base-port", type=int, default=8431, help="First backend port")
+    parser.add_argument("--port", type=int, default=8432, help="Proxy listen port")
+    parser.add_argument("--base-port", type=int, default=8433, help="First backend port")
 
     parser.add_argument("--model", required=True, help="Model name/path for backends")
     parser.add_argument("--draft-model", default=None, help="Draft model name/path")
