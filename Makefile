@@ -68,6 +68,10 @@ patch:
 		cd $(MLX_LM_DIR) && patch -p2 --forward < $(CURDIR)/patches/1_rotation.patch; \
 		echo "=> Applying turbo quant patch to mlx_lm ..."; \
 		cd $(MLX_LM_DIR) && patch -p2 --forward < $(CURDIR)/patches/2_turbo_quant.patch; \
+		echo "=> Applying Gemma4 token buffer patch to mlx_lm ..."; \
+		cd $(MLX_LM_DIR) && patch -p2 --forward < $(CURDIR)/patches/4_gemma4_token_buffer.patch; \
+		echo "=> Applying Waldwicht quantization patch to mlx_lm ..."; \
+		cd $(MLX_LM_DIR) && patch -p2 --forward < $(CURDIR)/patches/3_mlx-lm-waldwicht.patch; \
 		find $(MLX_LM_DIR) -name '*.rej' -delete 2>/dev/null || true; \
 		find $(MLX_LM_DIR) -name '*.orig' -delete 2>/dev/null || true; \
 	else \

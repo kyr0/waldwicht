@@ -1,33 +1,16 @@
-From f26fddfd3bfc3c7516407ec7588a9e5c3de87f6c Mon Sep 17 00:00:00 2001
-From: Angelos Katharopoulos <a_katharopoulos@apple.com>
-Date: Mon, 6 Apr 2026 17:40:48 -0700
-Subject: [PATCH] Gemma4 final fixes and multi-token think/tool start/end
- (#1114)
-
----
- mlx_lm/generate.py            |  22 +++---
- mlx_lm/models/cache.py        |  41 ++++++++++-
- mlx_lm/models/gemma4_text.py  |  47 ++++---------
- mlx_lm/server.py              |  37 ++++------
- mlx_lm/tokenizer_utils.py     | 128 +++++++++++++++++++++++++++-------
- mlx_lm/tool_parsers/gemma4.py |  23 ++++--
- tests/test_generate.py        |  17 +++++
- tests/test_tool_parsing.py    |  32 +++++++++
- 8 files changed, 243 insertions(+), 104 deletions(-)
-
 diff --git a/mlx_lm/generate.py b/mlx_lm/generate.py
-index 5ea9e8bdc..d0913b5ac 100644
+index e1bcd5b..525375e 100644
 --- a/mlx_lm/generate.py
 +++ b/mlx_lm/generate.py
-@@ -35,6 +35,7 @@
-     KVCache,
+@@ -36,6 +36,7 @@ from .models.cache import (
      QuantizedKVCache,
+     QuantizedRotatingKVCache,
      RotatingKVCache,
 +    TokenBuffer,
      load_prompt_cache,
  )
  from .sample_utils import make_sampler
-@@ -1279,7 +1280,7 @@ def __init__(
+@@ -1280,7 +1281,7 @@ class GenerationBatch:
          self._current_logprobs = []
          self._next_tokens = inputs
          self._next_logprobs = []
@@ -36,7 +19,7 @@ index 5ea9e8bdc..d0913b5ac 100644
          self._num_tokens = [0] * len(self.uids)
          self._matcher_states = [m.make_state() for m in state_machines]
  
-@@ -1327,23 +1328,23 @@ def _step(self) -> Tuple[List[int], List[mx.array]]:
+@@ -1328,23 +1329,23 @@ class GenerationBatch:
          self._current_logprobs = self._next_logprobs
          inputs = self._current_tokens
  
@@ -67,7 +50,7 @@ index 5ea9e8bdc..d0913b5ac 100644
                  processed_logits.append(sample_logits)
              logits = mx.concatenate(processed_logits, axis=0)
  
-@@ -1365,7 +1366,7 @@ def _step(self) -> Tuple[List[int], List[mx.array]]:
+@@ -1366,7 +1367,7 @@ class GenerationBatch:
          # asynchronously
          self._next_tokens = sampled
          self._next_logprobs = list(logprobs)
@@ -76,7 +59,7 @@ index 5ea9e8bdc..d0913b5ac 100644
  
          # Eval the current tokens and current logprobs. After that also add
          # them to self.tokens so that it always represents the tokens contained
-@@ -1883,7 +1884,6 @@ def batch_generate(
+@@ -1884,7 +1885,6 @@ def batch_generate(
      max_tokens: Union[int, List[int]] = 128,
      verbose: bool = False,
      return_prompt_caches: bool = False,
@@ -84,7 +67,7 @@ index 5ea9e8bdc..d0913b5ac 100644
      **kwargs,
  ) -> BatchResponse:
      """
-@@ -1902,8 +1902,6 @@ def batch_generate(
+@@ -1903,8 +1903,6 @@ def batch_generate(
            can be per prompt if a list is provided.
         return_prompt_caches (bool): Return the prompt caches in the batch
            responses. Default: ``False``.
@@ -94,10 +77,10 @@ index 5ea9e8bdc..d0913b5ac 100644
            See :obj:`BatchGenerator` for more details.
      """
 diff --git a/mlx_lm/models/cache.py b/mlx_lm/models/cache.py
-index eb65318ac..1e6349fd4 100644
+index 0f44de5..299e98e 100644
 --- a/mlx_lm/models/cache.py
 +++ b/mlx_lm/models/cache.py
-@@ -1381,9 +1381,10 @@ def pad(c):
+@@ -1748,9 +1748,10 @@ class BatchRotatingKVCache(_BaseCache):
          self._offset = max(self._offset, other._offset)
  
      def extract(self, idx):
@@ -110,7 +93,7 @@ index eb65318ac..1e6349fd4 100644
          cache.keys = self.keys[idx : idx + 1]
          cache.values = self.values[idx : idx + 1]
          cache._idx = self._idx
-@@ -1449,6 +1450,42 @@ def nbytes(self):
+@@ -1816,6 +1817,42 @@ class BatchRotatingKVCache(_BaseCache):
          return self.keys.nbytes + self.values.nbytes
  
  
@@ -154,10 +137,10 @@ index eb65318ac..1e6349fd4 100644
  class PromptTrieResult:
      model: Any
 diff --git a/mlx_lm/models/gemma4_text.py b/mlx_lm/models/gemma4_text.py
-index 8acb92b39..d3bdb35f0 100644
+index 8acb92b..d3bdb35 100644
 --- a/mlx_lm/models/gemma4_text.py
 +++ b/mlx_lm/models/gemma4_text.py
-@@ -13,20 +13,6 @@
+@@ -13,20 +13,6 @@ from .rope_utils import initialize_rope
  from .switch_layers import SwitchGLU
  
  
@@ -178,7 +161,7 @@ index 8acb92b39..d3bdb35f0 100644
  @dataclass
  class ModelArgs(BaseModelArgs):
      model_type: str = "gemma4_text"
-@@ -65,7 +51,7 @@ def __post_init__(self):
+@@ -65,7 +51,7 @@ class ModelArgs(BaseModelArgs):
          if self.rope_parameters is None:
              self.rope_parameters = {
                  "full_attention": {
@@ -187,7 +170,7 @@ index 8acb92b39..d3bdb35f0 100644
                      "rope_theta": 1000000.0,
                      "rope_type": "proportional",
                  },
-@@ -125,7 +111,7 @@ def __init__(self, config: ModelArgs, layer_idx: int = 0):
+@@ -125,7 +111,7 @@ class MLP(nn.Module):
          self.up_proj = nn.Linear(config.hidden_size, intermediate_size, bias=False)
  
      def __call__(self, x: mx.array) -> mx.array:
@@ -196,7 +179,7 @@ index 8acb92b39..d3bdb35f0 100644
  
  
  class Router(nn.Module):
-@@ -144,15 +130,16 @@ def __call__(self, x: mx.array):
+@@ -144,15 +130,16 @@ class Router(nn.Module):
          x = mx.fast.rms_norm(x, self.scale * self._root_size, self.eps)
  
          expert_scores = self.proj(x)
@@ -218,7 +201,7 @@ index 8acb92b39..d3bdb35f0 100644
          return top_k_indices, top_k_weights
  
  
-@@ -180,16 +167,10 @@ def __init__(self, config: ModelArgs):
+@@ -180,16 +167,10 @@ class Experts(nn.Module):
      def __call__(
          self, x: mx.array, top_k_indices: mx.array, top_k_weights: mx.array
      ) -> mx.array:
@@ -238,7 +221,7 @@ index 8acb92b39..d3bdb35f0 100644
  
  
  class Attention(nn.Module):
-@@ -263,7 +244,7 @@ def __call__(
+@@ -263,7 +244,7 @@ class Attention(nn.Module):
              if not self.use_k_eq_v:
                  values = self.v_proj(x).reshape(B, L, self.n_kv_heads, self.head_dim)
  
@@ -247,7 +230,7 @@ index 8acb92b39..d3bdb35f0 100644
  
              keys = self.k_norm(keys)
              keys = keys.transpose(0, 2, 1, 3)
-@@ -278,10 +259,6 @@ def __call__(
+@@ -278,10 +259,6 @@ class Attention(nn.Module):
          if cache is not None:
              keys, values = cache.update_and_fetch(keys, values)
  
@@ -259,10 +242,10 @@ index 8acb92b39..d3bdb35f0 100644
              queries, keys, values, cache=cache, scale=self.scale, mask=mask
          )
 diff --git a/mlx_lm/server.py b/mlx_lm/server.py
-index a492e9ae8..33e95a125 100644
+index 1200bcb..b4a15fa 100644
 --- a/mlx_lm/server.py
 +++ b/mlx_lm/server.py
-@@ -550,12 +550,10 @@ def _tokenize(self, tokenizer, request, args):
+@@ -550,12 +550,10 @@ class ResponseGenerator:
          # Choose the initial state among only reasoning or normal
          initial_state = "normal"
          if tokenizer.has_thinking:
@@ -279,7 +262,7 @@ index a492e9ae8..33e95a125 100644
  
          # It is not a user message so no segmentation needed.
          if messages[-1]["role"] != "user":
-@@ -590,10 +588,9 @@ def _tokenize(self, tokenizer, request, args):
+@@ -590,10 +588,9 @@ class ResponseGenerator:
          # tokens)
          tail_start = len(prompt)
          if tokenizer.has_thinking:
@@ -293,7 +276,7 @@ index a492e9ae8..33e95a125 100644
  
          # Finalize the segments and return
          if sys_end < tail_start:
-@@ -641,22 +638,18 @@ def _make_state_machine(
+@@ -641,22 +638,18 @@ class ResponseGenerator:
  
          # Reasoning related transitions
          if tokenizer.has_thinking:
@@ -325,10 +308,10 @@ index a492e9ae8..33e95a125 100644
              transitions["tool"] = [(te, "normal")]
              transitions["tool"].extend(common_stops)
 diff --git a/mlx_lm/tokenizer_utils.py b/mlx_lm/tokenizer_utils.py
-index b340d3ce2..85f230210 100644
+index b340d3c..85f2302 100644
 --- a/mlx_lm/tokenizer_utils.py
 +++ b/mlx_lm/tokenizer_utils.py
-@@ -253,6 +253,37 @@ def make_byte_decoder(cls):
+@@ -253,6 +253,37 @@ class BPEStreamingDetokenizer(StreamingDetokenizer):
          cls._byte_decoder = char_to_bytes
  
  
@@ -366,7 +349,7 @@ index b340d3ce2..85f230210 100644
  class TokenizerWrapper:
      """A wrapper that combines an HF tokenizer and a detokenizer.
  
-@@ -277,10 +308,12 @@ def __init__(
+@@ -277,10 +308,12 @@ class TokenizerWrapper:
              if eos_token_ids is not None
              else {tokenizer.eos_token_id}
          )
@@ -383,7 +366,7 @@ index b340d3ce2..85f230210 100644
  
          self._chat_template = chat_template
          self.has_chat_template = (
-@@ -289,29 +322,20 @@ def __init__(
+@@ -289,29 +322,20 @@ class TokenizerWrapper:
          self._tool_parser = tool_parser
          self._tool_call_start = tool_call_start
          self._tool_call_end = tool_call_end
@@ -425,7 +408,7 @@ index b340d3ce2..85f230210 100644
          if self._chat_template is not None:
              out = self._chat_template(*args, **kwargs)
              if tokenize:
-@@ -333,6 +357,36 @@ def add_eos_token(self, token: str):
+@@ -333,6 +357,36 @@ class TokenizerWrapper:
  
          self._eos_token_ids.add(token_id)
  
@@ -462,7 +445,7 @@ index b340d3ce2..85f230210 100644
      @property
      def has_thinking(self):
          return self._think_start is not None
-@@ -343,7 +397,13 @@ def think_start(self):
+@@ -343,7 +397,13 @@ class TokenizerWrapper:
  
      @property
      def think_start_id(self):
@@ -477,7 +460,7 @@ index b340d3ce2..85f230210 100644
  
      @property
      def think_end(self):
-@@ -351,7 +411,13 @@ def think_end(self):
+@@ -351,7 +411,13 @@ class TokenizerWrapper:
  
      @property
      def think_end_id(self):
@@ -492,7 +475,7 @@ index b340d3ce2..85f230210 100644
  
      @property
      def has_tool_calling(self):
-@@ -361,10 +427,18 @@ def has_tool_calling(self):
+@@ -361,10 +427,18 @@ class TokenizerWrapper:
      def tool_call_start(self):
          return self._tool_call_start
  
@@ -512,7 +495,7 @@ index b340d3ce2..85f230210 100644
      def tool_parser(self):
          return self._tool_parser
 diff --git a/mlx_lm/tool_parsers/gemma4.py b/mlx_lm/tool_parsers/gemma4.py
-index 90257a551..1df4d2916 100644
+index 90257a5..1df4d29 100644
 --- a/mlx_lm/tool_parsers/gemma4.py
 +++ b/mlx_lm/tool_parsers/gemma4.py
 @@ -1,10 +1,14 @@
@@ -532,7 +515,7 @@ index 90257a551..1df4d2916 100644
  
  
  def _gemma4_args_to_json(text: str) -> str:
-@@ -30,10 +34,8 @@ def _capture(m):
+@@ -30,10 +34,8 @@ def _gemma4_args_to_json(text: str) -> str:
      return text
  
  
@@ -560,74 +543,3 @@ index 90257a551..1df4d2916 100644
 +
  tool_call_start = "<|tool_call>"
  tool_call_end = "<tool_call|>"
-diff --git a/tests/test_generate.py b/tests/test_generate.py
-index d3d90013f..9214281cd 100644
---- a/tests/test_generate.py
-+++ b/tests/test_generate.py
-@@ -402,6 +402,23 @@ def test_batch_generate_with_logits_processors(self):
-         self.assertEqual(responses[uid1].logprobs[1].item(), 0.0)
-         self.assertEqual(responses[uid2].logprobs[2].item(), 0.0)
- 
-+    def test_batch_generate_function_with_logits_processors(self):
-+        """Test that batch_generate function with logits_processors produces correct results."""
-+        logit_bias = {0: 2000.0, 1: -2000.0}
-+        processors = make_logits_processors(logit_bias)
-+
-+        prompts = [self.tokenizer.encode("hello")]
-+        response = batch_generate(
-+            self.model,
-+            self.tokenizer,
-+            prompts,
-+            max_tokens=1,
-+            logits_processors=processors,
-+        )
-+        self.assertEqual(len(response.texts), 1)
-+        generated_token = self.tokenizer.encode(response.texts[0])[0]
-+        self.assertEqual(generated_token, 0)
-+
-     def test_batch_generate_with_samplers(self):
-         """Test that batch_generate with logits_processors produces correct results."""
-         batch_gen = BatchGenerator(
-diff --git a/tests/test_tool_parsing.py b/tests/test_tool_parsing.py
-index e8c416917..5ba79d1b2 100644
---- a/tests/test_tool_parsing.py
-+++ b/tests/test_tool_parsing.py
-@@ -222,6 +222,38 @@ def test_gemma4(self):
-             {"query": "hello world", "limit": 10, "verbose": False},
-         )
- 
-+        # Multiple tool calls in a single block (no delimiter between them)
-+        test_case = (
-+            'call:glob{pattern:<|"|>README*.md<|"|>}'
-+            'call:glob{pattern:<|"|>CONTRIBUTING.md<|"|>}'
-+        )
-+        tool_calls = gemma4.parse_tool_call(test_case, None)
-+        self.assertIsInstance(tool_calls, list)
-+        self.assertEqual(len(tool_calls), 2)
-+        self.assertEqual(tool_calls[0]["name"], "glob")
-+        self.assertEqual(tool_calls[0]["arguments"], {"pattern": "README*.md"})
-+        self.assertEqual(tool_calls[1]["name"], "glob")
-+        self.assertEqual(tool_calls[1]["arguments"], {"pattern": "CONTRIBUTING.md"})
-+
-+        # Multiple tool calls with nested args
-+        test_case = (
-+            'call:search{query:<|"|>weather<|"|>,limit:5}'
-+            'call:configure{settings:{enabled:true,name:<|"|>test<|"|>}}'
-+        )
-+        tool_calls = gemma4.parse_tool_call(test_case, None)
-+        self.assertIsInstance(tool_calls, list)
-+        self.assertEqual(len(tool_calls), 2)
-+        self.assertEqual(tool_calls[0]["name"], "search")
-+        self.assertEqual(
-+            tool_calls[0]["arguments"],
-+            {"query": "weather", "limit": 5},
-+        )
-+        self.assertEqual(tool_calls[1]["name"], "configure")
-+        self.assertEqual(
-+            tool_calls[1]["arguments"],
-+            {"settings": {"enabled": True, "name": "test"}},
-+        )
-+
-     def test_kimi_k2(self):
-         # Single tool call
-         test_case = (

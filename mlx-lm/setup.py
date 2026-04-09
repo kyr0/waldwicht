@@ -33,6 +33,7 @@ setup(
         "protobuf",
         "pyyaml",
         "jinja2",
+        "regex",
     ],
     packages=[
         "mlx_lm",
