@@ -1,0 +1,3 @@
+[submodule "omlx"]
+	path = omlx
+	url = git@github.com:kyr0/omlx.git
