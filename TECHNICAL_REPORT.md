@@ -18,7 +18,7 @@ _Technical Report_
 
 **Component-level quantization as a new method.** Unlike uniform or layer-level mixed-precision quantization — both of which existing inference engines support natively — component-level allocation constitutes a distinct quantization paradigm that requires non-trivial inference engine adaptations. Each architectural weight group (attention projections, MLP, embeddings, gating) is quantized at an independently optimized bit-width, meaning a single forward pass touches weights at 3, 4, and 5-bit precision simultaneously. We identify and implement three required changes to the MLX inference stack: (1) per-component config resolution with leaf-name matching, (2) quantized KV-cache reference propagation through Gemma 4's KV-sharing mechanism, and (3) shape-aware attention mask handling for quantized key/value tuples. We release these as a patch to mlx-lm (`patches/mlx-lm-waldwicht.patch`). The resulting method yields both size and throughput gains over uniform quantization at equivalent quality:
 
-| Method | Configuration | Size | tok/s | Quality (C/Cm/R) | Expanded Gate |
+| Method | Configuration | Size | tok/s | Quality (C/Cm/R) | Expanded Quality Gate |
 |---|---|---|---|---|---|
 | Uniform | 5-bit g64 | 3.86 GB | 44.1 | 9.4 / 9.3 / 9.5 | PASS |
 | **Component-level** | **attn=5, mlp=4, ple=3, gate=4, embed=3** | **2.96 GB** | **46.6** | **8.8 / 9.0 / 9.1** | **PASS** |
@@ -33,7 +33,7 @@ _Technical Report_
 | **Waldwicht-Sproessling** | **3.17 GB** | 48.6 | 2.83 GB | attn=5, mlp=5, ple=3, gate=4, embed=3 |
 | **Waldwicht-Juengling** | **3.86 GB** | 47.4 | 3.52 GB | uniform 5-bit g64 (near-BF16 quality) |
 
-The above model configurations have been tested while the notebook **has been under 50% CPU load** and **50% memory pressure** _yellow marking_ on the same MacBook Air M4 24 GB machine the ablation tests have been run. This is to ensure that Waldwicht models prove that intelligent models can now run _in background_ on true consumer devices _at speed_.
+The above model configurations have been tested while the notebook **was already under 50% CPU load** and **50% memory pressure** _yellow marking_ on the same MacBook Air M4 24 GB machine the ablation tests have been run. This is to ensure that Waldwicht models prove that intelligent models can now run _in background_ on true consumer devices _at speed_.
 
 *Throughput and peak Metal memory measured on MacBook Air M4 24 GB, 256-token generation, 3-run average, greedy decoding.*
 
@@ -368,11 +368,11 @@ The 8-prompt AQ gate consists entirely of math/logic prompts. To assess generali
 
 Values are correctness / completion / reasoning_hygiene averages per category.
 
-#### 7.8.2 Expanded Gate Results
+#### 7.8.2 Expanded Quality Gate Results
 
 Using a relaxed threshold of ≥ 7.0/7.0/7.0 (appropriate for a diverse benchmark where some categories are inherently harder):
 
-| Config | Size (GB) | tok/s | Corr. | Comp. | Reas. | Expanded Gate |
+| Config | Size (GB) | tok/s | Corr. | Comp. | Reas. | Expanded Quality Gate |
 |---|---|---|---|---|---|---|
 | Optimal (attn=4, mlp=3, ple=2, gate=3, embed=2) | 2.32 | — | 4.45 | 5.40 | 5.05 | **FAIL** |
 | ple2+gate3+embed2 (attn=4, mlp=4) | 2.53 | — | 6.55 | 7.35 | 6.80 | **FAIL** |
@@ -403,7 +403,7 @@ The 2.32 GB config's component offsets from the 4-bit base (attn=0, mlp=−1, pl
 | Uniform 4-bit g64 (baseline) | 3.22 GB | 8.8 | 8.7 | 9.1 | PASS |
 | Uniform 5-bit g64 (baseline) | 3.86 GB | 9.4 | 9.3 | 9.5 | PASS |
 
-Both 5-bit mixed variants pass. **Variant B (2.96 GB)** passes the expanded gate at **2.96 GB — 8% smaller than uniform 4-bit** while scoring comparably, suggesting that 5-bit attention precision is more valuable than uniform 4-bit across all components.
+Both 5-bit mixed variants pass. **Variant B (2.96 GB)** passes the Expanded Quality Gate at **2.96 GB — 8% smaller than uniform 4-bit** while scoring comparably, suggesting that 5-bit attention precision is more valuable than uniform 4-bit across all components.
 
 Per-category breakdown for Variant B (2.96 GB):
 
