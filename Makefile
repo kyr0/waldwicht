@@ -59,6 +59,12 @@ _deps:
 	PYPI_RELEASE=1 $(UV) pip install --quiet -e ./mlx --no-build-isolation
 	@echo "=> Installing mlx-lm fork (editable, Gemma4 support + local MLX) ..."
 	$(UV) pip install --quiet -e ./mlx-lm --no-build-isolation
+	@echo "=> Installing omlx (editable, against local mlx-lm) ..."
+	$(UV) pip install --quiet -e ./omlx --no-deps --no-build-isolation
+	@echo "=> Installing omlx remaining dependencies (skipping mlx/mlx-lm) ..."
+	$(UV) pip install --quiet -e "./omlx[dev]" --no-build-isolation 2>&1 | grep -v "already satisfied" || true
+	@echo "=> Re-linking local mlx-lm fork (in case omlx deps overwrote it) ..."
+	$(UV) pip install --quiet -e ./mlx-lm --no-build-isolation --no-deps
 
 MLX_LM_DIR = $$($(PYTHON) -c "import mlx_lm; print(mlx_lm.__path__[0])")
 
