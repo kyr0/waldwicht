@@ -1,0 +1,633 @@
+From f26fddfd3bfc3c7516407ec7588a9e5c3de87f6c Mon Sep 17 00:00:00 2001
+From: Angelos Katharopoulos <a_katharopoulos@apple.com>
+Date: Mon, 6 Apr 2026 17:40:48 -0700
+Subject: [PATCH] Gemma4 final fixes and multi-token think/tool start/end
+ (#1114)
+
+---
+ mlx_lm/generate.py            |  22 +++---
+ mlx_lm/models/cache.py        |  41 ++++++++++-
+ mlx_lm/models/gemma4_text.py  |  47 ++++---------
+ mlx_lm/server.py              |  37 ++++------
+ mlx_lm/tokenizer_utils.py     | 128 +++++++++++++++++++++++++++-------
+ mlx_lm/tool_parsers/gemma4.py |  23 ++++--
+ tests/test_generate.py        |  17 +++++
+ tests/test_tool_parsing.py    |  32 +++++++++
+ 8 files changed, 243 insertions(+), 104 deletions(-)
+
+diff --git a/mlx_lm/generate.py b/mlx_lm/generate.py
+index 5ea9e8bdc..d0913b5ac 100644
+--- a/mlx_lm/generate.py
++++ b/mlx_lm/generate.py
+@@ -35,6 +35,7 @@
+     KVCache,
+     QuantizedKVCache,
+     RotatingKVCache,
++    TokenBuffer,
+     load_prompt_cache,
+ )
+ from .sample_utils import make_sampler
+@@ -1279,7 +1280,7 @@ def __init__(
+         self._current_logprobs = []
+         self._next_tokens = inputs
+         self._next_logprobs = []
+-        self._token_context = [mx.array(t[-256:]) for t in tokens]
++        self._token_context = [TokenBuffer(t) for t in tokens]
+         self._num_tokens = [0] * len(self.uids)
+         self._matcher_states = [m.make_state() for m in state_machines]
+ 
+@@ -1327,23 +1328,23 @@ def _step(self) -> Tuple[List[int], List[mx.array]]:
+         self._current_logprobs = self._next_logprobs
+         inputs = self._current_tokens
+ 
+-        # Update the token context that will be used by the logits processors
+-        for i, ti in enumerate(self._token_context):
+-            self._token_context[i] = mx.concatenate(
+-                [ti[1:] if len(ti) == 256 else ti, inputs[i : i + 1]]
+-            )
+-
+         # Forward pass
+         logits = self.model(inputs[:, None], cache=self.prompt_cache)
+         logits = logits[:, -1, :]
+ 
+         # Logits processors
++        token_context = []
+         if any(self.logits_processors):
++            # Update the token context that will be used by the logits processors
++            token_context = [
++                tc.update_and_fetch(inputs[i : i + 1])
++                for i, tc in enumerate(self._token_context)
++            ]
+             processed_logits = []
+             for e in range(len(self.uids)):
+                 sample_logits = logits[e : e + 1]
+                 for processor in self.logits_processors[e]:
+-                    sample_logits = processor(self.tokens[e], sample_logits)
++                    sample_logits = processor(token_context[e], sample_logits)
+                 processed_logits.append(sample_logits)
+             logits = mx.concatenate(processed_logits, axis=0)
+ 
+@@ -1365,7 +1366,7 @@ def _step(self) -> Tuple[List[int], List[mx.array]]:
+         # asynchronously
+         self._next_tokens = sampled
+         self._next_logprobs = list(logprobs)
+-        mx.async_eval(self._next_tokens, self._next_logprobs, self._token_context)
++        mx.async_eval(self._next_tokens, self._next_logprobs, token_context)
+ 
+         # Eval the current tokens and current logprobs. After that also add
+         # them to self.tokens so that it always represents the tokens contained
+@@ -1883,7 +1884,6 @@ def batch_generate(
+     max_tokens: Union[int, List[int]] = 128,
+     verbose: bool = False,
+     return_prompt_caches: bool = False,
+-    logits_processors: Optional[List[Callable[[mx.array, mx.array], mx.array]]] = None,
+     **kwargs,
+ ) -> BatchResponse:
+     """
+@@ -1902,8 +1902,6 @@ def batch_generate(
+           can be per prompt if a list is provided.
+        return_prompt_caches (bool): Return the prompt caches in the batch
+           responses. Default: ``False``.
+-       logits_processors (List[Callable[[mx.array, mx.array], mx.array]], optional):
+-          A list of functions that take tokens and logits and return the processed logits. Default: ``None``.
+        kwargs: The remaining options get passed to :obj:`BatchGenerator`.
+           See :obj:`BatchGenerator` for more details.
+     """
+diff --git a/mlx_lm/models/cache.py b/mlx_lm/models/cache.py
+index eb65318ac..1e6349fd4 100644
+--- a/mlx_lm/models/cache.py
++++ b/mlx_lm/models/cache.py
+@@ -1381,9 +1381,10 @@ def pad(c):
+         self._offset = max(self._offset, other._offset)
+ 
+     def extract(self, idx):
++        mx.eval(self.left_padding, self.offset)
+         cache = RotatingKVCache(self.max_size)
+-        padding = self.left_padding[idx].item()
+-        offset = self.offset[idx].item()
++        padding = max(0, self.left_padding.tolist()[idx])
++        offset = self.offset.tolist()[idx]
+         cache.keys = self.keys[idx : idx + 1]
+         cache.values = self.values[idx : idx + 1]
+         cache._idx = self._idx
+@@ -1449,6 +1450,42 @@ def nbytes(self):
+         return self.keys.nbytes + self.values.nbytes
+ 
+ 
++class TokenBuffer:
++    """A simple token buffer that can be efficiently appended to in a similar
++    fashion to the KVCache.
++
++    Perhaps these could share some logic in the future.
++    """
++
++    step = 256
++
++    def __init__(self, tokens=[]):
++        self._buffer = mx.array(tokens, dtype=mx.int32)
++        self._size = len(tokens)
++
++    def update_and_fetch(self, tokens):
++        start = self._size
++        end = start + len(tokens)
++
++        new_size = ((end + self.step - 1) // self.step) * self.step
++        if new_size > self._buffer.size:
++            self._buffer = mx.concatenate(
++                [self._buffer, mx.zeros(new_size - self._buffer.size, dtype=mx.int32)]
++            )
++        self._buffer[start:end] = tokens
++        self._size = end
++
++        return self._buffer[:end]
++
++    @property
++    def state(self):
++        return self._buffer
++
++    @property
++    def tokens(self):
++        return self._buffer[: self._size]
++
++
+ @dataclass
+ class PromptTrieResult:
+     model: Any
+diff --git a/mlx_lm/models/gemma4_text.py b/mlx_lm/models/gemma4_text.py
+index 8acb92b39..d3bdb35f0 100644
+--- a/mlx_lm/models/gemma4_text.py
++++ b/mlx_lm/models/gemma4_text.py
+@@ -13,20 +13,6 @@
+ from .switch_layers import SwitchGLU
+ 
+ 
+-class _OffsetCache(_BaseCache):
+-    """Lightweight cache for KV-shared layers that only tracks offset."""
+-
+-    def __init__(self):
+-        self.offset = 0
+-
+-    @property
+-    def nbytes(self):
+-        return 0
+-
+-    def empty(self):
+-        return True
+-
+-
+ @dataclass
+ class ModelArgs(BaseModelArgs):
+     model_type: str = "gemma4_text"
+@@ -65,7 +51,7 @@ def __post_init__(self):
+         if self.rope_parameters is None:
+             self.rope_parameters = {
+                 "full_attention": {
+-                    "partial_rotary_factor": 1.0,
++                    "partial_rotary_factor": 0.25,
+                     "rope_theta": 1000000.0,
+                     "rope_type": "proportional",
+                 },
+@@ -125,7 +111,7 @@ def __init__(self, config: ModelArgs, layer_idx: int = 0):
+         self.up_proj = nn.Linear(config.hidden_size, intermediate_size, bias=False)
+ 
+     def __call__(self, x: mx.array) -> mx.array:
+-        return self.down_proj(nn.gelu_approx(self.gate_proj(x)) * self.up_proj(x))
++        return self.down_proj(geglu(self.gate_proj(x), self.up_proj(x)))
+ 
+ 
+ class Router(nn.Module):
+@@ -144,15 +130,16 @@ def __call__(self, x: mx.array):
+         x = mx.fast.rms_norm(x, self.scale * self._root_size, self.eps)
+ 
+         expert_scores = self.proj(x)
+-        router_probs = mx.softmax(expert_scores, axis=-1)
+ 
+         top_k_indices = mx.argpartition(
+-            -expert_scores, kth=self.config.top_k_experts - 1, axis=-1
+-        )[..., : self.config.top_k_experts]
++            expert_scores, kth=-self.config.top_k_experts, axis=-1
++        )
++        top_k_indices = top_k_indices[..., -self.config.top_k_experts :]
+ 
+-        top_k_weights = mx.take_along_axis(router_probs, top_k_indices, axis=-1)
+-        top_k_weights = top_k_weights / mx.sum(top_k_weights, axis=-1, keepdims=True)
++        top_k_weights = mx.take_along_axis(expert_scores, top_k_indices, axis=-1)
++        top_k_weights = mx.softmax(top_k_weights, axis=-1)
+         top_k_weights = top_k_weights * self.per_expert_scale[top_k_indices]
++
+         return top_k_indices, top_k_weights
+ 
+ 
+@@ -180,16 +167,10 @@ def __init__(self, config: ModelArgs):
+     def __call__(
+         self, x: mx.array, top_k_indices: mx.array, top_k_weights: mx.array
+     ) -> mx.array:
+-        B, S, H = x.shape
+-        K = top_k_indices.shape[-1]
++        w = mx.expand_dims(top_k_weights, -1)
++        y = self.switch_glu(x, top_k_indices)
+ 
+-        x_flat = x.reshape(B * S, H)
+-        indices_flat = top_k_indices.reshape(B * S, K)
+-
+-        expert_out = self.switch_glu(x_flat, indices_flat)
+-
+-        weights = top_k_weights.reshape(B * S, K)[..., None]
+-        return (expert_out * weights).sum(axis=-2).reshape(B, S, H)
++        return (w * y).sum(-2)
+ 
+ 
+ class Attention(nn.Module):
+@@ -263,7 +244,7 @@ def __call__(
+             if not self.use_k_eq_v:
+                 values = self.v_proj(x).reshape(B, L, self.n_kv_heads, self.head_dim)
+ 
+-            offset = cache.offset if cache is not None else 0
++            offset = mx.array(cache.offset) if cache is not None else 0
+ 
+             keys = self.k_norm(keys)
+             keys = keys.transpose(0, 2, 1, 3)
+@@ -278,10 +259,6 @@ def __call__(
+         if cache is not None:
+             keys, values = cache.update_and_fetch(keys, values)
+ 
+-        if mask is not None and isinstance(mask, mx.array):
+-            if mask.shape[-1] != keys.shape[-2]:
+-                mask = mask[..., -keys.shape[-2] :]
+-
+         output = scaled_dot_product_attention(
+             queries, keys, values, cache=cache, scale=self.scale, mask=mask
+         )
+diff --git a/mlx_lm/server.py b/mlx_lm/server.py
+index a492e9ae8..33e95a125 100644
+--- a/mlx_lm/server.py
++++ b/mlx_lm/server.py
+@@ -550,12 +550,10 @@ def _tokenize(self, tokenizer, request, args):
+         # Choose the initial state among only reasoning or normal
+         initial_state = "normal"
+         if tokenizer.has_thinking:
+-            for i in range(-1, -len(prompt), -1):
+-                if prompt[i] == tokenizer.think_start_id:
+-                    initial_state = "reasoning"
+-                    break
+-                if prompt[i] == tokenizer.think_end_id:
+-                    break
++            think_start = tokenizer.rfind_think_start(prompt)
++            think_end = tokenizer.rfind_think_end(prompt)
++            if think_start > think_end:
++                initial_state = "reasoning"
+ 
+         # It is not a user message so no segmentation needed.
+         if messages[-1]["role"] != "user":
+@@ -590,10 +588,9 @@ def _tokenize(self, tokenizer, request, args):
+         # tokens)
+         tail_start = len(prompt)
+         if tokenizer.has_thinking:
+-            for i in range(1, min(11, len(prompt) - sys_end), 1):
+-                if prompt[-i] == tokenizer.think_start_id:
+-                    tail_start = len(prompt) - i
+-                    break
++            think_start = tokenizer.rfind_think_start(prompt, start=tail_start - 11)
++            if think_start >= 0:
++                tail_start = think_start
+ 
+         # Finalize the segments and return
+         if sys_end < tail_start:
+@@ -641,22 +638,18 @@ def _make_state_machine(
+ 
+         # Reasoning related transitions
+         if tokenizer.has_thinking:
+-            ts = tokenizer.think_start_id
+-            te = tokenizer.think_end_id
+-            transitions["normal"].append(((ts,), "reasoning"))
+-            transitions["reasoning"] = [((te,), "normal")]
++            ts = tokenizer.think_start_tokens
++            te = tokenizer.think_end_tokens
++            transitions["normal"].append((ts, "reasoning"))
++            transitions["reasoning"] = [(te, "normal")]
+             transitions["reasoning"].extend(common_stops)
+-            sequences[(ts,)] = tokenizer.convert_ids_to_tokens(ts)
+-            sequences[(te,)] = tokenizer.convert_ids_to_tokens(te)
++            sequences[ts] = tokenizer.think_start
++            sequences[te] = tokenizer.think_end
+ 
+         # Tool calling relating transitions
+         if tokenizer.has_tool_calling:
+-            ts = tuple(
+-                tokenizer.encode(tokenizer.tool_call_start, add_special_tokens=False)
+-            )
+-            te = tuple(
+-                tokenizer.encode(tokenizer.tool_call_end, add_special_tokens=False)
+-            )
++            ts = tokenizer.tool_call_start_tokens
++            te = tokenizer.tool_call_end_tokens
+             transitions["normal"].append((ts, "tool"))
+             transitions["tool"] = [(te, "normal")]
+             transitions["tool"].extend(common_stops)
+diff --git a/mlx_lm/tokenizer_utils.py b/mlx_lm/tokenizer_utils.py
+index b340d3ce2..85f230210 100644
+--- a/mlx_lm/tokenizer_utils.py
++++ b/mlx_lm/tokenizer_utils.py
+@@ -253,6 +253,37 @@ def make_byte_decoder(cls):
+         cls._byte_decoder = char_to_bytes
+ 
+ 
++def _infer_thinking(tokenizer):
++    vocab = tokenizer.get_vocab()
++    THINK_TOKENS = [
++        ("<think>", "</think>"),
++        ("<longcat_think>", "</longcat_think>"),
++    ]
++
++    # Single token thinking modes
++    for think_start, think_end in THINK_TOKENS:
++        if think_start in vocab and think_end in vocab:
++            return (
++                think_start,
++                think_end,
++                (vocab[think_start],),
++                (vocab[think_end],),
++            )
++
++    # Multi token thinking modes
++    if "<|channel>" in vocab and "<channel|>" in vocab:
++        think_start = "<|channel>thought"
++        think_end = "<channel|>"
++        return (
++            think_start,
++            think_end,
++            tuple(tokenizer.encode(think_start, add_special_tokens=False)),
++            tuple(tokenizer.encode(think_end, add_special_tokens=False)),
++        )
++
++    return (None, None, None, None)
++
++
+ class TokenizerWrapper:
+     """A wrapper that combines an HF tokenizer and a detokenizer.
+ 
+@@ -277,10 +308,12 @@ def __init__(
+             if eos_token_ids is not None
+             else {tokenizer.eos_token_id}
+         )
+-        self._think_start = None
+-        self._think_end = None
+-        self._think_start_id = None
+-        self._think_end_id = None
++        (
++            self._think_start,
++            self._think_end,
++            self._think_start_tokens,
++            self._think_end_tokens,
++        ) = _infer_thinking(tokenizer)
+ 
+         self._chat_template = chat_template
+         self.has_chat_template = (
+@@ -289,29 +322,20 @@ def __init__(
+         self._tool_parser = tool_parser
+         self._tool_call_start = tool_call_start
+         self._tool_call_end = tool_call_end
+-
+-        vocab = tokenizer.get_vocab()
+-        THINK_TOKENS = [
+-            ("<think>", "</think>"),
+-            ("<longcat_think>", "</longcat_think>"),
+-        ]
+-        for think_start, think_end in THINK_TOKENS:
+-            if think_start in vocab and think_end in vocab:
+-                self._think_start = think_start
+-                self._think_end = think_end
+-                self._think_start_id = vocab[think_start]
+-                self._think_end_id = vocab[think_end]
+-                break
+-
+-        # Disable tool calling if tool call tokens aren't in vocab
+-        if (tool_call_start and tool_call_start not in vocab) or (
+-            tool_call_end and tool_call_end not in vocab
+-        ):
+-            self._tool_call_start = None
+-            self._tool_call_end = None
+-            self._tool_parser = None
++        self._tool_call_start_tokens = None
++        self._tool_call_end_tokens = None
++        if tool_call_start is not None:
++            self._tool_call_start_tokens = tuple(
++                tokenizer.encode(tool_call_start, add_special_tokens=False)
++            )
++            self._tool_call_end_tokens = tuple(
++                tokenizer.encode(tool_call_end, add_special_tokens=False)
++            )
+ 
+     def apply_chat_template(self, *args, tokenize=True, **kwargs):
++        if "enable_thinking" not in kwargs:
++            kwargs["enable_thinking"] = self.has_thinking
++
+         if self._chat_template is not None:
+             out = self._chat_template(*args, **kwargs)
+             if tokenize:
+@@ -333,6 +357,36 @@ def add_eos_token(self, token: str):
+ 
+         self._eos_token_ids.add(token_id)
+ 
++    def _find(self, tokens, sequence, start=None, end=None, reverse=False):
++        start = start or 0
++        end = end or len(tokens)
++        outer_loop = (
++            range(end - len(sequence), start - 1, -1)
++            if reverse
++            else range(start, end - len(sequence) + 1)
++        )
++        for i in outer_loop:
++            if tokens[i] == sequence[0]:
++                if all(tokens[i + j] == sequence[j] for j in range(1, len(sequence))):
++                    return i
++        return -1
++
++    def find_think_start(self, tokens, start=None, end=None):
++        return self._find(tokens, self._think_start_tokens, start=start, end=end)
++
++    def rfind_think_start(self, tokens, start=None, end=None):
++        return self._find(
++            tokens, self._think_start_tokens, start=start, end=end, reverse=True
++        )
++
++    def find_think_end(self, tokens, start=None, end=None):
++        return self._find(tokens, self._think_end_tokens, start=start, end=end)
++
++    def rfind_think_end(self, tokens, start=None, end=None):
++        return self._find(
++            tokens, self._think_end_tokens, start=start, end=end, reverse=True
++        )
++
+     @property
+     def has_thinking(self):
+         return self._think_start is not None
+@@ -343,7 +397,13 @@ def think_start(self):
+ 
+     @property
+     def think_start_id(self):
+-        return self._think_start_id
++        if len(self._think_start_tokens) > 1:
++            raise ValueError("The start thinking sequence is more than 1 token")
++        return self._think_start_tokens[0]
++
++    @property
++    def think_start_tokens(self):
++        return self._think_start_tokens
+ 
+     @property
+     def think_end(self):
+@@ -351,7 +411,13 @@ def think_end(self):
+ 
+     @property
+     def think_end_id(self):
+-        return self._think_end_id
++        if len(self._think_end_tokens) > 1:
++            raise ValueError("The end thinking sequence is more than 1 token")
++        return self._think_end_tokens[0]
++
++    @property
++    def think_end_tokens(self):
++        return self._think_end_tokens
+ 
+     @property
+     def has_tool_calling(self):
+@@ -361,10 +427,18 @@ def has_tool_calling(self):
+     def tool_call_start(self):
+         return self._tool_call_start
+ 
++    @property
++    def tool_call_start_tokens(self):
++        return self._tool_call_start_tokens
++
+     @property
+     def tool_call_end(self):
+         return self._tool_call_end
+ 
++    @property
++    def tool_call_end_tokens(self):
++        return self._tool_call_end_tokens
++
+     @property
+     def tool_parser(self):
+         return self._tool_parser
+diff --git a/mlx_lm/tool_parsers/gemma4.py b/mlx_lm/tool_parsers/gemma4.py
+index 90257a551..1df4d2916 100644
+--- a/mlx_lm/tool_parsers/gemma4.py
++++ b/mlx_lm/tool_parsers/gemma4.py
+@@ -1,10 +1,14 @@
+ # Copyright © 2025 Apple Inc.
+ 
+ import json
+-import re
+ from typing import Any, Optional
+ 
+-_tool_call_regex = re.compile(r"call:(\w+)(\{.*\})", re.DOTALL)
++import regex as re
++
++# Matches call:name{...} with balanced braces via the regex module's
++# recursive (?R)-style support.  (\{(?:[^{}]|(?2))*\}) recurses on the
++# second capture group so nested objects like {a:{b:1}} are captured whole.
++_tool_call_regex = re.compile(r"call:(\w+)(\{(?:[^{}]|(?2))*\})", re.DOTALL)
+ 
+ 
+ def _gemma4_args_to_json(text: str) -> str:
+@@ -30,10 +34,8 @@ def _capture(m):
+     return text
+ 
+ 
+-def parse_tool_call(text: str, _: Optional[Any] = None):
+-    match = _tool_call_regex.search(text)
+-    if not match:
+-        raise ValueError("No function provided.")
++def _parse_single(match: re.Match) -> dict:
++    """Parse a single call:name{args} regex match into a tool call dict."""
+     func_name = match.group(1)
+     args_str = match.group(2)
+     json_str = _gemma4_args_to_json(args_str)
+@@ -41,5 +43,14 @@ def parse_tool_call(text: str, _: Optional[Any] = None):
+     return dict(name=func_name, arguments=arguments)
+ 
+ 
++def parse_tool_call(text: str, _: Optional[Any] = None):
++    matches = list(_tool_call_regex.finditer(text))
++    if not matches:
++        raise ValueError("No function provided.")
++    if len(matches) == 1:
++        return _parse_single(matches[0])
++    return [_parse_single(m) for m in matches]
++
++
+ tool_call_start = "<|tool_call>"
+ tool_call_end = "<tool_call|>"
+diff --git a/tests/test_generate.py b/tests/test_generate.py
+index d3d90013f..9214281cd 100644
+--- a/tests/test_generate.py
++++ b/tests/test_generate.py
+@@ -402,6 +402,23 @@ def test_batch_generate_with_logits_processors(self):
+         self.assertEqual(responses[uid1].logprobs[1].item(), 0.0)
+         self.assertEqual(responses[uid2].logprobs[2].item(), 0.0)
+ 
++    def test_batch_generate_function_with_logits_processors(self):
++        """Test that batch_generate function with logits_processors produces correct results."""
++        logit_bias = {0: 2000.0, 1: -2000.0}
++        processors = make_logits_processors(logit_bias)
++
++        prompts = [self.tokenizer.encode("hello")]
++        response = batch_generate(
++            self.model,
++            self.tokenizer,
++            prompts,
++            max_tokens=1,
++            logits_processors=processors,
++        )
++        self.assertEqual(len(response.texts), 1)
++        generated_token = self.tokenizer.encode(response.texts[0])[0]
++        self.assertEqual(generated_token, 0)
++
+     def test_batch_generate_with_samplers(self):
+         """Test that batch_generate with logits_processors produces correct results."""
+         batch_gen = BatchGenerator(
+diff --git a/tests/test_tool_parsing.py b/tests/test_tool_parsing.py
+index e8c416917..5ba79d1b2 100644
+--- a/tests/test_tool_parsing.py
++++ b/tests/test_tool_parsing.py
+@@ -222,6 +222,38 @@ def test_gemma4(self):
+             {"query": "hello world", "limit": 10, "verbose": False},
+         )
+ 
++        # Multiple tool calls in a single block (no delimiter between them)
++        test_case = (
++            'call:glob{pattern:<|"|>README*.md<|"|>}'
++            'call:glob{pattern:<|"|>CONTRIBUTING.md<|"|>}'
++        )
++        tool_calls = gemma4.parse_tool_call(test_case, None)
++        self.assertIsInstance(tool_calls, list)
++        self.assertEqual(len(tool_calls), 2)
++        self.assertEqual(tool_calls[0]["name"], "glob")
++        self.assertEqual(tool_calls[0]["arguments"], {"pattern": "README*.md"})
++        self.assertEqual(tool_calls[1]["name"], "glob")
++        self.assertEqual(tool_calls[1]["arguments"], {"pattern": "CONTRIBUTING.md"})
++
++        # Multiple tool calls with nested args
++        test_case = (
++            'call:search{query:<|"|>weather<|"|>,limit:5}'
++            'call:configure{settings:{enabled:true,name:<|"|>test<|"|>}}'
++        )
++        tool_calls = gemma4.parse_tool_call(test_case, None)
++        self.assertIsInstance(tool_calls, list)
++        self.assertEqual(len(tool_calls), 2)
++        self.assertEqual(tool_calls[0]["name"], "search")
++        self.assertEqual(
++            tool_calls[0]["arguments"],
++            {"query": "weather", "limit": 5},
++        )
++        self.assertEqual(tool_calls[1]["name"], "configure")
++        self.assertEqual(
++            tool_calls[1]["arguments"],
++            {"settings": {"enabled": True, "name": "test"}},
++        )
++
+     def test_kimi_k2(self):
+         # Single tool call
+         test_case = (

@@ -47,9 +47,6 @@ setup(
         "test": ["datasets", "lm-eval"],
         "train": ["datasets", "tqdm"],
         "evaluate": ["lm-eval", "tqdm"],
-        "cuda13": [f"mlx[cuda13]>={MIN_MLX_VERSION}"],
-        "cuda12": [f"mlx[cuda12]>={MIN_MLX_VERSION}"],
-        "cpu": [f"mlx[cpu]>={MIN_MLX_VERSION}"],
     },
     entry_points={
         "console_scripts": [

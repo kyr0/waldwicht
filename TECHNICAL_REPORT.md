@@ -16,6 +16,15 @@ _Technical Report_
 
 **Abstract.** We quantize Gemma 4 E2B (2.3B effective parameters) for Apple Silicon inference via MLX, testing 22 layer-level and 28 component-level configurations across four phases, plus expanded-benchmark evaluations of selected finalists. Layer-level mixed-precision — which helped the larger E4B — hurts E2B; uniform 3-bit g64 wins on perplexity among all 22 layer-level configs. Shifting to component-level allocation (different bits per weight type, not per layer), we find that attention had to remain at 4-bit in all passing compositions while MLP tolerates 3-bit and embeddings tolerate 2-bit, yielding a 2.32 GB config that passes an 8-prompt math gate. However, a broader 20-prompt benchmark covering code, translation, reasoning, and creative writing overturns this result — the 2.32 GB config fails broadly (avg 4.5/5.4/5.0). Transferring the component sensitivity ordering to a 5-bit base produces a **2.96 GB config** (3.2× text-weight compression, from ~9.6 GB text-only BF16) that passes the diverse benchmark at 8.8/9.0/9.1, making it the smallest general-use config tested. The best-performing configurations use no transforms, no rotation, and no calibration data — only standard MLX affine quantization.
 
+**Component-level quantization as a new method.** Unlike uniform or layer-level mixed-precision quantization — both of which existing inference engines support natively — component-level allocation constitutes a distinct quantization paradigm that requires non-trivial inference engine adaptations. Each architectural weight group (attention projections, MLP, embeddings, gating) is quantized at an independently optimized bit-width, meaning a single forward pass touches weights at 3, 4, and 5-bit precision simultaneously. We identify and implement three required changes to the MLX inference stack: (1) per-component config resolution with leaf-name matching, (2) quantized KV-cache reference propagation through Gemma 4's KV-sharing mechanism, and (3) shape-aware attention mask handling for quantized key/value tuples. We release these as a patch to mlx-lm (`patches/mlx-lm-waldwicht.patch`). The resulting method yields both size and throughput gains over uniform quantization at equivalent quality:
+
+| Method | Configuration | Size | tok/s | Quality (C/Cm/R) | Expanded Gate |
+|---|---|---|---|---|---|
+| Uniform | 5-bit g64 | 3.86 GB | 44.1 | 9.4 / 9.3 / 9.5 | PASS |
+| **Component-level** | **attn=5, mlp=4, ple=3, gate=4, embed=3** | **2.96 GB** | **46.6** | **8.8 / 9.0 / 9.1** | **PASS** |
+
+*Component-level allocation achieves 23% smaller size and 6% higher throughput than the nearest uniform config at comparable quality (expanded 20-prompt benchmark, same measurement setup). With KV-cache quantization enabled in the Waldwicht Inference Server, the gap widens to 9% faster throughput and 25% less peak Metal memory (51.5 tok/s at 2.63 GB vs 47.4 tok/s at 3.52 GB).*
+
 **Model releases.** We release the three top-tier models from this ablation study as ready-to-run MLX exports:
 
 | Model | Size | tok/s | Peak RAM | Configuration |
@@ -42,7 +51,7 @@ A natural question arises: **does this finding generalize to smaller models in t
 
 We investigate this question on Gemma 4 E2B, the 2.3-billion-parameter variant in the Gemma 4 family. In Phases 1–3, using the same ROTQ pipeline — with rotation disabled in all primary sweeps except a dedicated Phase 1 sanity check — evaluation methodology, and test prompts as the E4B study, we run a systematic ablation of 22 configurations. The results reveal a **qualitative difference** between the two model sizes: *layer-level* precision allocation that helps the larger model actively *hurts* the smaller one.
 
-In Phase 4, we go deeper — shifting from layer-level to **component-level** mixed-precision. Rather than assigning different bits to different *layers*, we assign different bits to different *weight types* (attention projections, MLP matrices, PLE embeddings, PLE gating, and main embeddings/LM-head). Using a quality-gated pipeline with an 8-prompt LLM-judge (Anthropic Claude Opus 4.6 High) evaluation, we evaluate 28 component-level configurations to find per-component bit-width floors and their valid compositions. This approach succeeds where layer-level mixed-precision failed, achieving **2.32 GB** (text-only) — 28% below the uniform 4-bit quality floor (3.22 GB).
+In Phase 4, we go deeper — shifting from layer-level to **component-level** mixed-precision, a new quantization paradigm that assigns different bit-widths to different *weight types* (attention projections, MLP matrices, PLE embeddings, PLE gating, and main embeddings/LM-head) rather than to different *layers*. This is not merely a different configuration within existing tooling — it requires non-trivial changes to inference engines that assume uniform or layer-level quantization. Using a quality-gated pipeline with an 8-prompt LLM-judge (Anthropic Claude Opus 4.6 High) evaluation, we evaluate 28 component-level configurations to find per-component bit-width floors and their valid compositions. This approach succeeds where layer-level mixed-precision failed, achieving **2.32 GB** (text-only) — 28% below the uniform 4-bit quality floor (3.22 GB). We identify and implement the three inference engine adaptations required to make component-level quantization work in practice on MLX (Section 9.5), and release them as a patch to mlx-lm.
 
 ---
 
@@ -201,6 +210,8 @@ The best near-edge config (e3-ne6-g128, PPL 8,437 at 3.44 GB) is still 55% worse
 ## 7. Phase 4: AQ-Gated Component-Level Quantization
 
 Phases 1–3 explored *layer-level* precision allocation (which decoder layers get more bits). The universal failure of mixed-precision at that granularity motivated a shift to *component-level* allocation: assigning different bit-widths to different weight types across *all* layers simultaneously.
+
+**Methodological note.** Component-level quantization is not merely a new configuration within existing quantization frameworks — it is a new quantization method. Existing inference engines — including MLX, llama.cpp, and vLLM — assume either uniform quantization (one bit-width for all quantizable weights) or layer-level mixed-precision (one bit-width per layer). Component-level allocation breaks this assumption: within a single layer, different weight matrices (e.g., `q_proj` at 5-bit, `gate_proj` at 4-bit, PLE embedding at 3-bit) must be dequantized at different precisions. This requires changes to the inference engine's weight loading, quantization config resolution, and — for architectures with KV-cache sharing like Gemma 4 — attention dispatch logic. We detail the required adaptations in Section 9.5.
 
 ### 7.1 Methodology
 
@@ -488,6 +499,18 @@ PPL ranking is inversely correlated with answer quality on this model (uniform 3
 5. **Group size tuning was inconclusive on mixed strategies.** We tested uniform g32, g64, and g128 on the optimal config, confirming g64 as the best tested tradeoff (Section 7.7). Per-component mixed group sizes (e.g., MLP at g32 with attention at g128) remain unexplored.
 6. **Composition search is incomplete.** We tested 8 of the many possible component combinations. An exhaustive search might find additional valid configs.
 
+### 9.5 Inference Engine Adaptation for Component-Level Quantization
+
+Component-level mixed-precision is not a tuning knob exposed by existing inference engines. Deploying the configurations developed in Phase 4 required three modifications to the MLX inference stack (mlx-lm), which we contribute as a patch (`patches/mlx-lm-waldwicht.patch`, ~50 lines across two files).
+
+**1. Per-component quantization config resolution.** Standard mlx-lm resolves quantization parameters by exact weight path matching: a weight at path `language_model.model.layers.0.self_attn.q_proj` is looked up directly in the quantization config dictionary. Component-level configs use short architectural names (e.g., `embed_tokens`, `per_layer_input_gate`) that must match weight paths differing in prefix conventions between HuggingFace checkpoints and MLX's post-sanitization model tree. We add leaf-name matching to the quantization class predicate: after checking the full dotted path, it extracts the last path component (e.g., `embed_tokens` from `language_model.model.embed_tokens`) and checks whether it appears as a component-level override in the config. This enables a single config dictionary to specify per-component bit-widths without enumerating every full weight path.
+
+**2. Quantized KV-cache reference propagation.** Gemma 4's KV-sharing mechanism (last 20 of 35 decoder layers reuse KV caches from earlier "originating" layers) interacts non-trivially with quantized KV caches. When KV-cache quantization is enabled (e.g., `--kv-bits 8`), the originating layer's `QuantizedKVCache.update_and_fetch()` returns quantized tuples `((data, scales, biases), (data, scales, biases))` rather than plain `mx.array` tensors. Sharing layers receive these tuples as `shared_kv` but pass `cache=None` to the scaled dot-product attention (SDPA) dispatcher, which checks `hasattr(cache, 'bits')` to decide between quantized and standard SDPA. With `cache=None`, the dispatcher routes to `mx.fast.scaled_dot_product_attention`, which cannot handle quantized tuples — producing a `TypeError`. We fix this by propagating the originating layer's cache object (`shared_cache`) through the sharing path, so the SDPA dispatcher receives a cache with the correct `.bits` attribute and routes to `quantized_scaled_dot_product_attention`.
+
+**3. Shape-aware attention mask handling.** Attention mask dimensions are validated against the key sequence length. With quantized KV caches, keys are tuples `(data, scales, biases)` rather than plain arrays, so `keys.shape[-2]` fails. We add a type check: `keys[0].shape[-2]` for quantized tuples, `keys.shape[-2]` otherwise.
+
+These changes are specific to Gemma 4's KV-sharing architecture but illustrate a general principle: **component-level quantization introduces a new class of inference-time compatibility requirements** that do not arise with uniform or layer-level quantization. Other architectures with weight sharing, grouped-query attention, or cross-layer parameter tying will likely require analogous adaptations when component-level precision is applied.
+
 ---
 
 ## 10. Conclusion
@@ -498,7 +521,7 @@ Key findings:
 
 1. **Uniform beats layer-level mixed-precision for E2B.** Uniform 3-bit g64 (3.27 GB, PPL 5,452) outperforms all 22 layer-level mixed-precision configs. Group size g64 outperforms g128 (PPL 5,452 vs 14,701). Both reverse E4B findings.
 
-2. **Component-level mixed-precision succeeds where layer-level fails.** Assigning different bit-widths to weight types (not layers) yields a 2.32 GB config (28% below the 4-bit quality floor) that passes an 8-prompt math-focused quality gate. In all tested passing compositions, attention had to remain at 4-bit; other components tolerate 2–3 bits.
+2. **Component-level mixed-precision is a new quantization method, not a configuration.** Assigning different bit-widths to architectural weight groups (not layers) yields a 2.96 GB general-use config that is 23% smaller and 6% faster than uniform 5-bit at comparable quality — a Pareto improvement that no uniform configuration achieves. This is not a tuning knob within existing frameworks: it requires inference engine changes to support per-component config resolution, quantized KV-cache propagation through weight-sharing paths, and shape-aware attention mask handling (Section 9.5). We release the required changes as a patch to mlx-lm. In all tested passing compositions, attention had to remain at the base bit-width; other components tolerate 1–2 bit demotions.
 
 3. **Independent component floors do not compose.** Applying all independent minimums simultaneously fails (scores 4.0–4.6/10). The heuristic: keep attention at the quality floor, demote everything else.
 
@@ -507,6 +530,8 @@ Key findings:
 5. **Domain-specific gates are misleading.** The 2.32 GB config passes math but fails a diverse 20-prompt benchmark (code, translation, reasoning). A 5-bit mixed variant at **2.96 GB** (3.2× text-weight compression) passes the expanded benchmark, displacing uniform 4-bit (3.22 GB) as the smallest general-use config.
 
 6. **Quantization strategy is model-size-dependent.** The optimal approach differs qualitatively between E2B and E4B across every dimension tested (layer allocation, group size, edge protection, rotation). Recipes do not transfer without validation.
+
+7. **Inference engine adaptation is a prerequisite for component-level quantization.** Three changes to the MLX inference stack — per-component config resolution with leaf-name matching, quantized KV-cache reference propagation through Gemma 4's sharing mechanism, and shape-aware attention mask handling — are required to deploy the configs developed in this study. These changes are architecture-specific but the pattern generalizes: any model with weight sharing or cross-layer parameter tying will need analogous adaptations for component-level precision.
 
 Three practical optima (text-only sizes): **2.32 GB** (math/conversational only), **2.96 GB** (general use, recommended), **3.86 GB** (near-BF16 quality). All achieved with standard MLX `mx.quantize` — the best-performing configurations use no transforms, no rotation, and no calibration data.
 

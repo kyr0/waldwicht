@@ -347,9 +347,15 @@ def load_model(
 
     def _quantize(quantization):
         def class_predicate(p, m):
-            # Handle custom per layer quantizations
-            if p in config["quantization"]:
-                return config["quantization"][p]
+            # Handle custom per-component quantizations
+            # Check full path first, then match on the last path component
+            # (e.g. "embed_tokens" matches "language_model.model.embed_tokens")
+            q_cfg = config["quantization"]
+            if p in q_cfg:
+                return q_cfg[p]
+            leaf = p.rsplit(".", 1)[-1]
+            if leaf in q_cfg and isinstance(q_cfg[leaf], dict):
+                return q_cfg[leaf]
             if not hasattr(m, "to_quantized"):
                 return False
             return f"{p}.scales" in weights

@@ -249,6 +249,7 @@ class Attention(nn.Module):
         cache: Optional[Any] = None,
         shared_kv: Optional[tuple] = None,
         offset: Optional[Any] = None,
+        shared_cache: Optional[Any] = None,
     ) -> mx.array:
         B, L, _ = x.shape
 
@@ -275,15 +276,22 @@ class Attention(nn.Module):
         queries = queries.transpose(0, 2, 1, 3)
         queries = self.rope(queries, offset=offset)
 
+        # Use the local cache if present, otherwise use the originating
+        # layer's cache reference for quantized SDPA dispatch.
+        effective_cache = cache
         if cache is not None:
             keys, values = cache.update_and_fetch(keys, values)
+        elif shared_cache is not None:
+            effective_cache = shared_cache
 
         if mask is not None and isinstance(mask, mx.array):
-            if mask.shape[-1] != keys.shape[-2]:
-                mask = mask[..., -keys.shape[-2] :]
+            # keys may be a quantized tuple (data, scales, biases)
+            k_seq_len = keys[0].shape[-2] if isinstance(keys, (tuple, list)) else keys.shape[-2]
+            if mask.shape[-1] != k_seq_len:
+                mask = mask[..., -k_seq_len:]
 
         output = scaled_dot_product_attention(
-            queries, keys, values, cache=cache, scale=self.scale, mask=mask
+            queries, keys, values, cache=effective_cache, scale=self.scale, mask=mask
         )
         output = output.transpose(0, 2, 1, 3).reshape(B, L, -1)
 
@@ -352,12 +360,14 @@ class DecoderLayer(nn.Module):
         per_layer_input: Optional[mx.array] = None,
         shared_kv: Optional[tuple] = None,
         offset: Optional[Any] = None,
+        shared_cache: Optional[Any] = None,
     ) -> mx.array:
         residual = x
 
         h = self.input_layernorm(x)
         h, shared_kv, offset = self.self_attn(
-            h, mask, cache, shared_kv=shared_kv, offset=offset
+            h, mask, cache, shared_kv=shared_kv, offset=offset,
+            shared_cache=shared_cache,
         )
         h = self.post_attention_layernorm(h)
         h = residual + h
@@ -563,7 +573,7 @@ class Gemma4TextModel(nn.Module):
         # Apply each layer. We save all intermediate kvs and offset and grab
         # the previous one for the shared kv layers.
         masks = self._make_masks(h, cache)
-        intermediates = [(None, None)] * len(self.layers)
+        intermediates = [(None, None, None)] * len(self.layers)
         for idx, (layer, c, mask, prev_idx, per_layer_input) in enumerate(
             zip(
                 self.layers,
@@ -573,7 +583,7 @@ class Gemma4TextModel(nn.Module):
                 per_layer_inputs,
             )
         ):
-            kvs, offset = intermediates[prev_idx]
+            kvs, offset, orig_cache = intermediates[prev_idx]
 
             h, kvs, offset = layer(
                 h,
@@ -582,9 +592,12 @@ class Gemma4TextModel(nn.Module):
                 per_layer_input=per_layer_input,
                 shared_kv=kvs,
                 offset=offset,
+                shared_cache=orig_cache,
             )
 
-            intermediates[idx] = (kvs, offset)
+            # Track the originating cache for KV-sharing layers so
+            # downstream layers can use it for quantized SDPA dispatch.
+            intermediates[idx] = (kvs, offset, c if c is not None else orig_cache)
 
         return self.norm(h)
 
