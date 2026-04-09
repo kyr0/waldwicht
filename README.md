@@ -16,6 +16,10 @@ The Waldwicht inference server supports 8-bit KV cache quantization, alongside T
 ## Requirements / Setup
 
 - macOS on Apple Silicon / M-series processor _(tested on Macbook Air M4 24GB, macOS 15.7.3)_
+- [Homebrew](https://brew.sh/) — required for installing packaging tools (`pipx`). Install with:
+  ```sh
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  ```
 
 Open a Terminal and run:
 

@@ -14,7 +14,7 @@ DRAFT_MODEL :=
 MAX_BACKENDS := 2
 MAX_MEM_UTIL := 80
 
-.PHONY: setup start stop status log test test-tools bench download patch unpatch clean models
+.PHONY: setup start stop status log test test-tools bench download patch unpatch package clean models
 
 setup: _clean _install_uv _venv _deps _ensure_metal_toolchain
 	@echo "\n[OK] Setup complete. Run 'make start' to launch the server."
@@ -54,7 +54,7 @@ _deps:
 	@echo "=> Xcode command line tools ..."
 	@xcode-select -p &>/dev/null || (echo "=> Installing Xcode command line tools ..."; xcode-select --install)
 	@echo "=> Installing Python dependencies ..."
-	$(UV) pip install --quiet setuptools openai python-dotenv httpx uvicorn starlette pydantic
+	$(UV) pip install --quiet pip setuptools openai python-dotenv httpx uvicorn starlette pydantic
 	@echo "=> Installing Waldwicht MLX fork (editable, from source) ..."
 	PYPI_RELEASE=1 $(UV) pip install --quiet -e ./mlx --no-build-isolation
 	@echo "=> Installing mlx-lm fork (editable, Gemma4 support + local MLX) ..."
@@ -62,7 +62,7 @@ _deps:
 	@echo "=> Installing omlx (editable, against local mlx-lm) ..."
 	$(UV) pip install --quiet -e ./omlx --no-deps --no-build-isolation
 	@echo "=> Installing omlx remaining dependencies (skipping mlx/mlx-lm) ..."
-	$(UV) pip install --quiet -e "./omlx[dev]" --no-build-isolation 2>&1 | grep -v "already satisfied" || true
+	$(UV) pip install --quiet -e "./omlx[dev,grammar]" --no-build-isolation 2>&1 | grep -v "already satisfied" || true
 	@echo "=> Re-linking local mlx-lm fork (in case omlx deps overwrote it) ..."
 	$(UV) pip install --quiet -e ./mlx-lm --no-build-isolation --no-deps
 
@@ -199,6 +199,20 @@ models:
 	[print(f'{rid:<{wn}}  {sz/1e9:>7.2f}G  {path}') for rid, sz, path in models]; \
 	print(f'\n{len(models)} model(s), {sum(sz for _,sz,_ in models)/1e9:.2f} GB total') \
 	"
+
+# -- package -----------------------------------------------------------
+_ensure_pipx:
+	@if ! command -v pipx &>/dev/null; then \
+		echo "=> Installing pipx via Homebrew ..."; \
+		brew install pipx && pipx ensurepath; \
+	else \
+		echo "=> pipx already installed: $$(pipx --version)"; \
+	fi
+
+package: _ensure_pipx
+	@echo "=> Building oMLX macOS app + DMG ..."
+	cd omlx/packaging && $(CURDIR)/$(PYTHON) build.py
+	@echo "=> Done. Output in omlx/packaging/dist/"
 
 # -- unpatch ----------------------------------------------------------
 unpatch:

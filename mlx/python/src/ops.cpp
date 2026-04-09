@@ -1429,6 +1429,28 @@ void init_ops(nb::module_& m) {
       nb::sig(
           "def arange(stop : Union[int, float], step : Union[None, int, float] = None, dtype: Optional[Dtype] = None, *, stream: Union[None, Stream, Device] = None) -> array"));
   m.def(
+      "bartlett",
+      &mlx::core::bartlett,
+      "M"_a,
+      nb::kw_only(),
+      "stream"_a = nb::none(),
+      R"pbdoc(
+        Return the Bartlett window.
+        
+        The Bartlett window is a taper formed by using a weighted cosine.
+
+        .. math::
+          w(n) = 1 - \frac{2|n - (M-1)/2|}{M-1}
+           \qquad 0 \le n \le M-1
+        
+        Args:
+            M (int): Number of points in the output window.
+            
+        Returns:
+            array: The window, with the maximum value normalized to one (the value one
+                   appears only if the number of samples is odd).
+    )pbdoc");
+  m.def(
       "hanning",
       &mlx::core::hanning,
       "M"_a,
@@ -1470,6 +1492,30 @@ void init_ops(nb::module_& m) {
         Args:
             M (int): Number of points in the output window.
 
+        Returns:
+            array: The window, with the maximum value normalized to one (the value one
+                   appears only if the number of samples is odd).
+    )pbdoc");
+  m.def(
+      "blackman",
+      &mlx::core::blackman,
+      "M"_a,
+      nb::kw_only(),
+      "stream"_a = nb::none(),
+      nb::sig(
+          "def blackman(M: int, *, stream: Union[None, Stream, Device] = None) -> array"), // <--- J'ai rajouté ça
+      R"pbdoc(
+        Return the Blackman window.
+        
+        The Blackman window is a taper formed by using the first three terms of a summation of cosines.
+
+        .. math::
+          w(n) = 0.42 - 0.5 \cos\left(\frac{2\pi n}{M-1}\right) + 0.08 \cos\left(\frac{4\pi n}{M-1}\right)
+           \qquad 0 \le n \le M-1
+        
+        Args:
+            M (int): Number of points in the output window.
+            
         Returns:
             array: The window, with the maximum value normalized to one (the value one
                    appears only if the number of samples is odd).
@@ -1719,7 +1765,7 @@ void init_ops(nb::module_& m) {
       )pbdoc");
   m.def(
       "asarray",
-      [](const ArrayInitType& a, std::optional<mx::Dtype> dtype) {
+      [](const nb::object& a, std::optional<mx::Dtype> dtype) {
         return create_array(a, dtype);
       },
       nb::arg(),
@@ -4348,14 +4394,14 @@ void init_ops(nb::module_& m) {
 
           .. table:: Quantization modes
 
-            ======  ======================   ==============================  =============  =====
-            mode    group size               bits                            scale type     bias
-            ======  ======================   ==============================  =============  =====
-            affine  32, 64\ :sup:`*`, 128    1, 2, 3, 4\ :sup:`*`, 5, 6, 8   same as input  yes
-            mxfp4   32\ :sup:`*`             4\ :sup:`*`                     e8m0           no
-            mxfp8   32\ :sup:`*`             8\ :sup:`*`                     e8m0           no
-            nvfp4   16\ :sup:`*`             4\ :sup:`*`                     e4m3           no
-            ======  ======================   ==============================  =============  =====
+            ======  ======================   ==========================  =============  =====
+            mode    group size               bits                        scale type     bias
+            ======  ======================   ==========================  =============  =====
+            affine  32, 64\ :sup:`*`, 128    2, 3, 4\ :sup:`*`, 5, 6, 8  same as input  yes
+            mxfp4   32\ :sup:`*`             4\ :sup:`*`                 e8m0           no
+            mxfp8   32\ :sup:`*`             8\ :sup:`*`                 e8m0           no
+            nvfp4   16\ :sup:`*`             4\ :sup:`*`                 e4m3           no
+            ======  ======================   ==========================  =============  =====
 
           :sup:`*` indicates the default value when unspecified.
 
