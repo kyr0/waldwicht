@@ -6,7 +6,7 @@
 
 ## Overview
 
-Waldwicht is a family of mixed-precision quantized LLMs based on Google Gemma 4 E2B, designed for efficient inference on Apple Silicon. The models are the result of an extensive ablation study on quantization configurations, leading to a novel component-level mixed-precision approach that preserves output quality while significantly reducing memory usage.
+Waldwicht is a family of mixed-precision quantized LLMs based on Google Gemma 4 E2B, designed for efficient inference on Apple Silicon. The models are the result of an [extensive ablation study](TECHNICAL_REPORT.md) on quantization configurations, leading to a novel component-level mixed-precision approach that preserves output quality while significantly reducing memory usage.
 
 Alongside the models, we release the Waldwicht Inference Server — an OpenAI-compatible API server optimized for Apple Silicon with custom memory management, multi-worker support, and advanced features like TurboQuant and speculative decoding. This allows anyone with a Macbook Air M-series processor to run intelligent AI models locally with good performance, handling a wide range of tasks including tool calling and long-context retrieval.
 
