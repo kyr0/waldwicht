@@ -12,15 +12,15 @@ Alongside the models, we release the Waldwicht Inference Server — an OpenAI-co
 
 On top of that, we also release a custom `oMLX` build that supports Waldwicht models and provides a user-friendly Web UI, menu bar app, and integration with OpenClaw, OpenCode, and other agents for seamless local AI interactions.
 
-<img src="docs/winzling.gif" alt="Waldwicht Winzling demo in oMLX" width="600"/>
+<img src="docs/winzling.gif" alt="Waldwicht Winzling demo in oMLX" width="800"/>
 
 Real-world memory footprint of Waldwicht Winzling:
 
-<img src="docs/real-mem.png" alt="Waldwicht Winzling - real-world memory footpint" width="600"/>
+<img src="docs/real-mem.png" alt="Waldwicht Winzling - real-world memory footpint" width="800"/>
 
 Real-world benchmark **while under typical consumer conditions** (50% CPU load, 50% memory pressure) on Macbook **Air** M4 24 GB:
 
-<img src="docs/bench-m4-air-base.png" alt="Waldwicht Winzling - real-world benchmark on M4 Air" width="600"/>
+<img src="docs/bench-m4-air-base.png" alt="Waldwicht Winzling - real-world benchmark on M4 Air" width="800"/>
 
 ### Requirements / Setup
 
@@ -30,19 +30,19 @@ Real-world benchmark **while under typical consumer conditions** (50% CPU load, 
 
 Download the latest release of [Waldwicht-oMLX (DMG)](https://github.com/kyr0/waldwicht/releases/tag/Waldwicht-oMLX-v0.0.1). Launch the `oMLX.app`, open the menu bar icon, and click `Start Server`. Then click: `Admin Panel`. After the webbrowser opens, visit `http://127.0.0.1:8000/admin/dashboard?tab=models&modelsTab=downloader` and download a Waldwicht model from HuggingFace (e.g. `kyr0/Gemma-4-Waldwicht-Winzling`):
 
-<img src="docs/download_from_hf.png" alt="oMLX model downloader" width="600"/>
+<img src="docs/download_from_hf.png" alt="oMLX model downloader" width="800"/>
 
 It should look like this:
 
-<img src="docs/download-progress.png" alt="oMLX download in progress" width="600" />
+<img src="docs/download-progress.png" alt="oMLX download in progress" width="800" />
 
 Now after this, switch to the "Chat" tab. Waldwicht Winzling should be auto-selected and you can start chatting with the model:
 
-<img src="docs/omlx-chat.png" alt="oMLX chat interface" width="600" />
+<img src="docs/omlx-chat.png" alt="oMLX chat interface" width="800" />
 
 You can also use the OpenAI API directly and integrate Waldwicht with Codex, OpenCode, OpenClaw and Claude Code:
 
-<img src="docs/omlx-integrations.png" alt="oMLX integrations" width="600" />
+<img src="docs/omlx-integrations.png" alt="oMLX integrations" width="800" />
 
 ## 2. Available Models
 
