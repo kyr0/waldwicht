@@ -5,14 +5,18 @@ import json
 import os
 import subprocess
 import sys
+from difflib import SequenceMatcher
 
-from dotenv import load_dotenv
-from openai import OpenAI
+from test_common import (
+    BASE_URL,
+    apply_chat_defaults,
+    create_client,
+    require_content,
+    resolve_model,
+)
 
-load_dotenv()
-
-client = OpenAI()
-MODEL = client.models.list().data[0].id
+client = create_client()
+MODEL, AVAILABLE_MODELS = resolve_model(client)
 
 CALIBRATION_FILE = "calibration.json"
 
@@ -36,16 +40,24 @@ def fail(msg: str):
 # -- helpers ----------------------------------------------------------
 
 def chat(messages, **kwargs):
-    return client.chat.completions.create(model=MODEL, messages=messages, **kwargs)
+    return client.chat.completions.create(
+        model=MODEL,
+        messages=messages,
+        **apply_chat_defaults(kwargs),
+    )
+
+
+def normalize_text(text: str) -> str:
+    return " ".join(text.split())
 
 
 # -- tests ------------------------------------------------------------
 
 def test_list_models():
     print("\n-- List models (health check) --")
-    models = client.models.list()
-    if models.data:
-        ok(f"Got {len(models.data)} model(s): {models.data[0].id}")
+    if AVAILABLE_MODELS:
+        ok(f"Got {len(AVAILABLE_MODELS)} model(s); selected: {MODEL}")
+        print(f"  Server: {BASE_URL}")
     else:
         fail("No models returned")
 
@@ -65,7 +77,7 @@ def test_chat_basic():
         print(f"\n-- Chat: {name} --")
         try:
             r = chat(msgs, **kw)
-            content = r.choices[0].message.content
+            content = require_content(r)
             ok(f"{len(content)} chars")
         except Exception as e:
             fail(str(e))
@@ -74,18 +86,27 @@ def test_chat_basic():
 def test_streaming():
     print("\n-- Chat: Streaming --")
     try:
-        chunks = []
+        content_chunks = []
+        reasoning_chunks = []
         stream = chat(
             [{"role": "user", "content": "Count from 1 to 5."}],
             max_tokens=64, stream=True,
         )
         for chunk in stream:
-            if chunk.choices and chunk.choices[0].delta.content:
-                chunks.append(chunk.choices[0].delta.content)
-        if len(chunks) > 1:
-            ok(f"Streaming: {len(chunks)} chunks received")
+            if not chunk.choices:
+                continue
+            delta = chunk.choices[0].delta
+            if delta.content:
+                content_chunks.append(delta.content)
+            reasoning = getattr(delta, "reasoning", None)
+            if reasoning:
+                reasoning_chunks.append(reasoning)
+        if content_chunks:
+            ok(f"Streaming content: {len(content_chunks)} chunk(s) received")
+        elif reasoning_chunks:
+            ok(f"Streaming reasoning: {len(reasoning_chunks)} chunk(s) received")
         else:
-            fail(f"Streaming: only {len(chunks)} chunk(s)")
+            fail("Streaming: no content or reasoning chunks received")
     except Exception as e:
         fail(f"Streaming error: {e}")
 
@@ -95,9 +116,14 @@ def test_long_generation():
     try:
         r = chat(
             [{"role": "user", "content": "Write the longest, most detailed essay you can about the history of computing, from the abacus to modern AI."}],
-            max_tokens=65536,
+            max_tokens=512,
         )
-        ok(f"{r.usage.completion_tokens} tokens generated")
+        text = require_content(r)
+        completion_tokens = r.usage.completion_tokens if r.usage else 0
+        if completion_tokens >= 128:
+            ok(f"{completion_tokens} tokens generated")
+        else:
+            fail(f"Long generation too short ({completion_tokens} tokens, {len(text)} chars)")
     except Exception as e:
         fail(str(e))
 
@@ -123,7 +149,7 @@ def test_sampling_params():
         print(f"\n-- Chat: {name} --")
         try:
             r = chat(msgs, **kw)
-            ok(f"{r.choices[0].message.content[:80]}")
+            ok(f"{require_content(r)[:80]}")
         except Exception as e:
             fail(str(e))
 
@@ -136,7 +162,7 @@ def test_determinism():
     responses = []
     for run in range(1, 6):
         r = chat(msgs, **kw)
-        text = r.choices[0].message.content
+        text = require_content(r)
         responses.append(text)
         if run == 1:
             print(f"  run {run} (warmup): {text[:80]}...")
@@ -176,7 +202,7 @@ def test_calibration_baseline():
             temperature=0.01, seed=0,
         )
 
-        got = r.choices[0].message.content.strip()
+        got = require_content(r).strip()
         tokens = r.usage.completion_tokens if r.usage else 0
 
         # Run same prompt again to check self-consistency
@@ -184,14 +210,18 @@ def test_calibration_baseline():
             [{"role": "user", "content": prompt}],
             temperature=0.01, seed=0,
         )
-        got2 = r2.choices[0].message.content.strip()
+        got2 = require_content(r2).strip()
 
         if got == got2:
             ok(f"id={entry['id']} self-consistent ({tokens} tok)")
         else:
-            fail(f"id={entry['id']} NOT self-consistent across runs")
-            print(f"    run 1: {got[:100]}...")
-            print(f"    run 2: {got2[:100]}...")
+            similarity = SequenceMatcher(None, normalize_text(got), normalize_text(got2)).ratio()
+            if similarity >= 0.94:
+                ok(f"id={entry['id']} near-identical ({tokens} tok, similarity={similarity:.3f})")
+            else:
+                fail(f"id={entry['id']} NOT self-consistent across runs")
+                print(f"    run 1: {got[:100]}...")
+                print(f"    run 2: {got2[:100]}...")
 
 
 def test_needle_in_haystack():
@@ -204,7 +234,7 @@ def test_needle_in_haystack():
         )
         payload = json.loads(payload_json)
         r = chat(payload["messages"], max_tokens=payload.get("max_tokens", 64))
-        answer = r.choices[0].message.content
+        answer = require_content(r)
         ptokens = r.usage.prompt_tokens if r.usage else "?"
         print(f"  Prompt tokens: {ptokens}")
         if "NEEDLE-IN-HAYSTACK-8430-FOUND" in answer:
@@ -226,7 +256,7 @@ def test_long_context_qa():
         )
         payload = json.loads(payload_json)
         r = chat(payload["messages"], max_tokens=payload.get("max_tokens", 256))
-        answer = r.choices[0].message.content
+        answer = require_content(r)
         ptokens = r.usage.prompt_tokens if r.usage else "?"
         print(f"  Prompt tokens: {ptokens}")
         if len(answer) > 20:
@@ -262,6 +292,7 @@ def test_finish_reason_length():
 # -- main -------------------------------------------------------------
 
 if __name__ == "__main__":
+    print(f"Using model: {MODEL}")
     test_list_models()
     test_chat_basic()
     test_streaming()

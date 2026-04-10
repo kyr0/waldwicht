@@ -430,15 +430,30 @@ def rotq_export(
             "mode": "affine",
         }
 
-    # Add ROTQ metadata (informational only, not used by loader)
-    model_config["rotq_config"] = {
-        "equalization": config.equalization,
-        "equalization_method": config.equalization_method,
-        "permutation": config.permutation,
-        "rotation": config.rotation,
-        "rotation_families": config.rotation_families,
-        "scale_method": config.scale_method,
-    }
+    # ── Strip multimodal configs and inference-irrelevant metadata ───────
+    # Audio tower, vision tower, and their associated token IDs are not
+    # present in text-only exports.  rotq_config is build-time metadata
+    # that the loader doesn't need.
+    _STRIP_KEYS = [
+        "architectures",
+        "audio_config",
+        "audio_token_id",
+        "boa_token_id",
+        "eoa_token_id",
+        "eoa_token_index",
+        "vision_config",
+        "vision_soft_tokens_per_image",
+        "image_token_id",
+        "boi_token_id",
+        "eoi_token_id",
+        "video_token_id",
+        "rotq_config",
+    ]
+    for key in _STRIP_KEYS:
+        model_config.pop(key, None)
+
+    if config.verbose:
+        print(f"[ROTQ] Stripped {len(_STRIP_KEYS)} multimodal/metadata keys from config.")
 
     with open(out_dir / "config.json", "w") as f:
         json.dump(model_config, f, indent=2)

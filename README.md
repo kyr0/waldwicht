@@ -2,16 +2,25 @@
   <img src="./waldwicht_banner.png">
 </div>
 
+# Waldwicht project
 
-# Waldwicht High Performance MLX Inference Server
+## Overview
 
-This is an OpenAI-compatible LLM inference server for running the [**Waldwicht model family**](https://huggingface.co/kyr0/Waldwicht-8B-mlx-1bit) (Mixed-Precision Quantization models of Google Gemma 4 E2B, preserving output quality, based on an extensive ablation study by Aron Homberg).
+Waldwicht is a family of mixed-precision quantized LLMs based on Google Gemma 4 E2B, designed for efficient inference on Apple Silicon. The models are the result of an extensive ablation study on quantization configurations, leading to a novel component-level mixed-precision approach that preserves output quality while significantly reducing memory usage.
 
-The Waldwicht inference server supports 8-bit KV cache quantization, alongside TurboQuant and Speculative Decoding on any Apple Silicon machines via [MLX](https://github.com/ml-explore/mlx) and a fork of [MLX-LM](https://github.com/ml-explore/mlx-lm) in which I implemented several optimiztations.
+Alongside the models, we release the Waldwicht Inference Server — an OpenAI-compatible API server optimized for Apple Silicon with custom memory management, multi-worker support, and advanced features like TurboQuant and speculative decoding. This allows anyone with a Macbook Air M-series processor to run intelligent AI models locally with good performance, handling a wide range of tasks including tool calling and long-context retrieval.
 
-> Using Waldwicht models, everyone with a Macbook Air M-series processor can now run intelligent AI models with good performance (see below), handling a wide range of tasks, including tool calling and long-context retrieval (I heard you wanted to run OpenClaw locally for free?):
+On top of that, we also release a custom `oMLX` build that supports Waldwicht models and provides a user-friendly Web UI, menu bar app, and integration with OpenClaw, OpenCode, and other agents for seamless local AI interactions.
 
-<img src="docs/waldwicht_demo_aichat.gif" alt="Waldwicht demo in aichat terminal UI" width="600"/>
+<img src="docs/winzling.gif" alt="Waldwicht Winzling demo in oMLX" width="600"/>
+
+Real-world memory footprint of Waldwicht Winzling:
+
+<img src="docs/real-mem.png" alt="Waldwicht Winzling - real-world memory footpint" width="600"/>
+
+Real-world benchmark **while under typical consumer conditions** (50% CPU load, 50% memory pressure) on Macbook **Air** M4 24 GB:
+
+<img src="docs/bench-m4-air-base.png" alt="Waldwicht Winzling - real-world benchmark on M4 Air" width="600"/>
 
 ## Requirements / Setup
 
@@ -61,6 +70,13 @@ make setup   # install uv, venv, deps, download model
 make start   # launch server on localhost:8430
 make test    # run example queries
 make stop    # stop the server
+```
+
+For local model paths:
+
+```sh
+MODEL=/path/to/model make start
+# e.g. MODEL=/Volumes/AI_Models/mlx/Gemma-4-Waldwicht-Winzling
 ```
 
 ## Accessing the model
@@ -116,6 +132,52 @@ Endpoints:
 - `POST /v1/chat/completions` - chat completion (supports `"stream": true`)
 - `GET  /health` - proxy health (backends alive, active connections)
 
+### For local model path
+
+Shows an example with thinking (reasoning) enabled:
+
+```bash
+curl -s http://127.0.0.1:8432/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "/Volumes/AI_Models/mlx/Gemma-4-Waldwicht-Winzling",
+    "messages": [{"role": "user", "content": "Say hello in 5 words"}],
+    "max_tokens": 500,
+    "stream": false,
+    "chat_template_kwargs": {"enable_thinking": true}
+  }' | python3 -m json.tool
+```
+
+Result:
+
+```json
+{
+    "id": "chatcmpl-7703e3d0-f6a1-454a-b00e-94cd8c43a5ec",
+    "system_fingerprint": "0.31.2-0.31.2.dev20260410+8332e228-macOS-15.7.3-arm64-arm-64bit-applegpu_g16g",
+    "object": "chat.completion",
+    "model": "/Volumes/AI_Models/mlx/Gemma-4-Waldwicht-Winzling",
+    "created": 1775818420,
+    "choices": [
+        {
+            "index": 0,
+            "finish_reason": "stop",
+            "message": {
+                "role": "assistant",
+                "content": "Hello! Have a wonderful day.",
+                "reasoning": "\nThinking Process:\n\n1.  **Analyze the Request:** The user wants me to say \"hello\" but limit the response to exactly five words.\n2.  **Determine the Core Meaning:** The core meaning is a greeting.\n3.  **Generate Options (Focusing on 5 words):**\n    *   How about: Hello, how are you today? (6 words - too long)\n    *   How about: Hello! I hope you are well. (7 words - too long)\n    *   How about: Hello there, have a great day. (7 words - too long)\n    *   How about: Hello! Wishing you a wonderful day. (6 words - too long)\n    *   How about: Hello! Let's start the conversation. (6 words - too long)\n    *   How about: Hello! I send warm greetings now. (6 words - too long)\n    *   *Constraint Check:* I need a simple, direct greeting that fits the limit.\n4.  **Select the Best/Most Direct Option:** The simplest way to say hello in five words is usually a direct greeting plus a friendly addition.\n    *   Option A: Hello! How are you doing today? (6 words - Fail)\n    *   Option B: Hello! I hope you have a good day. (7 words - Fail)\n    *   Option C: Hello! Wishing you a wonderful day. (6 words - Fail)\n    *   Option D: Hello! Have a fantastic day now. (6 words - Fail)\n    *   Option E: Hello! I hope everything is great. (6 words - Fail)\n    *   Option F: Hello! Let's begin this chat now. (6 words - Fail)\n    *   Option G: Hello! I hope you are well. (6 words - Fail)\n    *   Option H: Hello! Have a wonderful day. (5 words - Success!)\n5.  **Final Output Generation:** (Ensure it meets the 5-word limit.)"
+            }
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 21,
+        "completion_tokens": 446,
+        "total_tokens": 467,
+        "prompt_tokens_details": {
+            "cached_tokens": 20
+        }
+    }
+}
+```
 
 ## Makefile Commands
 
@@ -131,6 +193,7 @@ Open any terminal, run:
 | `make test` | Run example queries (health, chat, streaming) |
 | `make bench` | Run 50 varied prompts and report tok/s |
 | `make models` | List downloaded models with size and location |
+| `make export-model` | Export a quantized Waldwicht model variant |
 | `make clean` | Remove venv, logs, and caches |
 
 
@@ -246,6 +309,38 @@ The recommended Waldwicht-Winzling (2.96 GB) passes a diverse 20-prompt benchmar
 - **Streaming** — proper SSE streaming with `[DONE]` sentinel
 - **Sampling controls** — `temperature`, `top_p`, and `seed` all work as expected; `seed` + low temp produces deterministic output across runs
 - **Long context** — needle-in-a-haystack retrieval and coherent summarization of long multi-topic transcripts
+- **Per-request thinking** — produces `reasoning` field with step-by-step thought process when enabled - much slower but usually leads to more accurate and detailed responses
+
+## Reproduction
+
+To re-export the quantized Waldwicht models from the BF16 source weights:
+
+```sh
+# Export Winzling (default)
+make export-model
+
+# Export a specific variant
+make export-model EXPORT_MODEL=Gemma-4-Waldwicht-Sproessling
+make export-model EXPORT_MODEL=Gemma-4-Waldwicht-Juengling
+
+# Custom output directory
+make export-model EXPORT_MODEL=Gemma-4-Waldwicht-Winzling OUTPUT_DIR=/path/to/output
+```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `EXPORT_MODEL` | `Gemma-4-Waldwicht-Winzling` | Model variant to export |
+| `OUTPUT_DIR` | sibling `mlx` directory next to `HF_HOME` | Directory where the exported model is written |
+
+Available variants:
+
+| Variant | Type | Configuration |
+|---------|------|---------------|
+| `Gemma-4-Waldwicht-Winzling` | mixed | attn=5, mlp=4, ple=3, gate=4, embed=3 |
+| `Gemma-4-Waldwicht-Sproessling` | mixed | attn=5, mlp=5, ple=3, gate=4, embed=3 |
+| `Gemma-4-Waldwicht-Juengling` | uniform | 5-bit g64 |
+
+The export script lives in `ablation_scripts/export.py` and uses the local `./mlx` and `./mlx-lm` forks for quantization. The BF16 source model path is configured in `ablation_scripts/infrastructure.py` (`BF16_PATH`).
 
 ## License
 

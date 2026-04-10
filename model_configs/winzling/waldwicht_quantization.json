@@ -1,0 +1,11 @@
+{
+  "type": "mixed",
+  "default_bits": 5,
+  "default_group_size": 64,
+  "overrides": {
+    "mlp": {"bits": 4, "group_size": 64},
+    "ple_embeddings": {"bits": 3, "group_size": 64},
+    "ple_gate_proj": {"bits": 4, "group_size": 64},
+    "main_embed_lmhead": {"bits": 3, "group_size": 64}
+  }
+}

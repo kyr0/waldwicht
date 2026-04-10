@@ -20,18 +20,25 @@ from mlx_lm.sample_utils import make_sampler
 
 # ── Paths & constants ────────────────────────────────────────────────────────
 
-BF16_PATH = "hf/gemma-4-E2B-it"
-OPTIMAL_PATH = "mlx/gemma-4-E2B-q3-g64-optimal"
+HF_HOME = os.path.expanduser(
+    os.environ.setdefault("HF_HOME", str(Path.home() / ".cache" / "huggingface"))
+)
+MODELS_ROOT = os.path.dirname(HF_HOME)
+BF16_PATH = os.path.join(HF_HOME, "gemma-4-E2B-it")
+OPTIMAL_PATH = os.path.join(MODELS_ROOT, "mlx", "gemma-4-E2B-q3-g64-optimal")
+SCAFFOLD_PATH = os.path.join(os.path.dirname(__file__), "..", "model_scaffold")
 CALIBRATION_PATH = os.path.join(
     os.path.dirname(__file__), "..", "optimal", "calibration", "calibration_e2b.json"
 )
 AQ_CALIBRATION_PATH = os.path.join(
     os.path.dirname(__file__), "..", "answer_quality_calibration.json"
 )
-TMP_DIR = "tmp-cap-e2b"
+TMP_DIR = os.path.join(HF_HOME, "tmp")
 RESULTS_DIR = os.path.join(os.path.dirname(__file__), "results")
 
 N_LAYERS = 35
+
+os.makedirs(TMP_DIR, exist_ok=True)
 
 PPL_TEXT = (
     "The quick brown fox jumps over the lazy dog. "
@@ -171,6 +178,17 @@ def requantize_all_linear(
     return out, count
 
 
+# ── Scaffold copy ────────────────────────────────────────────────────────────
+
+def copy_scaffold(dst_dir: str):
+    """Copy config/tokenizer files from the local model_scaffold to dst_dir."""
+    os.makedirs(dst_dir, exist_ok=True)
+    for f in os.listdir(SCAFFOLD_PATH):
+        src = os.path.join(SCAFFOLD_PATH, f)
+        if os.path.isfile(src):
+            shutil.copy2(src, dst_dir)
+
+
 # ── Sharded save ─────────────────────────────────────────────────────────────
 
 def save_sharded(weights: dict, out_dir: str, max_shard_bytes: int = 2 * 1024**3):
@@ -217,6 +235,9 @@ def patch_config_quantization(config_path: str, global_bits: int, global_gs: int
                               overrides: dict | None = None):
     """Rewrite the quantization section in config.json.
 
+    Also strips multimodal and build-time-only metadata keys that are
+    irrelevant for text-only inference.
+
     Args:
         config_path: Path to config.json.
         global_bits: Default bits for all weights.
@@ -226,6 +247,20 @@ def patch_config_quantization(config_path: str, global_bits: int, global_gs: int
     """
     with open(config_path) as f:
         config = json.load(f)
+
+    # Strip multimodal tower configs and inference-irrelevant metadata.
+    # "architectures" is removed because the HF value
+    # (Gemma4ForConditionalGeneration) signals a multimodal model to
+    # inference engines; mlx-lm uses model_type instead.
+    for key in (
+        "architectures",
+        "audio_config", "audio_token_id", "boa_token_id",
+        "eoa_token_id", "eoa_token_index",
+        "vision_config", "vision_soft_tokens_per_image",
+        "image_token_id", "boi_token_id", "eoi_token_id",
+        "video_token_id", "rotq_config",
+    ):
+        config.pop(key, None)
 
     # Start fresh — remove all per-layer overrides from old config
     quant = {"bits": global_bits, "group_size": global_gs}
@@ -385,19 +420,14 @@ def export_uniform_quantized(
     """Quantize all linear layers uniformly from BF16 and export.
 
     Copies non-weight files (config.json, tokenizer, etc.) from the
-    existing optimal model, replaces all weights, patches config.
+    local model_scaffold, replaces all weights, patches config.
 
     Returns model size in GB.
     """
-    # Copy optimal model structure (configs, tokenizer files)
+    # Copy scaffold (config, tokenizer files)
     if os.path.exists(out_path):
         shutil.rmtree(out_path)
-    shutil.copytree(OPTIMAL_PATH, out_path)
-
-    # Remove old weight files
-    for f in os.listdir(out_path):
-        if f.endswith(".safetensors") or f == "model.safetensors.index.json":
-            os.remove(os.path.join(out_path, f))
+    copy_scaffold(out_path)
 
     # Load BF16 and quantize everything
     bf16_weights = load_bf16_weights(bf16_path)
@@ -468,11 +498,7 @@ def export_mixed_quantized(
     """
     if os.path.exists(out_path):
         shutil.rmtree(out_path)
-    shutil.copytree(OPTIMAL_PATH, out_path)
-
-    for f in os.listdir(out_path):
-        if f.endswith(".safetensors") or f == "model.safetensors.index.json":
-            os.remove(os.path.join(out_path, f))
+    copy_scaffold(out_path)
 
     bf16_weights = load_bf16_weights(bf16_path)
 

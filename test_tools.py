@@ -4,14 +4,12 @@ import json
 import sys
 from typing import Literal, Optional
 
-from dotenv import load_dotenv
-from openai import OpenAI
 from pydantic import BaseModel, ValidationError
 
-load_dotenv()
+from test_common import apply_chat_defaults, create_client, require_content, resolve_model
 
-client = OpenAI()
-MODEL = client.models.list().data[0].id
+client = create_client()
+MODEL, AVAILABLE_MODELS = resolve_model(client)
 
 
 # -- Pydantic models for tool call argument validation ----------------
@@ -92,6 +90,7 @@ def run_test(name, user_message, expected_tools=None):
     result = client.chat.completions.create(
         model=MODEL, messages=messages, tools=TOOLS,
         max_tokens=256, temperature=0.1,
+        **apply_chat_defaults(),
     )
     choice = result.choices[0]
     assistant_msg = choice.message
@@ -146,8 +145,9 @@ def run_test(name, user_message, expected_tools=None):
         print("\n[2] Sending tool results back...")
         result2 = client.chat.completions.create(
             model=MODEL, messages=messages, max_tokens=256, temperature=0.1,
+            **apply_chat_defaults(),
         )
-        final_content = result2.choices[0].message.content
+        final_content = require_content(result2)
         print(f"    Assistant: {final_content[:200]}")
     else:
         content = assistant_msg.content or ""

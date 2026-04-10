@@ -1,0 +1,5 @@
+{
+  "type": "uniform",
+  "default_bits": 5,
+  "default_group_size": 64
+}

@@ -9,12 +9,13 @@ PID_FILE    := .waldwicht.pid
 LOG_FILE    := waldwicht-proxy.log
 HOST        := 127.0.0.1
 PORT        := 8432
-MODEL       := kyr0/Gemma-4-Waldwicht-Winzling
-DRAFT_MODEL :=
+MODEL       ?= kyr0/Gemma-4-Waldwicht-Winzling
+DRAFT_MODEL ?=
 MAX_BACKENDS := 2
 MAX_MEM_UTIL := 80
+HF_HOME     ?= $(HOME)/.cache/huggingface
 
-.PHONY: setup start stop status log test test-tools bench download patch unpatch package clean models
+.PHONY: setup start stop status log test test-tools bench download patch unpatch package clean models export-model
 
 setup: _clean _install_uv _venv _deps _ensure_metal_toolchain
 	@echo "\n[OK] Setup complete. Run 'make start' to launch the server."
@@ -63,7 +64,8 @@ _deps:
 	$(UV) pip install --quiet -e ./omlx --no-deps --no-build-isolation
 	@echo "=> Installing omlx remaining dependencies (skipping mlx/mlx-lm) ..."
 	$(UV) pip install --quiet -e "./omlx[dev,grammar]" --no-build-isolation 2>&1 | grep -v "already satisfied" || true
-	@echo "=> Re-linking local mlx-lm fork (in case omlx deps overwrote it) ..."
+	@echo "=> Re-linking local forks (in case omlx deps overwrote them) ..."
+	PYPI_RELEASE=1 $(UV) pip install --quiet -e ./mlx --no-build-isolation --no-deps
 	$(UV) pip install --quiet -e ./mlx-lm --no-build-isolation --no-deps
 
 MLX_LM_DIR = $$($(PYTHON) -c "import mlx_lm; print(mlx_lm.__path__[0])")
@@ -123,6 +125,7 @@ start:
 			sleep 2; \
 		done; \
 	fi
+	@$(MAKE) --no-print-directory status
 
 stop:
 	@if [ -f "$(PID_FILE)" ]; then \
@@ -159,7 +162,10 @@ stop:
 status:
 	@if [ -f "$(PID_FILE)" ] && kill -0 $$(cat $(PID_FILE)) 2>/dev/null; then \
 		echo "Proxy: running (PID $$(cat $(PID_FILE)))"; \
+		echo "  URL: http://$(HOST):$(PORT)/v1"; \
 		curl -sf http://$(HOST):$(PORT)/health 2>/dev/null | python3 -m json.tool || true; \
+		echo "  Models:"; \
+		curl -sf http://$(HOST):$(PORT)/v1/models 2>/dev/null | python3 -c "import sys,json; [print(f'    - {m[\"id\"]}') for m in json.load(sys.stdin).get('data',[])]" || true; \
 	else \
 		echo "Proxy: not running"; \
 	fi
@@ -173,11 +179,11 @@ log:
 
 test:
 	@echo "=> Running integration tests ..."
-	$(VENV)/bin/python test.py
+	MODEL=$(MODEL) $(VENV)/bin/python test.py
 	@echo "\n=> Running tool calling tests ..."
-	$(VENV)/bin/python test_tools.py
+	MODEL=$(MODEL) $(VENV)/bin/python test_tools.py
 	@echo "\n=> Running test calibration ..."
-	$(VENV)/bin/python test_calibration.py
+	MODEL=$(MODEL) $(VENV)/bin/python test_calibration.py
 
 # -- bench ------------------------------------------------------------
 bench:
@@ -228,6 +234,14 @@ unpatch:
 	else \
 		echo "=> Using local mlx-lm fork — nothing to unpatch."; \
 	fi
+
+# -- export-model -----------------------------------------------------
+EXPORT_MODEL ?= Gemma-4-Waldwicht-Winzling
+OUTPUT_DIR   ?= $(abspath $(HF_HOME)/../mlx)
+
+export-model:
+	@echo "=> Exporting $(EXPORT_MODEL) to $(OUTPUT_DIR) ..."
+	$(PYTHON) ablation_scripts/export.py --model $(EXPORT_MODEL) --output-dir $(OUTPUT_DIR)
 
 # -- clean ------------------------------------------------------------
 clean:

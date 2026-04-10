@@ -4,13 +4,10 @@
 import json
 import time
 
-from dotenv import load_dotenv
-from openai import OpenAI
+from test_common import apply_chat_defaults, create_client, require_content, resolve_model
 
-load_dotenv()
-
-client = OpenAI()
-MODEL = client.models.list().data[0].id
+client = create_client()
+MODEL, AVAILABLE_MODELS = resolve_model(client)
 
 PROMPTS = [
     "What is 2+2? Answer with just the number.",
@@ -33,10 +30,11 @@ for i, prompt in enumerate(PROMPTS):
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.7,
+        **apply_chat_defaults(),
     )
     t1 = time.perf_counter()
 
-    content = resp.choices[0].message.content
+    content = require_content(resp)
     completion_tokens = resp.usage.completion_tokens if resp.usage else 0
 
     elapsed = round(t1 - t0, 2)
