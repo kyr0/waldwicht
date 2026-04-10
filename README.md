@@ -25,18 +25,24 @@ Real-world benchmark **while under typical consumer conditions** (50% CPU load, 
 ## Requirements / Setup
 
 - macOS on Apple Silicon / M-series processor _(tested on Macbook Air M4 24GB, macOS 15.7.3)_
-- [Homebrew](https://brew.sh/) — required for installing packaging tools (`pipx`). Install with:
-  ```sh
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  ```
 
-Open a Terminal and run:
+### Setup / Installation (Users)
 
-```sh
-make setup   # install uv, venv, deps, download model
-```
+Download the latest release of [Waldwicht-oMLX (DMG)](https://github.com/kyr0/waldwicht/releases/tag/Waldwicht-oMLX-v0.0.1). Launch the `oMLX.app`, open the menu bar icon, and click `Start Server`. Then click: `Admin Panel`. After the webbrowser opens, visit `http://127.0.0.1:8000/admin/dashboard?tab=models&modelsTab=downloader` and download a Waldwicht model from HuggingFace (e.g. `kyr0/Gemma-4-Waldwicht-Winzling`):
 
-**Note**: The setup process includes downloading the `Waldwicht-Winzling` model from HuggingFace, which is around 3 GB in size. Make sure you have a stable internet connection and enough disk space. **The first-time installation process may take around 10-15 minutes, especially on the first run when it compiles the MLX extensions.**
+<img src="docs/download_from_hf.png" alt="oMLX model downloader" width="600"/>
+
+It should look like this:
+
+<img src="docs/download-progress.png" alt="oMLX download in progress" width="600" />
+
+Now after this, switch to the "Chat" tab. Waldwicht Winzling should be auto-selected and you can start chatting with the model:
+
+<img src="docs/omlx-chat.png" alt="oMLX chat interface" width="600" />
+
+You can also use the OpenAI API directly and integrate Waldwicht with Codex, OpenCode, OpenClaw and Claude Code:
+
+<img src="docs/omlx-integrations.png" alt="oMLX integrations" width="600" />
 
 ## Available Models
 
@@ -49,6 +55,21 @@ The Waldwicht model family was developed through a systematic ablation study of 
 | **[Waldwicht-Juengling](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Juengling)** | **3.86 GB** | ~47.4 | 3.52 GB | uniform 5-bit g64 (near-BF16 quality) |
 
 *Throughput and peak Metal memory measured on MacBook Air M4 24 GB, 256-token generation, 3-run average, greedy decoding — under 50% CPU load and 50% memory pressure to reflect real consumer conditions.*
+
+## For Developers
+
+- [Homebrew](https://brew.sh/) — required for installing packaging tools (`pipx`). Install with:
+  ```sh
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  ```
+
+Open a Terminal and run:
+
+```sh
+make setup   # install uv, venv, deps, download model
+```
+
+**Note**: The setup process includes downloading the `Waldwicht-Winzling` model from HuggingFace, which is around 3 GB in size. Make sure you have a stable internet connection and enough disk space. **The first-time installation process may take around 10-15 minutes, especially on the first run when it compiles the MLX extensions.**
 
 ## Special features
 
@@ -80,21 +101,6 @@ MODEL=/path/to/model make start
 ```
 
 ## Accessing the model
-
-### ChatGPT-like Web Interface
-
-Open a Terminal, and run:
-
-```bash
-docker run -d -p 3000:3000 \
-  -e OPENAI_API_KEY= \
-  -e BASE_URL=http://localhost:8432/v1 \
-  -e CUSTOM_MODELS="-all" \
-  -e CODE=demo \
-  yidadaa/chatgpt-next-web
-```
-
-### Any other software
 
 Whatever client software you might use - you will be prompted for providing a config. 
 
