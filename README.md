@@ -8,7 +8,7 @@
 
 Waldwicht is a family of mixed-precision quantized LLMs based on Google Gemma 4 E2B, designed for efficient inference on Apple Silicon. The models are the result of an [extensive ablation study](TECHNICAL_REPORT.md) on quantization configurations, leading to a novel component-level mixed-precision approach that preserves output quality while significantly reducing memory usage.
 
-Alongside the models, we release the Waldwicht Inference Server — an OpenAI-compatible API server optimized for Apple Silicon with custom memory management, multi-worker support, and advanced features like TurboQuant and speculative decoding. This allows anyone with a Macbook Air M-series processor to run intelligent AI models locally with good performance, handling a wide range of tasks including tool calling and long-context retrieval.
+Alongside the models, we release the Waldwicht Inference Server - an OpenAI-compatible API server optimized for Apple Silicon with custom memory management, multi-worker support, and advanced features like TurboQuant and speculative decoding. This allows anyone with a Macbook Air M-series processor to run intelligent AI models locally with good performance, handling a wide range of tasks including tool calling and long-context retrieval.
 
 On top of that, we also release a custom `oMLX` build that supports Waldwicht models and provides a user-friendly Web UI, menu bar app, and integration with OpenClaw, OpenCode, and other agents for seamless local AI interactions.
 
@@ -54,11 +54,11 @@ The Waldwicht model family was developed through a systematic ablation study of 
 | **[Waldwicht-Sproessling](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Sproessling)** | **3.17 GB** | ~48.6 | 2.83 GB | attn=5, mlp=5, ple=3, gate=4, embed=3 |
 | **[Waldwicht-Juengling](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Juengling)** | **3.86 GB** | ~47.4 | 3.52 GB | uniform 5-bit g64 (near-BF16 quality) |
 
-*Throughput and peak Metal memory measured on MacBook Air M4 24 GB, 256-token generation, 3-run average, greedy decoding — under 50% CPU load and 50% memory pressure to reflect real consumer conditions.*
+*Throughput and peak Metal memory measured on MacBook Air M4 24 GB, 256-token generation, 3-run average, greedy decoding - under 50% CPU load and 50% memory pressure to reflect real consumer conditions.*
 
 ## 3. For Developers
 
-- [Homebrew](https://brew.sh/) — required for installing packaging tools (`pipx`). Install with:
+- [Homebrew](https://brew.sh/) - required for installing packaging tools (`pipx`). Install with:
   ```sh
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   ```
@@ -230,7 +230,7 @@ For example (max predictability):
 
 Waldwicht-family models support a reasoning mode where the model produces a `<think>...</think>` block before the final answer. This is **enabled by default** in the server via `--chat-template-args '{"enable_thinking":true}'`.
 
-> **Note**: Reasoning mode requires `temperature > 0` — greedy decoding (`temperature: 0`) suppresses the thinking token.
+> **Note**: Reasoning mode requires `temperature > 0` - greedy decoding (`temperature: 0`) suppresses the thinking token.
 
 ### Disabling thinking per-request
 
@@ -305,17 +305,17 @@ The Waldwicht family is based on Google Gemma 4 E2B (~5.1B total / 2.3B effectiv
 
 The recommended Waldwicht-Winzling (2.96 GB) passes a diverse 20-prompt benchmark covering code, translation, reasoning, and creative writing at 8.8/9.0/9.1 (avg scores):
 
-- **Concept explanations** — clear, structured answers (e.g. quantum computing with proper use of bold, headings, and analogies)
-- **Factual Q&A** — short, accurate responses to direct questions
-- **Code generation** — understands programming topics (palindromes, Fibonacci, Python)
-- **Creative writing** — haiku, limericks, and freeform poetry with reasonable quality
-- **Translation** — handles English↔French and other language pairs
-- **Math and reasoning** — arithmetic, thermodynamics, science questions
-- **Tool calling** — single and parallel function calls via the OpenAI API; correctly emits `finish_reason: tool_calls` and valid JSON arguments
-- **Streaming** — proper SSE streaming with `[DONE]` sentinel
-- **Sampling controls** — `temperature`, `top_p`, and `seed` all work as expected; `seed` + low temp produces deterministic output across runs
-- **Long context** — needle-in-a-haystack retrieval and coherent summarization of long multi-topic transcripts
-- **Per-request thinking** — produces `reasoning` field with step-by-step thought process when enabled - much slower but usually leads to more accurate and detailed responses
+- **Concept explanations** - clear, structured answers (e.g. quantum computing with proper use of bold, headings, and analogies)
+- **Factual Q&A** - short, accurate responses to direct questions
+- **Code generation** - understands programming topics (palindromes, Fibonacci, Python)
+- **Creative writing** - haiku, limericks, and freeform poetry with reasonable quality
+- **Translation** - handles English<->French and other language pairs
+- **Math and reasoning** - arithmetic, thermodynamics, science questions
+- **Tool calling** - single and parallel function calls via the OpenAI API; correctly emits `finish_reason: tool_calls` and valid JSON arguments
+- **Streaming** - proper SSE streaming with `[DONE]` sentinel
+- **Sampling controls** - `temperature`, `top_p`, and `seed` all work as expected; `seed` + low temp produces deterministic output across runs
+- **Long context** - needle-in-a-haystack retrieval and coherent summarization of long multi-topic transcripts
+- **Per-request thinking** - produces `reasoning` field with step-by-step thought process when enabled - much slower but usually leads to more accurate and detailed responses
 
 ## Reproduction
 

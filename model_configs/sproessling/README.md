@@ -16,12 +16,12 @@ tags:
 
 ## Overview
 
-**Waldwicht-Sproessling** is a high-quality 5-bit mixed-precision quantization of Gemma 4 E2B (2.3B effective parameters). At **3.17 GB** it matches or exceeds uniform 4-bit (3.22 GB) on all quality metrics while being slightly smaller — discovered through a 50+ configuration ablation study on Apple Silicon.
+**Waldwicht-Sproessling** is a high-quality 5-bit mixed-precision quantization of Gemma 4 E2B (2.3B effective parameters). At **3.17 GB** it matches or exceeds uniform 4-bit (3.22 GB) on all quality metrics while being slightly smaller - discovered through a 50+ configuration ablation study on Apple Silicon.
 
-This is the **balanced variant**: attention and MLP both stay at 5-bit for maximum reasoning fidelity, while only PLE/embeddings are reduced to 3–4 bit. Choose this over Winzling when you need the best possible quality within a ~3 GB budget.
+This is the **balanced variant**: attention and MLP both stay at 5-bit for maximum reasoning fidelity, while only PLE/embeddings are reduced to 3-4 bit. Choose this over Winzling when you need the best possible quality within a ~3 GB budget.
 
 > **Part of the Waldwicht family:**
-> [Winzling (2.96 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Winzling) · [Sproessling (3.17 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Sproessling) · [Juengling (3.86 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Juengling)
+> [Winzling (2.96 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Winzling) - [Sproessling (3.17 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Sproessling) - [Juengling (3.86 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Juengling)
 
 ## Quick Start
 
@@ -48,7 +48,7 @@ Together with this model release, we are also launching the Waldwicht Inference 
 | PLE embeddings | `embed_tokens_per_layer` | 3 | 64 |
 | PLE gate/projection | `per_layer_input_gate`, `per_layer_projection` | 4 | 64 |
 | Main embed + LM head | `embed_tokens`, `lm_head` | 3 | 64 |
-| Norms, scalars | (not quantized) | BF16 | — |
+| Norms, scalars | (not quantized) | BF16 | - |
 
 ## Key Metrics
 
@@ -56,16 +56,16 @@ Together with this model release, we are also launching the Waldwicht Inference 
 |---|---|
 | **Model size** | 3.17 GB |
 | **Memory footprint** | 2.83 GB peak (MacBook Air M4 24 GB) |
-| **Compression from BF16** | 3.0× |
+| **Compression from BF16** | 3.0x |
 | **Throughput** | 48.6 tok/s avg (MacBook Air M4 24 GB) |
 | **Correctness (20-prompt)** | 9.25 / 10.0 |
 | **Completion (20-prompt)** | 9.15 / 10.0 |
 | **Reasoning hygiene (20-prompt)** | 9.35 / 10.0 |
-| **Expanded AQ gate** | ✅ PASS (threshold ≥ 7.0) |
+| **Expanded AQ gate** | [OK] PASS (threshold >= 7.0) |
 
 ## Benchmark Results
 
-Evaluated on a 20-prompt diverse benchmark covering 6 task categories: function calling (3), multi-step function calling (1), code generation (4), translation (4), multi-step reasoning (4), and creative writing (4). Each response scored on correctness, completion, and reasoning hygiene (0–10 scale).
+Evaluated on a 20-prompt diverse benchmark covering 6 task categories: function calling (3), multi-step function calling (1), code generation (4), translation (4), multi-step reasoning (4), and creative writing (4). Each response scored on correctness, completion, and reasoning hygiene (0-10 scale).
 
 **Overall: 9.25 / 9.15 / 9.35** (correctness / completion / reasoning hygiene)
 
@@ -79,11 +79,11 @@ Evaluated on a 20-prompt diverse benchmark covering 6 task categories: function 
 
 ## How This Config Was Discovered
 
-Sproessling applies the **relative weighting transfer** pattern to a 5-bit base (Section 7.9, Variant A). The component sensitivity ordering — attention > MLP > gate > PLE/embed — was discovered through 28 component-level experiments at 4-bit base, then transferred to 5-bit:
+Sproessling applies the **relative weighting transfer** pattern to a 5-bit base (Section 7.9, Variant A). The component sensitivity ordering - attention > MLP > gate > PLE/embed - was discovered through 28 component-level experiments at 4-bit base, then transferred to 5-bit:
 
-- **Attention and MLP** remain at 5-bit (full base precision) — these carry the reasoning and code generation capability
-- **PLE embeddings and main embed/LM-head** drop to 3-bit (−2 offset) — these are lookup tables tolerant of compression
-- **PLE gate/projection** drops to 4-bit (−1 offset)
+- **Attention and MLP** remain at 5-bit (full base precision) - these carry the reasoning and code generation capability
+- **PLE embeddings and main embed/LM-head** drop to 3-bit (-2 offset) - these are lookup tables tolerant of compression
+- **PLE gate/projection** drops to 4-bit (-1 offset)
 
 The result: 5-bit precision on the core compute path (attention + MLP) delivers quality that matches or exceeds uniform 4-bit across all 6 task categories, while 3-bit PLE/embeddings keep the total size **0.05 GB below uniform 4-bit**.
 
@@ -104,7 +104,7 @@ Full details: [Pushing Below 3 GB: Component-Level Mixed-Precision Quantization 
 
 # Base model
 
-For the base model documentation, see [Gemma 4 E2B](https://huggingface.co/google/gemma-4-E2B-it) — the smallest dense model in the Gemma 4 family, with 2.3B effective parameters and a 128K token context window.
+For the base model documentation, see [Gemma 4 E2B](https://huggingface.co/google/gemma-4-E2B-it) - the smallest dense model in the Gemma 4 family, with 2.3B effective parameters and a 128K token context window.
 
 <div align="center">
   <img src=https://ai.google.dev/gemma/images/gemma4_banner.png>

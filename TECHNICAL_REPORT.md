@@ -14,9 +14,9 @@ _Technical Report_
 
 **Date:** April 2026
 
-**Abstract.** We quantize Gemma 4 E2B (2.3B effective parameters) for Apple Silicon inference via MLX, testing 22 layer-level and 28 component-level configurations across four phases, plus expanded-benchmark evaluations of selected finalists. Layer-level mixed-precision — which helped the larger E4B — hurts E2B; uniform 3-bit g64 wins on perplexity among all 22 layer-level configs. Shifting to component-level allocation (different bits per weight type, not per layer), we find that attention had to remain at 4-bit in all passing compositions while MLP tolerates 3-bit and embeddings tolerate 2-bit, yielding a 2.32 GB config that passes an 8-prompt math gate. However, a broader 20-prompt benchmark covering code, translation, reasoning, and creative writing overturns this result — the 2.32 GB config fails broadly (avg 4.5/5.4/5.0). Transferring the component sensitivity ordering to a 5-bit base produces a **2.96 GB config** (3.2× text-weight compression, from ~9.6 GB text-only BF16) that passes the diverse benchmark at 8.8/9.0/9.1, making it the smallest general-use config tested. The best-performing configurations use no transforms, no rotation, and no calibration data — only standard MLX affine quantization.
+**Abstract.** We quantize Gemma 4 E2B (2.3B effective parameters) for Apple Silicon inference via MLX, testing 22 layer-level and 28 component-level configurations across four phases, plus expanded-benchmark evaluations of selected finalists. Layer-level mixed-precision - which helped the larger E4B - hurts E2B; uniform 3-bit g64 wins on perplexity among all 22 layer-level configs. Shifting to component-level allocation (different bits per weight type, not per layer), we find that attention had to remain at 4-bit in all passing compositions while MLP tolerates 3-bit and embeddings tolerate 2-bit, yielding a 2.32 GB config that passes an 8-prompt math gate. However, a broader 20-prompt benchmark covering code, translation, reasoning, and creative writing overturns this result - the 2.32 GB config fails broadly (avg 4.5/5.4/5.0). Transferring the component sensitivity ordering to a 5-bit base produces a **2.96 GB config** (3.2x text-weight compression, from ~9.6 GB text-only BF16) that passes the diverse benchmark at 8.8/9.0/9.1, making it the smallest general-use config tested. The best-performing configurations use no transforms, no rotation, and no calibration data - only standard MLX affine quantization.
 
-**Component-level quantization as a new method.** Unlike uniform or layer-level mixed-precision quantization — both of which existing inference engines support natively — component-level allocation constitutes a distinct quantization paradigm that requires non-trivial inference engine adaptations. Each architectural weight group (attention projections, MLP, embeddings, gating) is quantized at an independently optimized bit-width, meaning a single forward pass touches weights at 3, 4, and 5-bit precision simultaneously. We identify and implement three required changes to the MLX inference stack: (1) per-component config resolution with leaf-name matching, (2) quantized KV-cache reference propagation through Gemma 4's KV-sharing mechanism, and (3) shape-aware attention mask handling for quantized key/value tuples. We release these as a patch to mlx-lm (`patches/mlx-lm-waldwicht.patch`). The resulting method yields both size and throughput gains over uniform quantization at equivalent quality:
+**Component-level quantization as a new method.** Unlike uniform or layer-level mixed-precision quantization - both of which existing inference engines support natively - component-level allocation constitutes a distinct quantization paradigm that requires non-trivial inference engine adaptations. Each architectural weight group (attention projections, MLP, embeddings, gating) is quantized at an independently optimized bit-width, meaning a single forward pass touches weights at 3, 4, and 5-bit precision simultaneously. We identify and implement three required changes to the MLX inference stack: (1) per-component config resolution with leaf-name matching, (2) quantized KV-cache reference propagation through Gemma 4's KV-sharing mechanism, and (3) shape-aware attention mask handling for quantized key/value tuples. We release these as a patch to mlx-lm (`patches/mlx-lm-waldwicht.patch`). The resulting method yields both size and throughput gains over uniform quantization at equivalent quality:
 
 | Method | Configuration | Size | tok/s | Quality (C/Cm/R) | Expanded Quality Gate |
 |---|---|---|---|---|---|
@@ -37,7 +37,7 @@ The above model configurations have been tested while the notebook **was already
 
 *Throughput and peak Metal memory measured on MacBook Air M4 24 GB, 256-token generation, 3-run average, greedy decoding.*
 
-**Waldwicht Inference Server release.** Alongside the Waldwicht model family, we release the Waldwicht Inference Server — a simple, but high-performance Python API server for Apple Silicon with custom memory management, multi-worker support, custom MLX kernels, TurboQuant, and speculative decoding. It exposes standard OpenAI-compatible endpoints through a user-friendly interface and serves as a simple but performant, yet easy to understand reference implementation.
+**Waldwicht Inference Server release.** Alongside the Waldwicht model family, we release the Waldwicht Inference Server - a simple, but high-performance Python API server for Apple Silicon with custom memory management, multi-worker support, custom MLX kernels, TurboQuant, and speculative decoding. It exposes standard OpenAI-compatible endpoints through a user-friendly interface and serves as a simple but performant, yet easy to understand reference implementation.
 
 **Custom oMLX Inference.** Next to the Waldwicht Inference Server, we also release a custom `oMLX` build, which builds against our `mlx-lm` fork and therefore supports Waldwicht-family models. This is the most user-friendly way to run Waldwicht models locally on Apple Silicon. It also features a Web UI, menu bar app, and integration with OpenClaw, OpenCode, and other agents.
 
@@ -49,13 +49,13 @@ We also work on building `autokernel-mlx`, an agentic, open-source system for ge
 
 ## 1. Introduction
 
-In a prior study on Gemma 4 E4B (4.3B effective parameters, 42 decoder layers, 15.0 GB BF16), we demonstrated that precision allocation — assigning different bit widths to different layers — outperforms all algorithmic optimizations (rotation, equalization, permutation) for 3-bit post-training quantization. That study's central finding was a **rotation paradox**: block-Hadamard rotation reduced offline quantization error at 1-bit (+8.5% MSE) but catastrophically degraded generation quality at 3-bit (+390% perplexity), producing multi-language token leaking (Thai, Hindi, Japanese, Tamil characters mid-sentence in English). The E4B optimal configuration uses no rotation — only a three-tier precision allocation scheme (4-bit edge layers, 4-bit near-edge layers, 3-bit middle layers) achieving 4.24 GB (3.5× compression) with coherent generation on all tasks. Additionally, E4B exhibited a group size inversion: at 3-bit, larger groups (g128) outperformed smaller ones (g32) because metadata overhead at small group sizes consumed storage without improving fidelity.
+In a prior study on Gemma 4 E4B (4.3B effective parameters, 42 decoder layers, 15.0 GB BF16), we demonstrated that precision allocation - assigning different bit widths to different layers - outperforms all algorithmic optimizations (rotation, equalization, permutation) for 3-bit post-training quantization. That study's central finding was a **rotation paradox**: block-Hadamard rotation reduced offline quantization error at 1-bit (+8.5% MSE) but catastrophically degraded generation quality at 3-bit (+390% perplexity), producing multi-language token leaking (Thai, Hindi, Japanese, Tamil characters mid-sentence in English). The E4B optimal configuration uses no rotation - only a three-tier precision allocation scheme (4-bit edge layers, 4-bit near-edge layers, 3-bit middle layers) achieving 4.24 GB (3.5x compression) with coherent generation on all tasks. Additionally, E4B exhibited a group size inversion: at 3-bit, larger groups (g128) outperformed smaller ones (g32) because metadata overhead at small group sizes consumed storage without improving fidelity.
 
 A natural question arises: **does this finding generalize to smaller models in the same family?** Smaller models have less redundancy, different layer sensitivity profiles, and proportionally larger embedding tables relative to decoder weights. These structural differences could change the optimal quantization strategy.
 
-We investigate this question on Gemma 4 E2B, the 2.3-billion-parameter variant in the Gemma 4 family. In Phases 1–3, using the same ROTQ pipeline — with rotation disabled in all primary sweeps except a dedicated Phase 1 sanity check — evaluation methodology, and test prompts as the E4B study, we run a systematic ablation of 22 configurations. The results reveal a **qualitative difference** between the two model sizes: *layer-level* precision allocation that helps the larger model actively *hurts* the smaller one.
+We investigate this question on Gemma 4 E2B, the 2.3-billion-parameter variant in the Gemma 4 family. In Phases 1-3, using the same ROTQ pipeline - with rotation disabled in all primary sweeps except a dedicated Phase 1 sanity check - evaluation methodology, and test prompts as the E4B study, we run a systematic ablation of 22 configurations. The results reveal a **qualitative difference** between the two model sizes: *layer-level* precision allocation that helps the larger model actively *hurts* the smaller one.
 
-In Phase 4, we go deeper — shifting from layer-level to **component-level** mixed-precision, a new quantization paradigm that assigns different bit-widths to different *weight types* (attention projections, MLP matrices, PLE embeddings, PLE gating, and main embeddings/LM-head) rather than to different *layers*. This is not merely a different configuration within existing tooling — it requires non-trivial changes to inference engines that assume uniform or layer-level quantization. Using a quality-gated pipeline with an 8-prompt LLM-judge (Anthropic Claude Opus 4.6 High) evaluation, we evaluate 28 component-level configurations to find per-component bit-width floors and their valid compositions. This approach succeeds where layer-level mixed-precision failed, achieving **2.32 GB** (text-only) — 28% below the uniform 4-bit quality floor (3.22 GB). We identify and implement the three inference engine adaptations required to make component-level quantization work in practice on MLX (Section 9.5), and release them as a patch to mlx-lm.
+In Phase 4, we go deeper - shifting from layer-level to **component-level** mixed-precision, a new quantization paradigm that assigns different bit-widths to different *weight types* (attention projections, MLP matrices, PLE embeddings, PLE gating, and main embeddings/LM-head) rather than to different *layers*. This is not merely a different configuration within existing tooling - it requires non-trivial changes to inference engines that assume uniform or layer-level quantization. Using a quality-gated pipeline with an 8-prompt LLM-judge (Anthropic Claude Opus 4.6 High) evaluation, we evaluate 28 component-level configurations to find per-component bit-width floors and their valid compositions. This approach succeeds where layer-level mixed-precision failed, achieving **2.32 GB** (text-only) - 28% below the uniform 4-bit quality floor (3.22 GB). We identify and implement the three inference engine adaptations required to make component-level quantization work in practice on MLX (Section 9.5), and release them as a patch to mlx-lm.
 
 ---
 
@@ -71,9 +71,9 @@ In Phase 4, we go deeper — shifting from layer-level to **component-level** mi
 | Attention heads / KV heads | 8 / 1 | 8 / 2 |
 | Head dimensions | 256 (sliding) / 512 (global) | 256 (sliding) / 512 (global) |
 | Vocabulary | 262,144 | 262,144 |
-| Per-Layer Embeddings (PLE) | 35 × Embedding(262K, 256) + gating | 42 × Embedding(262K, 256) + gating |
+| Per-Layer Embeddings (PLE) | 35 x Embedding(262K, 256) + gating | 42 x Embedding(262K, 256) + gating |
 | KV sharing | Last 20 layers reuse earlier KV caches | Last 18 layers |
-| Attention pattern | 4 sliding + 1 global, repeating (×7) | 5 sliding + 1 global, repeating (×7) |
+| Attention pattern | 4 sliding + 1 global, repeating (x7) | 5 sliding + 1 global, repeating (x7) |
 | Tied embeddings | Yes | Yes |
 | Total parameters | ~5.1B | ~8.6B |
 | Effective parameters | ~2.3B | ~4.3B |
@@ -82,7 +82,7 @@ In Phase 4, we go deeper — shifting from layer-level to **component-level** mi
 
 ### 2.2 Structural Differences Relevant to Quantization
 
-**1. Larger embedding-to-decoder ratio.** The vocabulary embedding (262K × 1536 = 768 MB in BF16) is a comparable fraction of E2B's 10.25 GB (7.3%) to E4B's (262K × 2560 = 1280 MB out of 15.0 GB, 8.3%). However, total embedding weight (vocabulary + 35 PLE tables of 128 MB each) constitutes ~50% of E2B's BF16 size versus ~43% for E4B. Embedding quantization therefore has proportionally greater impact on E2B.
+**1. Larger embedding-to-decoder ratio.** The vocabulary embedding (262K x 1536 = 768 MB in BF16) is a comparable fraction of E2B's 10.25 GB (7.3%) to E4B's (262K x 2560 = 1280 MB out of 15.0 GB, 8.3%). However, total embedding weight (vocabulary + 35 PLE tables of 128 MB each) constitutes ~50% of E2B's BF16 size versus ~43% for E4B. Embedding quantization therefore has proportionally greater impact on E2B.
 
 **2. Fewer middle layers.** With 35 total layers, edge protection of $e=4$ layers per side leaves only 27 middle layers. Adding near-edge protection of $ne=4$ leaves only 19 middle layers (54% of total). For E4B (42 layers), the same configuration leaves 26 middle layers (62%). E2B has less "middle" to compress.
 
@@ -90,7 +90,7 @@ In Phase 4, we go deeper — shifting from layer-level to **component-level** mi
 
 ### 2.3 Quantization Compatibility
 
-All weight dimensions are divisible by $g=128$ without padding — no shape-related quantization issues arise for any group size tested (32, 64, 128).
+All weight dimensions are divisible by $g=128$ without padding - no shape-related quantization issues arise for any group size tested (32, 64, 128).
 
 **Note:** E2B includes audio tower and vision tower weights that are excluded from quantization (skip rule for `ndim > 2` weights in the ROTQ pipeline).
 
@@ -111,7 +111,7 @@ We follow the identical evaluation protocol used for E4B:
   5. Translation: "Translate 'The cat sat on the mat' into French"
 - **Model size:** On-disk size of the exported model directory.
 
-**Size measurement note.** The ROTQ pipeline (Phases 1–3) exports include ~0.63 GB of multimodal tower weights (audio + vision) as unquantized BF16. The AQ-gated pipeline (Phase 4) exports text-only weights. All Phase 1–3 sizes in this paper are reported *including* multimodal overhead to match the actual export artifacts. For text-weight-only comparison, subtract ~0.63 GB from Phase 1–3 sizes (e.g., q3-g64 text-only ≈ 2.64 GB; BF16 text-only ≈ 9.6 GB). Phase 4 sizes are directly comparable to each other and to deployment-relevant model sizes. The PPL values match exactly between pipelines for the same quantization (e.g., uniform 4-bit g64: PPL 32,443 in both), confirming the text weights are identical.
+**Size measurement note.** The ROTQ pipeline (Phases 1-3) exports include ~0.63 GB of multimodal tower weights (audio + vision) as unquantized BF16. The AQ-gated pipeline (Phase 4) exports text-only weights. All Phase 1-3 sizes in this paper are reported *including* multimodal overhead to match the actual export artifacts. For text-weight-only comparison, subtract ~0.63 GB from Phase 1-3 sizes (e.g., q3-g64 text-only ~= 2.64 GB; BF16 text-only ~= 9.6 GB). Phase 4 sizes are directly comparable to each other and to deployment-relevant model sizes. The PPL values match exactly between pipelines for the same quantization (e.g., uniform 4-bit g64: PPL 32,443 in both), confirming the text weights are identical.
 - **Speed:** Average tokens/second across generation prompts (excluding first-token latency).
 - **BF16 source:** `google/gemma-4-E2B-it` (HuggingFace).
 
@@ -142,16 +142,16 @@ The original E4B-based ROTQ pipeline required three modifications for E2B:
 
 | Model | PPL | Size (GB) | Speed (tok/s) | Gen Quality |
 |---|---|---|---|---|
-| **q3-g64** | **5,452** | **3.27** | **40.7** | **5/5 ✅** |
-| q3-rotq-sanity | 12,276 | 3.58 | 33.4 | 5/5 ✅ |
-| q3-g128 | 14,701 | 2.98 | 46.5 | 5/5 ✅ |
-| q3-plain-e4 | 18,542 | 3.58 | 40.9 | 5/5 ✅ |
-| q4-g64 | 32,443 | 3.85 | 34.3 | 5/5 ✅ |
-| bf16 | 43,302 | 10.25 | 15.2 | 5/5 ✅ |
+| **q3-g64** | **5,452** | **3.27** | **40.7** | **5/5 [OK]** |
+| q3-rotq-sanity | 12,276 | 3.58 | 33.4 | 5/5 [OK] |
+| q3-g128 | 14,701 | 2.98 | 46.5 | 5/5 [OK] |
+| q3-plain-e4 | 18,542 | 3.58 | 40.9 | 5/5 [OK] |
+| q4-g64 | 32,443 | 3.85 | 34.3 | 5/5 [OK] |
+| bf16 | 43,302 | 10.25 | 15.2 | 5/5 [OK] |
 
 ### 4.3 Observations
 
-Uniform q3-g64 has the lowest PPL (5,452) while remaining smaller than all mixed-precision alternatives (3.27 GB vs 3.44–3.85 GB). All six configs produce coherent output on all 5 prompts — unlike E4B, where rotation and uniform 3-bit caused generation failures. Mixed-precision (e4) and rotation configs are all worse than uniform q3-g64 on PPL, despite being larger. Rotation reduces PPL modestly within mixed configs (12,276 vs 18,542) — the opposite direction from E4B's +390% degradation — but remains irrelevant since uniform wins.
+Uniform q3-g64 has the lowest PPL (5,452) while remaining smaller than all mixed-precision alternatives (3.27 GB vs 3.44-3.85 GB). All six configs produce coherent output on all 5 prompts - unlike E4B, where rotation and uniform 3-bit caused generation failures. Mixed-precision (e4) and rotation configs are all worse than uniform q3-g64 on PPL, despite being larger. Rotation reduces PPL modestly within mixed configs (12,276 vs 18,542) - the opposite direction from E4B's +390% degradation - but remains irrelevant since uniform wins.
 
 **PPL caveat.** BF16 shows the highest PPL (43,302). This inversion (quantized < BF16) is an artifact of our short calibration text interacting with E2B's chat-tuned distribution. PPL is used only for relative ranking among quantized configs in this study, not as an absolute quality measure. Task-quality evaluation (Phase 4) supersedes PPL for practical decisions.
 
@@ -161,11 +161,11 @@ Uniform q3-g64 has the lowest PPL (5,452) while remaining smaller than all mixed
 
 ### 5.1 Configurations
 
-Eight configs varying edge layer count (2–5), group size (32, 64, 128), and near-edge 4-bit promotion:
+Eight configs varying edge layer count (2-5), group size (32, 64, 128), and near-edge 4-bit promotion:
 
 ### 5.2 Results
 
-| Configuration | Edge | GS | NE→4-bit | 4-bit Layers | 3-bit Layers | Size (GB) | PPL | Speed (tok/s) |
+| Configuration | Edge | GS | NE=>4-bit | 4-bit Layers | 3-bit Layers | Size (GB) | PPL | Speed (tok/s) |
 |---|---|---|---|---|---|---|---|---|
 | **e4-g32** | 4 | 32 | No | 8 | 27 | 3.85 | **6,788** | 35.9 |
 | e2-g128 | 2 | 128 | No | 4 | 31 | 3.54 | 13,899 | 41.7 |
@@ -176,11 +176,11 @@ Eight configs varying edge layer count (2–5), group size (32, 64, 128), and ne
 | e3-g128-ne4bit | 3 | 128 | Yes | 14 | 21 | 3.64 | 26,098 | 39.3 |
 | e4-g128-ne4bit | 4 | 128 | Yes | 16 | 19 | 3.66 | 34,394 | 39.4 |
 
-All configs: 5/5 generation quality ✅.
+All configs: 5/5 generation quality [OK].
 
 ### 5.3 Observations
 
-Group size is the dominant knob: g32 → PPL 6,788, g64 → 14,378, g128 → 18,542 (all e4). This reverses E4B's g128 preference, likely because E2B's narrower weight matrices (1536 vs 2560) have more intra-group variance at coarse granularity. Near-edge 4-bit promotion is harmful (+85% PPL for e4-g128), opposite to E4B's 26% benefit. The best mixed config (e4-g32, PPL 6,788 at 3.85 GB) still loses to uniform q3-g64 (5,452 at 3.27 GB) on both metrics.
+Group size is the dominant knob: g32 => PPL 6,788, g64 => 14,378, g128 => 18,542 (all e4). This reverses E4B's g128 preference, likely because E2B's narrower weight matrices (1536 vs 2560) have more intra-group variance at coarse granularity. Near-edge 4-bit promotion is harmful (+85% PPL for e4-g128), opposite to E4B's 26% benefit. The best mixed config (e4-g32, PPL 6,788 at 3.85 GB) still loses to uniform q3-g64 (5,452 at 3.27 GB) on both metrics.
 
 ---
 
@@ -188,7 +188,7 @@ Group size is the dominant knob: g32 → PPL 6,788, g64 → 14,378, g128 → 18,
 
 ### 6.1 Configurations
 
-With near-edge promotion already shown to hurt in Phase 2 (g128), we still swept depth systematically to confirm. Eight configs vary near-edge layer count (2–6), near-edge group size (g64/g128), and edge count (3–4).
+With near-edge promotion already shown to hurt in Phase 2 (g128), we still swept depth systematically to confirm. Eight configs vary near-edge layer count (2-6), near-edge group size (g64/g128), and edge count (3-4).
 
 ### 6.2 Results
 
@@ -203,7 +203,7 @@ With near-edge promotion already shown to hurt in Phase 2 (g128), we still swept
 | e4-ne4-g64 | 4 | 4 | 64 | 16 | 19 | 46% | 3.66 | 34,394 | 39.9 |
 | e4-ne6-g128 | 4 | 6 | 128 | 20 | 15 | 57% | 3.46 | 63,147 | 42.1 |
 
-All configs: 5/5 generation quality ✅.
+All configs: 5/5 generation quality [OK].
 
 ### 6.3 Observations
 
@@ -213,9 +213,9 @@ The best near-edge config (e3-ne6-g128, PPL 8,437 at 3.44 GB) is still 55% worse
 
 ## 7. Phase 4: AQ-Gated Component-Level Quantization
 
-Phases 1–3 explored *layer-level* precision allocation (which decoder layers get more bits). The universal failure of mixed-precision at that granularity motivated a shift to *component-level* allocation: assigning different bit-widths to different weight types across *all* layers simultaneously.
+Phases 1-3 explored *layer-level* precision allocation (which decoder layers get more bits). The universal failure of mixed-precision at that granularity motivated a shift to *component-level* allocation: assigning different bit-widths to different weight types across *all* layers simultaneously.
 
-**Methodological note.** Component-level quantization is not merely a new configuration within existing quantization frameworks — it is a new quantization method. Existing inference engines — including MLX, llama.cpp, and vLLM — assume either uniform quantization (one bit-width for all quantizable weights) or layer-level mixed-precision (one bit-width per layer). Component-level allocation breaks this assumption: within a single layer, different weight matrices (e.g., `q_proj` at 5-bit, `gate_proj` at 4-bit, PLE embedding at 3-bit) must be dequantized at different precisions. This requires changes to the inference engine's weight loading, quantization config resolution, and — for architectures with KV-cache sharing like Gemma 4 — attention dispatch logic. We detail the required adaptations in Section 9.5.
+**Methodological note.** Component-level quantization is not merely a new configuration within existing quantization frameworks - it is a new quantization method. Existing inference engines - including MLX, llama.cpp, and vLLM - assume either uniform quantization (one bit-width for all quantizable weights) or layer-level mixed-precision (one bit-width per layer). Component-level allocation breaks this assumption: within a single layer, different weight matrices (e.g., `q_proj` at 5-bit, `gate_proj` at 4-bit, PLE embedding at 3-bit) must be dequantized at different precisions. This requires changes to the inference engine's weight loading, quantization config resolution, and - for architectures with KV-cache sharing like Gemma 4 - attention dispatch logic. We detail the required adaptations in Section 9.5.
 
 ### 7.1 Methodology
 
@@ -225,27 +225,27 @@ Phases 1–3 explored *layer-level* precision allocation (which decoder layers g
 |---|---|---|---|
 | **attention** | `q_proj`, `k_proj`, `v_proj`, `o_proj` | 140 matrices | Self-attention projections |
 | **mlp** | `gate_proj`, `up_proj`, `down_proj` | 105 matrices | Feed-forward network |
-| **ple_embeddings** | `embed_tokens_per_layer.{0..34}` | 35 tables | Per-layer embedding lookups (262K×256 each) |
-| **ple_gate_proj** | `per_layer_input_gate`, `per_layer_projection` | 70 matrices | PLE gating (256×1536 and 1536×256) |
-| **main_embed_lmhead** | `embed_tokens`, `lm_head` | 2 tables | Main vocabulary embedding + output head (262K×1536) |
+| **ple_embeddings** | `embed_tokens_per_layer.{0..34}` | 35 tables | Per-layer embedding lookups (262Kx256 each) |
+| **ple_gate_proj** | `per_layer_input_gate`, `per_layer_projection` | 70 matrices | PLE gating (256x1536 and 1536x256) |
+| **main_embed_lmhead** | `embed_tokens`, `lm_head` | 2 tables | Main vocabulary embedding + output head (262Kx1536) |
 
 **Quality gate.** Perplexity proved unreliable for E2B (Section 4.3: BF16 has higher PPL than 3-bit). We therefore designed an 8-prompt answer-quality (AQ) evaluation:
 
 | ID | Prompt | Expected Answer |
 |---|---|---|
 | 0 | What is 2+2? Answer with just the number. | 4 |
-| 1 | Solve: 17 × 23. Show your work step by step. | 391 |
-| 2 | If a train travels 120 km in 2 hours, what is its average speed in m/s? | 50/3 ≈ 16.67 m/s |
-| 3 | What is the derivative of x³ + 2x² − 5x + 3? | 3x² + 4x − 5 |
+| 1 | Solve: 17 x 23. Show your work step by step. | 391 |
+| 2 | If a train travels 120 km in 2 hours, what is its average speed in m/s? | 50/3 ~= 16.67 m/s |
+| 3 | What is the derivative of x³ + 2x² - 5x + 3? | 3x² + 4x - 5 |
 | 4 | A box has 3 red, 5 blue, and 2 green balls. Probability of picking blue? | 1/2 |
 | 5 | What is the sum of the first 100 positive integers? | 5050 |
 | 6 | Convert 0.375 to a fraction in simplest form. | 3/8 |
 | 7 | If f(x) = 2x + 1 and g(x) = x², what is f(g(3))? | 19 |
 
-Each response is scored on three dimensions (0–10 scale): **correctness** (right answer), **completion** (full solution shown), and **reasoning hygiene** (no contradictions, loops, or junk tokens). A variant **passes** the quality gate if all three dimension averages ≥ 9.0/10. BF16 baseline scores 10.0/10.0/10.0 on all prompts.
+Each response is scored on three dimensions (0-10 scale): **correctness** (right answer), **completion** (full solution shown), and **reasoning hygiene** (no contradictions, loops, or junk tokens). A variant **passes** the quality gate if all three dimension averages >= 9.0/10. BF16 baseline scores 10.0/10.0/10.0 on all prompts.
 
 **Top-down sieve protocol:**
-1. **Step 1 (Uniform ladder):** Test uniform quantization at 6→5→4→3 bits. Find the lowest uniform bit-width that passes AQ — this is the *uniform quality floor*.
+1. **Step 1 (Uniform ladder):** Test uniform quantization at 6=>5=>4=>3 bits. Find the lowest uniform bit-width that passes AQ - this is the *uniform quality floor*.
 2. **Step 2 (Component floors):** Starting from the uniform floor, demote one component group at a time to the next lower rung. If it passes, try the rung below, etc. This finds each component's *independent minimum bit-width*.
 3. **Combination testing:** Test compositions of component floors, since independent floors may not compose.
 
@@ -258,7 +258,7 @@ Each response is scored on three dimensions (0–10 scale): **correctness** (rig
 | **4-bit g64** | **3.22** | **32,443** | **10.0** | **9.6** | **10.0** | **PASS** |
 | 3-bit g64 | 2.59 | 5,452 | 6.9 | 8.6 | 6.4 | **FAIL** |
 
-**Uniform quality floor: 4-bit.** Despite having the best PPL among all configs in Phases 1–3, uniform 3-bit fails the strict AQ gate — it produces incorrect arithmetic (17×23 ≠ 391), incomplete derivations, and reasoning contradictions. This confirms that PPL and answer quality measure different things for this model.
+**Uniform quality floor: 4-bit.** Despite having the best PPL among all configs in Phases 1-3, uniform 3-bit fails the strict AQ gate - it produces incorrect arithmetic (17x23 != 391), incomplete derivations, and reasoning contradictions. This confirms that PPL and answer quality measure different things for this model.
 
 ### 7.3 Step 2: Per-Component Quality Floors
 
@@ -267,25 +267,25 @@ Each row demotes one component from the 4-bit floor while keeping all others at 
 | Component | 3-bit | 2-bit | 1-bit | Floor |
 |---|---|---|---|---|
 | **ple_embeddings** | PASS (10.0/9.8/10.0) | PASS (10.0/9.8/10.0) | FAIL (8.8/8.8/8.4) | **2-bit** |
-| **attention** | PASS (9.6/9.2/9.2) | FAIL (2.2/2.1/2.1) | — | **3-bit** |
-| **mlp** | PASS (9.8/9.6/9.4) | FAIL (0.0/0.0/0.0) | — | **3-bit** |
-| **ple_gate_proj** | PASS (10.0/9.8/10.0) | FAIL (3.6/5.2/4.0) | — | **3-bit** |
+| **attention** | PASS (9.6/9.2/9.2) | FAIL (2.2/2.1/2.1) | - | **3-bit** |
+| **mlp** | PASS (9.8/9.6/9.4) | FAIL (0.0/0.0/0.0) | - | **3-bit** |
+| **ple_gate_proj** | PASS (10.0/9.8/10.0) | FAIL (3.6/5.2/4.0) | - | **3-bit** |
 | **main_embed_lmhead** | PASS (10.0/10.0/10.0) | PASS (9.4/9.1/9.8) | FAIL (5.0/6.0/5.0) | **2-bit** |
 
-PLE embeddings tolerate 2-bit (failing only at 1-bit), while attention is the most sensitive core component — 2-bit produces scores ~2/10, and even 3-bit (9.6/9.2/9.2) is the lowest passing score among all components. MLP shows binary behavior: clean pass at 3-bit, total collapse at 2-bit (0.0/0.0/0.0). Main embed+LM-head passes at 2-bit (9.4/9.1/9.8).
+PLE embeddings tolerate 2-bit (failing only at 1-bit), while attention is the most sensitive core component - 2-bit produces scores ~2/10, and even 3-bit (9.6/9.2/9.2) is the lowest passing score among all components. MLP shows binary behavior: clean pass at 3-bit, total collapse at 2-bit (0.0/0.0/0.0). Main embed+LM-head passes at 2-bit (9.4/9.1/9.8).
 
 **On-disk sizes for single-component demotion variants:**
 
 | Variant | Size (GB) | Δ from 4-bit |
 |---|---|---|
-| 4-bit uniform (baseline) | 3.22 | — |
-| ple_embeddings → 3-bit | 2.93 | −0.29 |
-| ple_embeddings → 2-bit | 2.64 | −0.58 |
-| attention → 3-bit | 3.18 | −0.04 |
-| mlp → 3-bit | 3.02 | −0.20 |
-| ple_gate_proj → 3-bit | 3.22 | −0.00 |
-| main_embed_lmhead → 3-bit | 3.17 | −0.05 |
-| main_embed_lmhead → 2-bit | 3.12 | −0.10 |
+| 4-bit uniform (baseline) | 3.22 | - |
+| ple_embeddings => 3-bit | 2.93 | -0.29 |
+| ple_embeddings => 2-bit | 2.64 | -0.58 |
+| attention => 3-bit | 3.18 | -0.04 |
+| mlp => 3-bit | 3.02 | -0.20 |
+| ple_gate_proj => 3-bit | 3.22 | -0.00 |
+| main_embed_lmhead => 3-bit | 3.17 | -0.05 |
+| main_embed_lmhead => 2-bit | 3.12 | -0.10 |
 
 The largest size savings come from PLE embeddings (35 large tables) and MLP (105 matrices), while attention and PLE gate projections are small.
 
@@ -338,7 +338,7 @@ Attention is the binding constraint in composition: attention at 3-bit passes in
 | ple_gate_proj (gate + projection) | 3-bit | 64 |
 | main_embed_lmhead (embed + LM head) | 2-bit | 64 |
 
-**Size: 2.32 GB** — 28% below the 4-bit quality floor (3.22 GB), 4.1× compression from text-only BF16 (~9.6 GB). Independent floors are necessary but not sufficient: the actual floor in combination is higher for attention (must stay 4-bit in any passing combo), because per-component quantization errors interact non-linearly.
+**Size: 2.32 GB** - 28% below the 4-bit quality floor (3.22 GB), 4.1x compression from text-only BF16 (~9.6 GB). Independent floors are necessary but not sufficient: the actual floor in combination is higher for attention (must stay 4-bit in any passing combo), because per-component quantization errors interact non-linearly.
 
 ### 7.7 Step 5: Group Size Tuning
 
@@ -346,16 +346,16 @@ All Phase 4 experiments up to this point used g64 uniformly. We tested three gro
 
 | Variant | Group Size Change | Size (GB) | Correctness | Completion | Reasoning | Gate |
 |---|---|---|---|---|---|---|
-| Baseline (all g64) | — | 2.32 | 9.9 | 9.4 | 9.6 | **PASS** |
-| MLP g32, rest g64 | MLP: 64→32 | 2.53 | 9.0 | 9.0 | 9.0 | **PASS** (borderline) |
-| All overrides g128 | All: 64→128 | 2.01 | 4.1 | 4.5 | 4.2 | **FAIL** |
-| All overrides g32 | All: 64→32 | 2.96 | 9.9 | 9.5 | 10.0 | **PASS** |
+| Baseline (all g64) | - | 2.32 | 9.9 | 9.4 | 9.6 | **PASS** |
+| MLP g32, rest g64 | MLP: 64=>32 | 2.53 | 9.0 | 9.0 | 9.0 | **PASS** (borderline) |
+| All overrides g128 | All: 64=>128 | 2.01 | 4.1 | 4.5 | 4.2 | **FAIL** |
+| All overrides g32 | All: 64=>32 | 2.96 | 9.9 | 9.5 | 10.0 | **PASS** |
 
-g128 causes degenerate output (scores 4.1–4.5/10) — coarse granularity interacts destructively with aggressive 2–3 bit widths. g32 passes (9.9/9.5/10.0) but adds +0.64 GB (27% overhead) in metadata. No variant improves the size–quality tradeoff over g64.
+g128 causes degenerate output (scores 4.1-4.5/10) - coarse granularity interacts destructively with aggressive 2-3 bit widths. g32 passes (9.9/9.5/10.0) but adds +0.64 GB (27% overhead) in metadata. No variant improves the size-quality tradeoff over g64.
 
 ### 7.8 Expanded Benchmark: Diverse Task Evaluation
 
-The 8-prompt AQ gate consists entirely of math/logic prompts. To assess generalization, we designed a 20-prompt expanded benchmark covering function calling (3), multi-step function calling (1), code generation (4), translation (4), multi-step reasoning (4), and creative writing (4). All prompts use greedy decoding (temp=0, max_tokens=512), scored on correctness, completion, and reasoning hygiene (each 0–10).
+The 8-prompt AQ gate consists entirely of math/logic prompts. To assess generalization, we designed a 20-prompt expanded benchmark covering function calling (3), multi-step function calling (1), code generation (4), translation (4), multi-step reasoning (4), and creative writing (4). All prompts use greedy decoding (temp=0, max_tokens=512), scored on correctness, completion, and reasoning hygiene (each 0-10).
 
 #### 7.8.1 Per-Category Results
 
@@ -374,28 +374,28 @@ Values are correctness / completion / reasoning_hygiene averages per category.
 
 #### 7.8.2 Expanded Quality Gate Results
 
-Using a relaxed threshold of ≥ 7.0/7.0/7.0 (appropriate for a diverse benchmark where some categories are inherently harder):
+Using a relaxed threshold of >= 7.0/7.0/7.0 (appropriate for a diverse benchmark where some categories are inherently harder):
 
 | Config | Size (GB) | tok/s | Corr. | Comp. | Reas. | Expanded Quality Gate |
 |---|---|---|---|---|---|---|
-| Optimal (attn=4, mlp=3, ple=2, gate=3, embed=2) | 2.32 | — | 4.45 | 5.40 | 5.05 | **FAIL** |
-| ple2+gate3+embed2 (attn=4, mlp=4) | 2.53 | — | 6.55 | 7.35 | 6.80 | **FAIL** |
+| Optimal (attn=4, mlp=3, ple=2, gate=3, embed=2) | 2.32 | - | 4.45 | 5.40 | 5.05 | **FAIL** |
+| ple2+gate3+embed2 (attn=4, mlp=4) | 2.53 | - | 6.55 | 7.35 | 6.80 | **FAIL** |
 | **5-bit mixed B (attn=5, mlp=4, ple=3, gate=4, embed=3)** | **2.96** | **46.6** | **8.75** | **8.95** | **9.05** | **PASS** |
 | 5-bit mixed A (attn=5, mlp=5, ple=3, gate=4, embed=3) | 3.17 | 46.3 | 9.25 | 9.15 | 9.35 | **PASS** |
-| Uniform 4-bit g64 | 3.22 | — | 8.80 | 8.70 | 9.05 | **PASS** |
+| Uniform 4-bit g64 | 3.22 | - | 8.80 | 8.70 | 9.05 | **PASS** |
 | Uniform 5-bit g64 | 3.86 | 44.1 | 9.40 | 9.35 | 9.50 | **PASS** |
 
 *Throughput measured on MacBook Air M4 24 GB, 256-token generation benchmark (3-run average, greedy decoding).*
 
 #### 7.8.3 Observations
 
-The 2.32 GB config passes the 8-prompt math gate but fails the expanded benchmark (4.5/5.4/5.0) — its quality is narrow, limited to conversational math. Code generation is the sharpest discriminator: correctness jumps 1.0→4.0→9.2→9.8 across configs. Below ~3-bit effective depth, code output is non-functional (broken recursion, hallucinated methods, degenerate loops). Creative writing recovers earliest (7.2/8.8/7.5 even at 2.32 GB), consistent with fluency being easier to preserve than structured reasoning. Translation at 2.32–2.53 GB contains fabricated vocabulary and mixed-script errors that disappear at 4-bit.
+The 2.32 GB config passes the 8-prompt math gate but fails the expanded benchmark (4.5/5.4/5.0) - its quality is narrow, limited to conversational math. Code generation is the sharpest discriminator: correctness jumps 1.0=>4.0=>9.2=>9.8 across configs. Below ~3-bit effective depth, code output is non-functional (broken recursion, hallucinated methods, degenerate loops). Creative writing recovers earliest (7.2/8.8/7.5 even at 2.32 GB), consistent with fluency being easier to preserve than structured reasoning. Translation at 2.32-2.53 GB contains fabricated vocabulary and mixed-script errors that disappear at 4-bit.
 
 ### 7.9 Relative Weighting Transfer Experiment
 
-The 2.32 GB config's component offsets from the 4-bit base (attn=0, mlp=−1, ple=−2, gate=−1, embed=−2) encode a sensitivity ordering. We transfer this pattern to a 5-bit base:
+The 2.32 GB config's component offsets from the 4-bit base (attn=0, mlp=-1, ple=-2, gate=-1, embed=-2) encode a sensitivity ordering. We transfer this pattern to a 5-bit base:
 
-**Variant A:** attn=5, mlp=5, ple=3, gate=4, embed=3 (conservative — only PLE/embed demoted)
+**Variant A:** attn=5, mlp=5, ple=3, gate=4, embed=3 (conservative - only PLE/embed demoted)
 **Variant B:** attn=5, mlp=4, ple=3, gate=4, embed=3 (full offset pattern)
 
 #### 7.9.1 5-Bit Mixed Results
@@ -407,7 +407,7 @@ The 2.32 GB config's component offsets from the 4-bit base (attn=0, mlp=−1, pl
 | Uniform 4-bit g64 (baseline) | 3.22 GB | 8.8 | 8.7 | 9.1 | PASS |
 | Uniform 5-bit g64 (baseline) | 3.86 GB | 9.4 | 9.3 | 9.5 | PASS |
 
-Both 5-bit mixed variants pass. **Variant B (2.96 GB)** passes the Expanded Quality Gate at **2.96 GB — 8% smaller than uniform 4-bit** while scoring comparably, suggesting that 5-bit attention precision is more valuable than uniform 4-bit across all components.
+Both 5-bit mixed variants pass. **Variant B (2.96 GB)** passes the Expanded Quality Gate at **2.96 GB - 8% smaller than uniform 4-bit** while scoring comparably, suggesting that 5-bit attention precision is more valuable than uniform 4-bit across all components.
 
 Per-category breakdown for Variant B (2.96 GB):
 
@@ -422,7 +422,7 @@ Per-category breakdown for Variant B (2.96 GB):
 
 #### 7.9.2 Observations
 
-The component sensitivity ordering (attention > MLP > gate > PLE/embed) transfers from 4-bit to 5-bit base. Variant B (2.96 GB) outperforms uniform 4-bit (3.22 GB) at smaller size by allocating precision to the most sensitive components. The transfer is asymmetric: at 4-bit base, the offsets push components to 2–3 bits (below the quality floor for code/reasoning); at 5-bit base, the same offsets yield 3–4 bits, remaining viable.
+The component sensitivity ordering (attention > MLP > gate > PLE/embed) transfers from 4-bit to 5-bit base. Variant B (2.96 GB) outperforms uniform 4-bit (3.22 GB) at smaller size by allocating precision to the most sensitive components. The transfer is asymmetric: at 4-bit base, the offsets push components to 2-3 bits (below the quality floor for code/reasoning); at 5-bit base, the same offsets yield 3-4 bits, remaining viable.
 
 ---
 
@@ -430,25 +430,25 @@ The component sensitivity ordering (attention > MLP > gate > PLE/embed) transfer
 
 ### 8.1 Optimal Configurations
 
-| | E2B (Phase 1–3) | E2B (Phase 4) | E2B (Phase 4 + Transfer) | E4B |
+| | E2B (Phase 1-3) | E2B (Phase 4) | E2B (Phase 4 + Transfer) | E4B |
 |---|---|---|---|---|
 | **Optimal config** | **q3-g64 (uniform)** | **Component-level mixed** | **5-bit mixed component** | **e4-ne4-g64 (3-tier)** |
-| Optimal PPL | 5,452 | — | — | 3,490 |
-| AQ gate (math) | FAIL | **PASS** | **PASS** | — |
-| AQ gate (expanded) | FAIL | FAIL | **PASS** | — |
+| Optimal PPL | 5,452 | - | - | 3,490 |
+| AQ gate (math) | FAIL | **PASS** | **PASS** | - |
+| AQ gate (expanded) | FAIL | FAIL | **PASS** | - |
 | Optimal size | 3.27 GB | **2.32 GB** | **2.96 GB** | 4.24 GB |
-| Compression ratio (reported export size) | 3.1×* | — | — | 3.5×* |
-| Compression ratio (text-only basis) | — | 4.1× | **3.2×** | — |
+| Compression ratio (reported export size) | 3.1x* | - | - | 3.5x* |
+| Compression ratio (text-only basis) | - | 4.1x | **3.2x** | - |
 | Transforms | None | None | None | None |
 | Calibration data | None | None | None | None |
 | Precision allocation | Uniform 3-bit | attn=4, mlp=3, ple=2, embed=2 | 5-bit mixed component | 3-tier layer-level |
 | Group size | 64 | 64 | 64 | 128 (3-bit) / 64 (4-bit) |
 
-*\* Phase 1–3 and E4B ratios use reported export sizes (including multimodal overhead): 10.25 / 3.27 and 15.0 / 4.24. Phase 4 ratios use text-only basis (~9.6 GB / size) since Phase 4 exports exclude multimodal weights.*
+*\* Phase 1-3 and E4B ratios use reported export sizes (including multimodal overhead): 10.25 / 3.27 and 15.0 / 4.24. Phase 4 ratios use text-only basis (~9.6 GB / size) since Phase 4 exports exclude multimodal weights.*
 
 ### 8.2 Why Mixed-Precision Helps E4B but Hurts E2B (at Layer Level)
 
-Three likely factors: (1) **Redundancy ratio** — E4B has 42 layers so protecting 16 edge layers still leaves 62% middle; E2B has 35 layers leaving only 54%. (2) **Hidden dimension** — E2B's 1536-wide rows produce only 12 groups at g128 (vs E4B's 20), increasing per-group quantization noise. (3) **Embedding dominance** — total embedding weight (main + PLE) is ~50% of E2B vs ~43% of E4B, so uniform treatment works better than mixed configs that trade coarser middle-layer quantization for finer embeddings.
+Three likely factors: (1) **Redundancy ratio** - E4B has 42 layers so protecting 16 edge layers still leaves 62% middle; E2B has 35 layers leaving only 54%. (2) **Hidden dimension** - E2B's 1536-wide rows produce only 12 groups at g128 (vs E4B's 20), increasing per-group quantization noise. (3) **Embedding dominance** - total embedding weight (main + PLE) is ~50% of E2B vs ~43% of E4B, so uniform treatment works better than mixed configs that trade coarser middle-layer quantization for finer embeddings.
 
 ### 8.3 The Group Size Reversal
 
@@ -457,13 +457,13 @@ Three likely factors: (1) **Redundancy ratio** — E4B has 42 layers so protecti
 | 3-bit group size | **g64** | **g128** |
 | Effective bpw (3-bit) | 3.50 | 3.25 |
 
-E2B's narrower weights (1536 vs 2560) have more intra-group variance at g128, and the quality gain from finer granularity (g64 → PPL 5,452 vs g128 → PPL 14,701) overwhelms the +0.29 GB size increase.
+E2B's narrower weights (1536 vs 2560) have more intra-group variance at g128, and the quality gain from finer granularity (g64 => PPL 5,452 vs g128 => PPL 14,701) overwhelms the +0.29 GB size increase.
 
 ### 8.4 The Rotation Divergence
 
 | | E2B | E4B |
 |---|---|---|
-| Rotation effect on PPL | −34% (18,542 → 12,276) | **+390%** (4,749 → 23,305) |
+| Rotation effect on PPL | -34% (18,542 => 12,276) | **+390%** (4,749 => 23,305) |
 | Rotation verdict | Slight benefit, but irrelevant | Catastrophic |
 
 Rotation moderately helps E2B but is irrelevant because uniform q3-g64 outperforms all rotation configs. The divergence suggests the rotation paradox is model-size-dependent.
@@ -482,13 +482,13 @@ Rotation moderately helps E2B but is irrelevant because uniform q3-g64 outperfor
 | Edge layer protection | Harmful | Essential |
 | Rotation effect | Slight benefit | Catastrophic harm |
 
-Quantization recipes do not transfer across model sizes — each size class needs its own validation. For E2B, layer sensitivity is approximately flat but component sensitivity varies enormously (attention requires 4-bit; PLE embeddings tolerate 2-bit). The right axis for precision allocation in smaller models is weight type, not layer index.
+Quantization recipes do not transfer across model sizes - each size class needs its own validation. For E2B, layer sensitivity is approximately flat but component sensitivity varies enormously (attention requires 4-bit; PLE embeddings tolerate 2-bit). The right axis for precision allocation in smaller models is weight type, not layer index.
 
-Independent component floors do not compose: applying all floors simultaneously produces scores of 4.0–4.6/10. The practical heuristic is to keep the most sensitive component (attention) at the uniform floor and demote everything else.
+Independent component floors do not compose: applying all floors simultaneously produces scores of 4.0-4.6/10. The practical heuristic is to keep the most sensitive component (attention) at the uniform floor and demote everything else.
 
 ### 9.2 Robustness of Smaller Models
 
-A striking finding is that all 22 Phase 1–3 configs produce coherent output (5/5 prompt quality), whereas E4B had multiple severe failure modes. Phase 4's stricter AQ gate reveals that this apparent robustness masks subtle quality degradation — uniform 3-bit produces coherent but *incorrect* math, only detectable with targeted evaluation.
+A striking finding is that all 22 Phase 1-3 configs produce coherent output (5/5 prompt quality), whereas E4B had multiple severe failure modes. Phase 4's stricter AQ gate reveals that this apparent robustness masks subtle quality degradation - uniform 3-bit produces coherent but *incorrect* math, only detectable with targeted evaluation.
 
 ### 9.3 PPL vs Answer Quality
 
@@ -509,7 +509,7 @@ Component-level mixed-precision is not a tuning knob exposed by existing inferen
 
 **1. Per-component quantization config resolution.** Standard mlx-lm resolves quantization parameters by exact weight path matching: a weight at path `language_model.model.layers.0.self_attn.q_proj` is looked up directly in the quantization config dictionary. Component-level configs use short architectural names (e.g., `embed_tokens`, `per_layer_input_gate`) that must match weight paths differing in prefix conventions between HuggingFace checkpoints and MLX's post-sanitization model tree. We add leaf-name matching to the quantization class predicate: after checking the full dotted path, it extracts the last path component (e.g., `embed_tokens` from `language_model.model.embed_tokens`) and checks whether it appears as a component-level override in the config. This enables a single config dictionary to specify per-component bit-widths without enumerating every full weight path.
 
-**2. Quantized KV-cache reference propagation.** Gemma 4's KV-sharing mechanism (last 20 of 35 decoder layers reuse KV caches from earlier "originating" layers) interacts non-trivially with quantized KV caches. When KV-cache quantization is enabled (e.g., `--kv-bits 8`), the originating layer's `QuantizedKVCache.update_and_fetch()` returns quantized tuples `((data, scales, biases), (data, scales, biases))` rather than plain `mx.array` tensors. Sharing layers receive these tuples as `shared_kv` but pass `cache=None` to the scaled dot-product attention (SDPA) dispatcher, which checks `hasattr(cache, 'bits')` to decide between quantized and standard SDPA. With `cache=None`, the dispatcher routes to `mx.fast.scaled_dot_product_attention`, which cannot handle quantized tuples — producing a `TypeError`. We fix this by propagating the originating layer's cache object (`shared_cache`) through the sharing path, so the SDPA dispatcher receives a cache with the correct `.bits` attribute and routes to `quantized_scaled_dot_product_attention`.
+**2. Quantized KV-cache reference propagation.** Gemma 4's KV-sharing mechanism (last 20 of 35 decoder layers reuse KV caches from earlier "originating" layers) interacts non-trivially with quantized KV caches. When KV-cache quantization is enabled (e.g., `--kv-bits 8`), the originating layer's `QuantizedKVCache.update_and_fetch()` returns quantized tuples `((data, scales, biases), (data, scales, biases))` rather than plain `mx.array` tensors. Sharing layers receive these tuples as `shared_kv` but pass `cache=None` to the scaled dot-product attention (SDPA) dispatcher, which checks `hasattr(cache, 'bits')` to decide between quantized and standard SDPA. With `cache=None`, the dispatcher routes to `mx.fast.scaled_dot_product_attention`, which cannot handle quantized tuples - producing a `TypeError`. We fix this by propagating the originating layer's cache object (`shared_cache`) through the sharing path, so the SDPA dispatcher receives a cache with the correct `.bits` attribute and routes to `quantized_scaled_dot_product_attention`.
 
 **3. Shape-aware attention mask handling.** Attention mask dimensions are validated against the key sequence length. With quantized KV caches, keys are tuples `(data, scales, biases)` rather than plain arrays, so `keys.shape[-2]` fails. We add a type check: `keys[0].shape[-2]` for quantized tuples, `keys.shape[-2]` otherwise.
 
@@ -525,19 +525,19 @@ Key findings:
 
 1. **Uniform beats layer-level mixed-precision for E2B.** Uniform 3-bit g64 (3.27 GB, PPL 5,452) outperforms all 22 layer-level mixed-precision configs. Group size g64 outperforms g128 (PPL 5,452 vs 14,701). Both reverse E4B findings.
 
-2. **Component-level mixed-precision is a new quantization method, not a configuration.** Assigning different bit-widths to architectural weight groups (not layers) yields a 2.96 GB general-use config that is 23% smaller and 6% faster than uniform 5-bit at comparable quality — a Pareto improvement that no uniform configuration achieves. This is not a tuning knob within existing frameworks: it requires inference engine changes to support per-component config resolution, quantized KV-cache propagation through weight-sharing paths, and shape-aware attention mask handling (Section 9.5). We release the required changes as a patch to mlx-lm. In all tested passing compositions, attention had to remain at the base bit-width; other components tolerate 1–2 bit demotions.
+2. **Component-level mixed-precision is a new quantization method, not a configuration.** Assigning different bit-widths to architectural weight groups (not layers) yields a 2.96 GB general-use config that is 23% smaller and 6% faster than uniform 5-bit at comparable quality - a Pareto improvement that no uniform configuration achieves. This is not a tuning knob within existing frameworks: it requires inference engine changes to support per-component config resolution, quantized KV-cache propagation through weight-sharing paths, and shape-aware attention mask handling (Section 9.5). We release the required changes as a patch to mlx-lm. In all tested passing compositions, attention had to remain at the base bit-width; other components tolerate 1-2 bit demotions.
 
-3. **Independent component floors do not compose.** Applying all independent minimums simultaneously fails (scores 4.0–4.6/10). The heuristic: keep attention at the quality floor, demote everything else.
+3. **Independent component floors do not compose.** Applying all independent minimums simultaneously fails (scores 4.0-4.6/10). The heuristic: keep attention at the quality floor, demote everything else.
 
 4. **PPL is inversely correlated with answer quality on this model.** Uniform 3-bit has the best PPL but fails the quality gate; BF16 has the worst PPL but scores 10/10. For chat-instruct models, task-specific evaluation is essential.
 
-5. **Domain-specific gates are misleading.** The 2.32 GB config passes math but fails a diverse 20-prompt benchmark (code, translation, reasoning). A 5-bit mixed variant at **2.96 GB** (3.2× text-weight compression) passes the expanded benchmark, displacing uniform 4-bit (3.22 GB) as the smallest general-use config.
+5. **Domain-specific gates are misleading.** The 2.32 GB config passes math but fails a diverse 20-prompt benchmark (code, translation, reasoning). A 5-bit mixed variant at **2.96 GB** (3.2x text-weight compression) passes the expanded benchmark, displacing uniform 4-bit (3.22 GB) as the smallest general-use config.
 
 6. **Quantization strategy is model-size-dependent.** The optimal approach differs qualitatively between E2B and E4B across every dimension tested (layer allocation, group size, edge protection, rotation). Recipes do not transfer without validation.
 
-7. **Inference engine adaptation is a prerequisite for component-level quantization.** Three changes to the MLX inference stack — per-component config resolution with leaf-name matching, quantized KV-cache reference propagation through Gemma 4's sharing mechanism, and shape-aware attention mask handling — are required to deploy the configs developed in this study. These changes are architecture-specific but the pattern generalizes: any model with weight sharing or cross-layer parameter tying will need analogous adaptations for component-level precision.
+7. **Inference engine adaptation is a prerequisite for component-level quantization.** Three changes to the MLX inference stack - per-component config resolution with leaf-name matching, quantized KV-cache reference propagation through Gemma 4's sharing mechanism, and shape-aware attention mask handling - are required to deploy the configs developed in this study. These changes are architecture-specific but the pattern generalizes: any model with weight sharing or cross-layer parameter tying will need analogous adaptations for component-level precision.
 
-Three practical optima (text-only sizes): **2.32 GB** (math/conversational only), **2.96 GB** (general use, recommended), **3.86 GB** (near-BF16 quality). All achieved with standard MLX `mx.quantize` — the best-performing configurations use no transforms, no rotation, and no calibration data.
+Three practical optima (text-only sizes): **2.32 GB** (math/conversational only), **2.96 GB** (general use, recommended), **3.86 GB** (near-BF16 quality). All achieved with standard MLX `mx.quantize` - the best-performing configurations use no transforms, no rotation, and no calibration data.
 
 ---
 
@@ -570,9 +570,9 @@ A first direction for future work is a deployment-oriented post-training adaptat
 
 A second direction is `autokernel-mlx`, an open-source system for generating, benchmarking, and compiling custom Metal kernels for Apple Silicon inference. Its purpose is to narrow the gap between quantization-time decisions and inference-time execution. While Waldwicht shows that component-level mixed-precision quantization can preserve quality at substantially lower storage cost, the present runtime stack does not yet convert these gains into proportional improvements in throughput and memory efficiency.
 
-We currently focus on three systems-level extensions. First, we plan to investigate **dynamic precision at inference time**. In Waldwicht V1, bit-width assignments are fixed at export time. A natural extension is a lightweight dispatch mechanism that selects between precompiled low-bit kernels at runtime, for example using lower precision for simpler conversational spans and higher precision for code- or reasoning-intensive segments. Second, we plan to develop **fused mixed-precision dequantization kernels**. A single Waldwicht forward pass may involve 2-bit, 3-bit, 4-bit, and 5-bit components, but current execution paths do not yet fully exploit this heterogeneity. Custom Metal kernels that fuse dequantization directly into matrix multiplication for each bit-width could reduce memory traffic, eliminate unnecessary intermediate tensors, and improve throughput. Third, we plan to explore **KV-cache quantization kernels**. Gemma 4’s KV-cache sharing makes cached key/value tensors an important runtime memory cost, and quantize-on-write / dequantize-on-read kernels for 4-bit or 8-bit KV caches could reduce inference-time memory independently of weight quantization.
+We currently focus on three systems-level extensions. First, we plan to investigate **dynamic precision at inference time**. In Waldwicht V1, bit-width assignments are fixed at export time. A natural extension is a lightweight dispatch mechanism that selects between precompiled low-bit kernels at runtime, for example using lower precision for simpler conversational spans and higher precision for code- or reasoning-intensive segments. Second, we plan to develop **fused mixed-precision dequantization kernels**. A single Waldwicht forward pass may involve 2-bit, 3-bit, 4-bit, and 5-bit components, but current execution paths do not yet fully exploit this heterogeneity. Custom Metal kernels that fuse dequantization directly into matrix multiplication for each bit-width could reduce memory traffic, eliminate unnecessary intermediate tensors, and improve throughput. Third, we plan to explore **KV-cache quantization kernels**. Gemma 4's KV-cache sharing makes cached key/value tensors an important runtime memory cost, and quantize-on-write / dequantize-on-read kernels for 4-bit or 8-bit KV caches could reduce inference-time memory independently of weight quantization.
 
-`autokernel-mlx` follows an LLM-in-the-loop generate–evaluate–refine workflow: given a kernel specification and target hardware profile, it generates candidate Metal implementations, compiles them, benchmarks them against a reference kernel, and iteratively refines them. More broadly, this line of work aims to extend Waldwicht from a quality-aware quantization framework toward a unified compression-and-execution stack for Apple Silicon inference.
+`autokernel-mlx` follows an LLM-in-the-loop generate-evaluate-refine workflow: given a kernel specification and target hardware profile, it generates candidate Metal implementations, compiles them, benchmarks them against a reference kernel, and iteratively refines them. More broadly, this line of work aims to extend Waldwicht from a quality-aware quantization framework toward a unified compression-and-execution stack for Apple Silicon inference.
 
 ---
 
@@ -656,16 +656,16 @@ Compositions of component demotions. All use g64. Default bits = 4 unless overri
 | 1 | **mlp=3, ple=2, gate=3, embed=2 (all g64)** | **2.32** | **9.88** | **9.38** | **9.62** | **PASS** |
 | 2 | ple=2, gate=3, embed=2 | 2.53 | 9.62 | 9.25 | 9.75 | PASS |
 | 3 | mlp=3, ple=2, gate=3, embed=2 (MLP g32) | 2.53 | 9.00 | 9.00 | 9.00 | PASS |
-| 4 | ple_embeddings → 2-bit only | 2.64 | 10.00 | 9.75 | 10.00 | PASS |
-| 5 | ple_embeddings → 3-bit only | 2.93 | 10.00 | 9.75 | 10.00 | PASS |
+| 4 | ple_embeddings => 2-bit only | 2.64 | 10.00 | 9.75 | 10.00 | PASS |
+| 5 | ple_embeddings => 3-bit only | 2.93 | 10.00 | 9.75 | 10.00 | PASS |
 | 6 | mlp=3, ple=2, gate=3, embed=2 (all g32) | 2.96 | 9.88 | 9.50 | 10.00 | PASS |
-| 7 | mlp → 3-bit only | 3.02 | 9.75 | 9.62 | 9.38 | PASS |
+| 7 | mlp => 3-bit only | 3.02 | 9.75 | 9.62 | 9.38 | PASS |
 | 8 | mlp=3 only (combo) | 3.02 | 9.38 | 9.38 | 9.12 | PASS |
-| 9 | main_embed_lmhead → 2-bit only | 3.12 | 9.38 | 9.12 | 9.75 | PASS |
-| 10 | main_embed_lmhead → 3-bit only | 3.17 | 10.00 | 10.00 | 10.00 | PASS |
-| 11 | attention → 3-bit only | 3.18 | 9.62 | 9.25 | 9.25 | PASS |
+| 9 | main_embed_lmhead => 2-bit only | 3.12 | 9.38 | 9.12 | 9.75 | PASS |
+| 10 | main_embed_lmhead => 3-bit only | 3.17 | 10.00 | 10.00 | 10.00 | PASS |
+| 11 | attention => 3-bit only | 3.18 | 9.62 | 9.25 | 9.25 | PASS |
 | 12 | uniform 4-bit g64 | 3.22 | 10.00 | 9.62 | 10.00 | PASS |
-| 13 | ple_gate_proj → 3-bit only | 3.22 | 10.00 | 9.75 | 10.00 | PASS |
+| 13 | ple_gate_proj => 3-bit only | 3.22 | 10.00 | 9.75 | 10.00 | PASS |
 | 14 | uniform 5-bit g64 | 3.86 | 10.00 | 10.00 | 10.00 | PASS |
 | 15 | uniform 6-bit g64 | 4.50 | 10.00 | 9.62 | 10.00 | PASS |
 
@@ -683,12 +683,12 @@ All variants use the optimal component bit-widths (attn=4, mlp=3, ple=2, gate=3,
 
 | Config | Size (GB) | Primary Failure Mode |
 |---|---|---|
-| uniform 3-bit | 2.59 | Wrong arithmetic (17×23), incomplete derivations, contradictions |
-| mlp → 2-bit | 2.81 | Total model collapse — outputs pure junk (all scores 0.0) |
-| attention → 2-bit | 3.13 | Garbled computation steps, wrong answers (scores ~2/10) |
-| ple_gate_proj → 2-bit | 3.22 | Treats g(x)=x² as g(x)=x, nonsensical fraction conversion |
-| ple_embeddings → 1-bit | 2.34 | Self-contradictions (50×101=550), confused multiplication methods |
-| main_embed_lmhead → 1-bit | 3.07 | Repetitive token loops ("you you you..."), wrong unit conversions |
+| uniform 3-bit | 2.59 | Wrong arithmetic (17x23), incomplete derivations, contradictions |
+| mlp => 2-bit | 2.81 | Total model collapse - outputs pure junk (all scores 0.0) |
+| attention => 2-bit | 3.13 | Garbled computation steps, wrong answers (scores ~2/10) |
+| ple_gate_proj => 2-bit | 3.22 | Treats g(x)=x² as g(x)=x, nonsensical fraction conversion |
+| ple_embeddings => 1-bit | 2.34 | Self-contradictions (50x101=550), confused multiplication methods |
+| main_embed_lmhead => 1-bit | 3.07 | Repetitive token loops ("you you you..."), wrong unit conversions |
 | All independent floors | 2.24 | Repetitive loops, self-contradictions, wrong answers across board |
 | attn=3 + mlp=3 | 2.97 | Combined noise exceeds budget; wrong arithmetic, truncated reasoning |
 | All overrides g128 | 2.01 | Degenerate repetition ("a a a..."), garbled loops ("step-故step-故..."), single-token non-sequiturs ("oneself") |

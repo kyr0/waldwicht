@@ -16,12 +16,12 @@ tags:
 
 ## Overview
 
-**Waldwicht-Winzling** is the smallest diverse-task-competent quantization of Gemma 4 E2B (2.3B effective parameters). At **2.96 GB** it is **8% smaller than uniform 4-bit** (3.22 GB) while matching its quality on a rigorous 20-prompt benchmark — the result of a 50+ configuration ablation study on Apple Silicon.
+**Waldwicht-Winzling** is the smallest diverse-task-competent quantization of Gemma 4 E2B (2.3B effective parameters). At **2.96 GB** it is **8% smaller than uniform 4-bit** (3.22 GB) while matching its quality on a rigorous 20-prompt benchmark - the result of a 50+ configuration ablation study on Apple Silicon.
 
 This is the **recommended general-use variant** for maximum compression. It uses **5-bit mixed-precision with component-level offsets**: attention stays at 5-bit (the most sensitive component), while MLP drops to 4-bit and PLE/embeddings drop to 3-bit.
 
 > **Part of the Waldwicht family:**
-> [Winzling (2.96 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Winzling) · [Sproessling (3.17 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Sproessling) · [Juengling (3.86 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Juengling)
+> [Winzling (2.96 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Winzling) - [Sproessling (3.17 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Sproessling) - [Juengling (3.86 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Juengling)
 
 ## Quick Start
 
@@ -47,7 +47,7 @@ Together with this model release, we are also launching the Waldwicht Inference 
 | PLE embeddings | `embed_tokens_per_layer` | 3 | 64 |
 | PLE gate/projection | `per_layer_input_gate`, `per_layer_projection` | 4 | 64 |
 | Main embed + LM head | `embed_tokens`, `lm_head` | 3 | 64 |
-| Norms, scalars | (not quantized) | BF16 | — |
+| Norms, scalars | (not quantized) | BF16 | - |
 
 ## Key Metrics
 
@@ -55,12 +55,12 @@ Together with this model release, we are also launching the Waldwicht Inference 
 |---|---|
 | **Model size** | 2.96 GB |
 | **Memory footprint** | 2.63 GB peak (MacBook Air M4 24 GB) |
-| **Compression from BF16** | 3.2× |
+| **Compression from BF16** | 3.2x |
 | **Throughput** | 51.5 tok/s avg (MacBook Air M4 24 GB) |
 | **Correctness (20-prompt)** | 8.75 / 10.0 |
 | **Completion (20-prompt)** | 8.95 / 10.0 |
 | **Reasoning hygiene (20-prompt)** | 9.05 / 10.0 |
-| **Expanded AQ gate** | ✅ PASS (threshold ≥ 7.0) |
+| **Expanded AQ gate** | [OK] PASS (threshold >= 7.0) |
 
 ## Benchmark Results by Category
 
@@ -85,14 +85,14 @@ Evaluated on a 20-prompt diverse benchmark covering 6 task categories (correctne
 
 ## How This Config Was Discovered
 
-This model is the result of a **relative weighting transfer experiment** (Section 7.9 of the research paper). The component sensitivity ordering — attention > MLP > gate > PLE/embed — was discovered at 4-bit base through systematic ablation of 28 component-level configurations. We found that:
+This model is the result of a **relative weighting transfer experiment** (Section 7.9 of the research paper). The component sensitivity ordering - attention > MLP > gate > PLE/embed - was discovered at 4-bit base through systematic ablation of 28 component-level configurations. We found that:
 
-1. **Attention is the binding constraint** — it must stay at the highest precision in any valid composition
+1. **Attention is the binding constraint** - it must stay at the highest precision in any valid composition
 2. **MLP tolerates 1-bit demotion** from the base precision
 3. **PLE embeddings and main embeddings tolerate 2-bit demotion** from base
 4. **PLE gate/projection tolerates 1-bit demotion** from base
 
-Transferring these relative offsets from a 4-bit base to a 5-bit base produced this 2.96 GB config — **the smallest model to pass the full expanded benchmark**, displacing uniform 4-bit (3.22 GB) as the practical minimum for diverse-task competence.
+Transferring these relative offsets from a 4-bit base to a 5-bit base produced this 2.96 GB config - **the smallest model to pass the full expanded benchmark**, displacing uniform 4-bit (3.22 GB) as the practical minimum for diverse-task competence.
 
 ### Known Limitations
 
@@ -109,7 +109,7 @@ Full details: [Pushing Below 3 GB: Component-Level Mixed-Precision Quantization 
 
 # Base model
 
-For the base model documentation, see [Gemma 4 E2B](https://huggingface.co/google/gemma-4-E2B-it) — the smallest dense model in the Gemma 4 family, with 2.3B effective parameters and a 128K token context window.
+For the base model documentation, see [Gemma 4 E2B](https://huggingface.co/google/gemma-4-E2B-it) - the smallest dense model in the Gemma 4 family, with 2.3B effective parameters and a 128K token context window.
 
 <div align="center">
   <img src=https://ai.google.dev/gemma/images/gemma4_banner.png>

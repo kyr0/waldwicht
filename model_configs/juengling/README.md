@@ -16,12 +16,12 @@ tags:
 
 ## Overview
 
-**Waldwicht-Juengling** is the highest-quality quantization of Gemma 4 E2B (2.3B effective parameters), using **uniform 5-bit g64** precision. At **3.86 GB** it achieves near-BF16 quality across all task categories — the result of a 50+ configuration ablation study on Apple Silicon.
+**Waldwicht-Juengling** is the highest-quality quantization of Gemma 4 E2B (2.3B effective parameters), using **uniform 5-bit g64** precision. At **3.86 GB** it achieves near-BF16 quality across all task categories - the result of a 50+ configuration ablation study on Apple Silicon.
 
 This is the **quality-first variant**: when you have the memory budget, Juengling delivers the best scores across code generation, multi-step reasoning, translation, and creative writing. Choose this when quality matters more than size.
 
 > **Part of the Waldwicht family:**
-> [Winzling (2.96 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Winzling) · [Sproessling (3.17 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Sproessling) · [Juengling (3.86 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Juengling)
+> [Winzling (2.96 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Winzling) - [Sproessling (3.17 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Sproessling) - [Juengling (3.86 GB)](https://huggingface.co/kyr0/Gemma-4-Waldwicht-Juengling)
 
 ## Quick Start
 
@@ -43,9 +43,9 @@ Together with this model release, we are also launching the Waldwicht Inference 
 | Component Group | Weight Key Patterns | Bits | Group Size |
 |---|---|---|---|
 | All linear weights | All 2-D weight tensors | 5 | 64 |
-| Norms, scalars | (not quantized) | BF16 | — |
+| Norms, scalars | (not quantized) | BF16 | - |
 
-Uniform 5-bit affine quantization with group size 64. No transforms, no rotation, no calibration data — standard MLX `mx.quantize`.
+Uniform 5-bit affine quantization with group size 64. No transforms, no rotation, no calibration data - standard MLX `mx.quantize`.
 
 ## Key Metrics
 
@@ -53,12 +53,12 @@ Uniform 5-bit affine quantization with group size 64. No transforms, no rotation
 |---|---|
 | **Model size** | 3.86 GB |
 | **Memory footprint** | 3.52 GB peak (MacBook Air M4 24 GB) |
-| **Compression from BF16** | 2.5× |
+| **Compression from BF16** | 2.5x |
 | **Throughput** | 47.4 tok/s avg (MacBook Air M4 24 GB) |
 | **Correctness (20-prompt)** | 9.40 / 10.0 |
 | **Completion (20-prompt)** | 9.35 / 10.0 |
 | **Reasoning hygiene (20-prompt)** | 9.50 / 10.0 |
-| **Expanded AQ gate** | ✅ PASS (threshold ≥ 7.0) |
+| **Expanded AQ gate** | [OK] PASS (threshold >= 7.0) |
 
 ## Benchmark Results by Category
 
@@ -76,7 +76,7 @@ Evaluated on a 20-prompt diverse benchmark covering 6 task categories (correctne
 ### Highlights
 
 - **Code generation** achieves near-perfect 9.8 correctness across all 4 code prompts
-- **Multi-step reasoning** scores 9.2 correctness — up from 7.0 at uniform 4-bit, the largest quality jump between bit-widths
+- **Multi-step reasoning** scores 9.2 correctness - up from 7.0 at uniform 4-bit, the largest quality jump between bit-widths
 - **Translation** scores 9.0 correctness across all 4 translation prompts
 - **Creative writing** scores perfect 10.0/10.0/10.0 across all 4 prompts
 - **Reasoning quality jumps sharply at 5-bit.** Multi-step reasoning goes from 7.0 (uniform 4-bit) to 9.2 (uniform 5-bit) correctness
@@ -119,7 +119,7 @@ Full details: [Pushing Below 3 GB: Component-Level Mixed-Precision Quantization 
 
 # Base model
 
-For the base model documentation, see [Gemma 4 E2B](https://huggingface.co/google/gemma-4-E2B-it) — the smallest dense model in the Gemma 4 family, with 2.3B effective parameters and a 128K token context window.
+For the base model documentation, see [Gemma 4 E2B](https://huggingface.co/google/gemma-4-E2B-it) - the smallest dense model in the Gemma 4 family, with 2.3B effective parameters and a 128K token context window.
 
 <div align="center">
   <img src=https://ai.google.dev/gemma/images/gemma4_banner.png>

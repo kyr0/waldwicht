@@ -83,7 +83,7 @@ patch:
 		find $(MLX_LM_DIR) -name '*.rej' -delete 2>/dev/null || true; \
 		find $(MLX_LM_DIR) -name '*.orig' -delete 2>/dev/null || true; \
 	else \
-		echo "=> Using local mlx-lm fork — patches already included, skipping."; \
+		echo "=> Using local mlx-lm fork - patches already included, skipping."; \
 	fi
 
 download:
@@ -232,7 +232,7 @@ unpatch:
 		find $(MLX_LM_DIR) -name '*.orig' -delete 2>/dev/null || true; \
 		echo "=> mlx_lm restored to clean state."; \
 	else \
-		echo "=> Using local mlx-lm fork — nothing to unpatch."; \
+		echo "=> Using local mlx-lm fork - nothing to unpatch."; \
 	fi
 
 # -- export-model -----------------------------------------------------
