@@ -22,11 +22,11 @@ Real-world benchmark **while under typical consumer conditions** (50% CPU load, 
 
 <img src="docs/bench-m4-air-base.png" alt="Waldwicht Winzling - real-world benchmark on M4 Air" width="600"/>
 
-## Requirements / Setup
+### Requirements / Setup
 
 - macOS on Apple Silicon / M-series processor _(tested on Macbook Air M4 24GB, macOS 15.7.3)_
 
-### Setup / Installation (Users)
+## 1. Setup / Installation (Users)
 
 Download the latest release of [Waldwicht-oMLX (DMG)](https://github.com/kyr0/waldwicht/releases/tag/Waldwicht-oMLX-v0.0.1). Launch the `oMLX.app`, open the menu bar icon, and click `Start Server`. Then click: `Admin Panel`. After the webbrowser opens, visit `http://127.0.0.1:8000/admin/dashboard?tab=models&modelsTab=downloader` and download a Waldwicht model from HuggingFace (e.g. `kyr0/Gemma-4-Waldwicht-Winzling`):
 
@@ -44,7 +44,7 @@ You can also use the OpenAI API directly and integrate Waldwicht with Codex, Ope
 
 <img src="docs/omlx-integrations.png" alt="oMLX integrations" width="600" />
 
-## Available Models
+## 2. Available Models
 
 The Waldwicht model family was developed through a systematic ablation study of 22 layer-level and 28 component-level quantization configurations on Google Gemma 4 E2B (2.3B effective parameters). See [TECHNICAL_REPORT.md](TECHNICAL_REPORT.md) for full details.
 
@@ -56,7 +56,7 @@ The Waldwicht model family was developed through a systematic ablation study of 
 
 *Throughput and peak Metal memory measured on MacBook Air M4 24 GB, 256-token generation, 3-run average, greedy decoding — under 50% CPU load and 50% memory pressure to reflect real consumer conditions.*
 
-## For Developers
+## 3. For Developers
 
 - [Homebrew](https://brew.sh/) — required for installing packaging tools (`pipx`). Install with:
   ```sh
