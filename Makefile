@@ -4,8 +4,9 @@
 SHELL       := /bin/zsh
 VENV        := .venv
 UV          := uv
+override VENV_PYTHON_VERSION := 3.12.8
 PYTHON      := $(VENV)/bin/python
-BUILD_PYTHON := $(if $(wildcard $(PYTHON)),$(abspath $(PYTHON)),python3)
+BUILD_PYTHON = $(abspath $(PYTHON))
 PID_FILE    := .waldwicht.pid
 LOG_FILE    := waldwicht-proxy.log
 HOST        := 127.0.0.1
@@ -82,11 +83,22 @@ _ensure_metal_toolchain:
 	fi
 
 _venv:
-	@if [ ! -d "$(VENV)" ]; then \
-		echo "=> Creating virtual environment ..."; \
-		$(UV) venv $(VENV); \
+	@recreate=0; \
+	if [ -x "$(PYTHON)" ]; then \
+		current_version=$$($(PYTHON) -c 'import platform; print(platform.python_version())'); \
+		if [ "$$current_version" != "$(VENV_PYTHON_VERSION)" ]; then \
+			recreate=1; \
+			echo "=> Virtual environment uses Python $$current_version, expected $(VENV_PYTHON_VERSION) - recreating ..."; \
+			rm -rf "$(VENV)"; \
+		fi; \
 	else \
-		echo "=> Virtual environment exists."; \
+		recreate=1; \
+	fi; \
+	if [ $$recreate -eq 1 ]; then \
+		echo "=> Creating virtual environment with Python $(VENV_PYTHON_VERSION) ..."; \
+		$(UV) venv --python $(VENV_PYTHON_VERSION) $(VENV); \
+	else \
+		echo "=> Virtual environment exists (Python $(VENV_PYTHON_VERSION))."; \
 	fi
 
 _deps:
@@ -288,7 +300,7 @@ _ensure_pipx:
 		echo "=> pipx already installed: $$(pipx --version)"; \
 	fi
 
-package: _ensure_pipx
+package: _ensure_pipx _install_uv _venv
 	@echo "=> Building oMLX macOS app + DMG ..."
 	@echo "=> macOS $(MACOS_MAJOR) packaging args: $(if $(PACKAGE_BUILD_ARGS),$(PACKAGE_BUILD_ARGS),<none>)"
 	cd omlx/packaging && $(BUILD_PYTHON) build.py $(PACKAGE_BUILD_ARGS)

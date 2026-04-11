@@ -58,10 +58,19 @@ The Waldwicht model family was developed through a systematic ablation study of 
 
 ## 3. For Developers
 
+**⚠️ WARNING: GIT SUBMODULES!**: this repository includes the `mlx` and `mlx-lm` codebases as submodules, which are used for the model conversion and quantization. Make sure to initialize and update them after cloning:
+
+```bash
+git clone --recurse-submodules
+```
+
+You also need:
+
 - [Homebrew](https://brew.sh/) - required for installing packaging tools (`pipx`). Install with:
   ```sh
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   ```
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) - for Python environment management and packaging.
 
 Open a Terminal and run:
 
@@ -69,7 +78,11 @@ Open a Terminal and run:
 make setup   # install uv, venv, deps, download model
 ```
 
+The repo-managed `.venv` is pinned to Python 3.12.8. If `.venv` was created with a different interpreter, `make setup` and `make package` will recreate it automatically.
+
 **Note**: The setup process includes downloading the `Waldwicht-Winzling` model from HuggingFace, which is around 3 GB in size. Make sure you have a stable internet connection and enough disk space. **The first-time installation process may take around 10-15 minutes, especially on the first run when it compiles the MLX extensions.**
+
+**Python 3.12.8 is required** due to some dependencies in the MLX and oMLX toolchain. 
 
 ## Special features
 
