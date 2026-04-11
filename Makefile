@@ -11,8 +11,8 @@ HOST        := 127.0.0.1
 PORT        := 8432
 MODEL       ?= kyr0/Gemma-4-Waldwicht-Winzling
 DRAFT_MODEL ?=
-EMBEDDING_MODEL ?= microsoft/harrier-oss-v1-270m
-EMBEDDING_MLX_PATH ?= embeddings/$(notdir $(EMBEDDING_MODEL))-mlx
+EMBEDDING_MODEL ?= kyr0/Harrier-Waldwicht-Wurzler-MLX
+EMBEDDING_MLX_PATH ?= $(notdir $(EMBEDDING_MODEL))
 EMBEDDING_DTYPE ?= bfloat16
 EMBEDDING_QUANTIZE ?= 1
 EMBEDDING_Q_GROUP_SIZE ?= 64
@@ -28,6 +28,7 @@ MAX_MEM_UTIL := 80
 HF_HOME     ?= $(HOME)/.cache/huggingface
 
 EMBEDDING_CONVERT_ARGS = $(if $(filter 1 true yes on,$(EMBEDDING_QUANTIZE)),--quantize --q-group-size $(EMBEDDING_Q_GROUP_SIZE) --q-bits $(EMBEDDING_Q_BITS) --q-mode $(EMBEDDING_Q_MODE),--dtype $(EMBEDDING_DTYPE))
+EMBEDDING_TEST_MODEL ?= $(if $(wildcard $(EMBEDDING_MLX_PATH)/config.json),$(EMBEDDING_MLX_PATH),$(EMBEDDING_MODEL))
 
 .PHONY: setup start stop status log test test-tools test-embed bench download patch unpatch package clean models export-model convert-embedding
 
@@ -285,9 +286,9 @@ convert-embedding: _embedding_deps
 	rsync -a --exclude '.DS_Store' "$(EMBEDDING_SCAFFOLD_DIR)/" "$(EMBEDDING_MLX_PATH)/"
 
 test-embed: _embedding_deps
-	@echo "=> Embedding test text with $(EMBEDDING_MLX_PATH) ..."
+	@echo "=> Embedding test text with $(EMBEDDING_TEST_MODEL) ..."
 	HF_HOME="$(HF_HOME)" $(PYTHON) test_embed.py \
-		--model "$(EMBEDDING_MLX_PATH)" \
+		--model "$(EMBEDDING_TEST_MODEL)" \
 		--text "$(EMBED_TEXT)" \
 		--max-length $(EMBED_MAX_LENGTH) \
 		--preview-dims $(EMBED_PREVIEW_DIMS)
