@@ -157,6 +157,30 @@ make test-embed \
   EMBED_TEXT="Waldwicht verifies embedding conversion."
 ```
 
+## MTEB Sanity Check
+
+The Waldwicht Makefile can run a packaged-runtime MTEB evaluation directly against this MLX export:
+
+```bash
+make embed-mteb \
+  EMBED_MTEB_MODEL=/path/to/Harrier-Waldwicht-Wurzler-MLX \
+  EMBED_MTEB_TASKS="STS12 STS13 STS14" \
+  EMBED_MTEB_OVERWRITE=1
+```
+
+This writes benchmark artifacts to `mteb-results/benchmark_results.json` and `mteb-results/benchmark_results.md`.
+
+Current quick-check result for the quantized 8-bit affine g64 export on the English MTEB v2 STS subset:
+
+| Task | Score |
+|---|---:|
+| STS12 | 0.605697 |
+| STS13 | 0.623238 |
+| STS14 | 0.600989 |
+| Mean (Task) | 0.609975 |
+
+These numbers are intended as a fast local sanity check for the quantized export, not as a full leaderboard submission.
+
 ## Model Details
 
 | Item | Value |

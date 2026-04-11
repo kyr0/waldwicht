@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-04-11T17:49:01.129949+00:00",
+  "benchmark": "MTEB(eng, v2)",
+  "tasks": [
+    "STS12",
+    "STS13",
+    "STS14"
+  ],
+  "model": {
+    "loader_kwargs": {},
+    "name": "/Volumes/AudioDisk/AI_Models/mlx/embeddings/Harrier-Waldwicht-Wurzler-MLX",
+    "revision": "no_revision_available",
+    "release_date": null,
+    "languages": null,
+    "n_parameters": null,
+    "n_active_parameters_override": null,
+    "n_embedding_parameters": null,
+    "memory_usage_mb": null,
+    "max_tokens": 512,
+    "embed_dim": 640,
+    "license": null,
+    "open_weights": true,
+    "public_training_code": null,
+    "public_training_data": null,
+    "framework": [
+      "Sentence Transformers"
+    ],
+    "reference": null,
+    "similarity_fn_name": "cosine",
+    "use_instructions": true,
+    "training_datasets": null,
+    "adapted_from": null,
+    "superseded_by": null,
+    "modalities": [
+      "text"
+    ],
+    "model_type": [
+      "dense"
+    ],
+    "citation": null,
+    "contacts": null,
+    "experiment_kwargs": null,
+    "output_dtypes": null,
+    "loader": null,
+    "is_cross_encoder": false
+  },
+  "prompt_file": "/Volumes/AudioDisk/AI_Models/mlx/embeddings/Harrier-Waldwicht-Wurzler-MLX/mteb_v2_eval_prompts.json",
+  "output_dir": "/Volumes/AudioDisk/AI_Models/mlx/embeddings/Harrier-Waldwicht-Wurzler-MLX/mteb-results",
+  "cache_dir": "/Volumes/AudioDisk/AI_Models/mlx/embeddings/Harrier-Waldwicht-Wurzler-MLX/mteb-results/cache",
+  "summary": [
+    {
+      "Model": "Harrier-Waldwicht-Wurzler-MLX",
+      "Rank (Mean Task)": 1,
+      "Mean (Task)": 0.6099745652100913,
+      "Mean (TaskType)": 0.6099745652100913,
+      "STS": 0.6099745652100913
+    }
+  ],
+  "per_task": [
+    {
+      "Model": "Harrier-Waldwicht-Wurzler-MLX",
+      "STS12": 0.6056968293703819,
+      "STS13": 0.6232377691856373,
+      "STS14": 0.6009890970742547
+    }
+  ]
+}

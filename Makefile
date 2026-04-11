@@ -5,6 +5,7 @@ SHELL       := /bin/zsh
 VENV        := .venv
 UV          := uv
 PYTHON      := $(VENV)/bin/python
+BUILD_PYTHON := $(if $(wildcard $(PYTHON)),$(abspath $(PYTHON)),python3)
 PID_FILE    := .waldwicht.pid
 LOG_FILE    := waldwicht-proxy.log
 HOST        := 127.0.0.1
@@ -27,16 +28,32 @@ OMLX_EMBED_HOST ?= 127.0.0.1
 OMLX_EMBED_PORT ?= 8436
 OMLX_EMBED_TIMEOUT ?= 180
 OMLX_EMBED_LOG_LEVEL ?= warning
+EMBED_MTEB_MODEL ?= $(EMBEDDING_TEST_MODEL)
+EMBED_MTEB_BENCHMARK ?= MTEB(eng, v2)
+EMBED_MTEB_TASKS ?=
+EMBED_MTEB_PROMPT_FILE ?=
+EMBED_MTEB_MAX_LENGTH ?= $(EMBED_MAX_LENGTH)
+EMBED_MTEB_BATCH_SIZE ?= 32
+EMBED_MTEB_OVERWRITE ?= 0
 MLX_EMBEDDINGS_DIR := mlx-embeddings
 EMBEDDING_SCAFFOLD_DIR := embeddings/model_scaffold
 MAX_BACKENDS := 2
 MAX_MEM_UTIL := 80
 HF_HOME     ?= $(HOME)/.cache/huggingface
+MACOS_MAJOR := $(shell /usr/bin/sw_vers -productVersion 2>/dev/null | cut -d. -f1)
+PACKAGE_BUILD_ARGS ?= $(if $(filter 26,$(MACOS_MAJOR)),--macos-target 26.0,)
+PACKAGED_OMLX_APP ?= omlx/packaging/dist/oMLX.app
+PACKAGED_OMLX_RUNTIME := $(PACKAGED_OMLX_APP)/Contents/MacOS/python3
+PACKAGED_RUNTIME_SOURCES := omlx/packaging/build.py omlx/packaging/venvstacks.toml omlx/pyproject.toml mlx-embeddings/pyproject.toml mlx-embeddings/mlx_embeddings/models/gemma3_text.py
 
 EMBEDDING_CONVERT_ARGS = $(if $(filter 1 true yes on,$(EMBEDDING_QUANTIZE)),--quantize --q-group-size $(EMBEDDING_Q_GROUP_SIZE) --q-bits $(EMBEDDING_Q_BITS) --q-mode $(EMBEDDING_Q_MODE),--dtype $(EMBEDDING_DTYPE))
 EMBEDDING_TEST_MODEL ?= $(if $(wildcard $(EMBEDDING_MLX_PATH)/config.json),$(EMBEDDING_MLX_PATH),$(EMBEDDING_MODEL))
+EMBED_MTEB_OUTPUT_DIR ?= $(if $(wildcard $(EMBED_MTEB_MODEL)/config.json),$(EMBED_MTEB_MODEL)/mteb-results,mteb-results/$(notdir $(EMBED_MTEB_MODEL)))
+EMBED_MTEB_CACHE_DIR ?= $(EMBED_MTEB_OUTPUT_DIR)/cache
+EMBED_MTEB_RESULTS_JSON ?= $(EMBED_MTEB_OUTPUT_DIR)/benchmark_results.json
+EMBED_MTEB_RESULTS_MD ?= $(EMBED_MTEB_OUTPUT_DIR)/benchmark_results.md
 
-.PHONY: setup start stop status log test test-tools test-embed test-embed-omlx bench download patch unpatch package clean models export-model convert-embedding
+.PHONY: setup start stop status log test test-tools test-embed test-embed-omlx embed-mteb bench download patch unpatch package clean models export-model convert-embedding _ensure_packaged_runtime
 
 setup: _clean _install_uv _venv _deps _ensure_metal_toolchain
 	@echo "\n[OK] Setup complete. Run 'make start' to launch the server."
@@ -273,8 +290,29 @@ _ensure_pipx:
 
 package: _ensure_pipx
 	@echo "=> Building oMLX macOS app + DMG ..."
-	cd omlx/packaging && $(CURDIR)/$(PYTHON) build.py
+	@echo "=> macOS $(MACOS_MAJOR) packaging args: $(if $(PACKAGE_BUILD_ARGS),$(PACKAGE_BUILD_ARGS),<none>)"
+	cd omlx/packaging && $(BUILD_PYTHON) build.py $(PACKAGE_BUILD_ARGS)
 	@echo "=> Done. Output in omlx/packaging/dist/"
+
+_ensure_packaged_runtime:
+	@needs_build=0; \
+	if [ ! -x "$(PACKAGED_OMLX_RUNTIME)" ]; then \
+		needs_build=1; \
+		echo "=> Packaged oMLX runtime missing - building it first ..."; \
+	else \
+		for src in $(PACKAGED_RUNTIME_SOURCES); do \
+			if [ "$$src" -nt "$(PACKAGED_OMLX_RUNTIME)" ]; then \
+				needs_build=1; \
+				echo "=> Packaged oMLX runtime is stale (newer source: $$src) - rebuilding ..."; \
+				break; \
+			fi; \
+		done; \
+	fi; \
+	if [ $$needs_build -eq 1 ]; then \
+		$(MAKE) --no-print-directory package; \
+	else \
+		echo "=> Using packaged oMLX runtime at $(PACKAGED_OMLX_APP)"; \
+	fi
 
 # -- unpatch ----------------------------------------------------------
 unpatch:
@@ -327,6 +365,23 @@ test-embed-omlx: _omlx_embedding_deps
 		--port $(OMLX_EMBED_PORT) \
 		--timeout $(OMLX_EMBED_TIMEOUT) \
 		--log-level "$(OMLX_EMBED_LOG_LEVEL)"
+
+embed-mteb: _ensure_packaged_runtime
+	@echo "=> Running $(EMBED_MTEB_BENCHMARK) for $(EMBED_MTEB_MODEL) with the packaged oMLX runtime ..."
+	HF_HOME="$(HF_HOME)" python3 tools/run_packaged_python.py \
+		--app "$(PACKAGED_OMLX_APP)" \
+		tools/embed_mteb.py \
+		--model "$(EMBED_MTEB_MODEL)" \
+		--benchmark "$(EMBED_MTEB_BENCHMARK)" \
+		--output-dir "$(EMBED_MTEB_OUTPUT_DIR)" \
+		--cache-dir "$(EMBED_MTEB_CACHE_DIR)" \
+		--results-json "$(EMBED_MTEB_RESULTS_JSON)" \
+		--results-md "$(EMBED_MTEB_RESULTS_MD)" \
+		--max-length $(EMBED_MTEB_MAX_LENGTH) \
+		--batch-size $(EMBED_MTEB_BATCH_SIZE) \
+		$(if $(strip $(EMBED_MTEB_PROMPT_FILE)),--prompt-file "$(EMBED_MTEB_PROMPT_FILE)") \
+		$(if $(strip $(EMBED_MTEB_TASKS)),--tasks $(EMBED_MTEB_TASKS)) \
+		$(if $(filter 1 true yes on,$(EMBED_MTEB_OVERWRITE)),--overwrite)
 
 # -- clean ------------------------------------------------------------
 clean:
