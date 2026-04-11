@@ -202,6 +202,7 @@ Open any terminal, run:
 | `make export-model` | Export a quantized Waldwicht model variant |
 | `make convert-embedding` | Convert and quantize an embedding model to MLX in the repo venv (8-bit by default) |
 | `make test-embed` | Load an embedding model and print one embedding smoke test |
+| `make test-embed-omlx` | Start oMLX locally and verify the `/v1/embeddings` HTTP endpoint |
 | `make clean` | Remove venv, logs, and caches |
 
 

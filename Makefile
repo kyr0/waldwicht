@@ -21,6 +21,12 @@ EMBEDDING_Q_MODE ?= affine
 EMBED_TEXT ?= The quick brown fox jumps over the lazy dog.
 EMBED_MAX_LENGTH ?= 512
 EMBED_PREVIEW_DIMS ?= 8
+OMLX_EMBED_MODEL_SOURCE ?= $(EMBEDDING_TEST_MODEL)
+OMLX_EMBED_TEXT ?= $(EMBED_TEXT)
+OMLX_EMBED_HOST ?= 127.0.0.1
+OMLX_EMBED_PORT ?= 8436
+OMLX_EMBED_TIMEOUT ?= 180
+OMLX_EMBED_LOG_LEVEL ?= warning
 MLX_EMBEDDINGS_DIR := mlx-embeddings
 EMBEDDING_SCAFFOLD_DIR := embeddings/model_scaffold
 MAX_BACKENDS := 2
@@ -30,7 +36,7 @@ HF_HOME     ?= $(HOME)/.cache/huggingface
 EMBEDDING_CONVERT_ARGS = $(if $(filter 1 true yes on,$(EMBEDDING_QUANTIZE)),--quantize --q-group-size $(EMBEDDING_Q_GROUP_SIZE) --q-bits $(EMBEDDING_Q_BITS) --q-mode $(EMBEDDING_Q_MODE),--dtype $(EMBEDDING_DTYPE))
 EMBEDDING_TEST_MODEL ?= $(if $(wildcard $(EMBEDDING_MLX_PATH)/config.json),$(EMBEDDING_MLX_PATH),$(EMBEDDING_MODEL))
 
-.PHONY: setup start stop status log test test-tools test-embed bench download patch unpatch package clean models export-model convert-embedding
+.PHONY: setup start stop status log test test-tools test-embed test-embed-omlx bench download patch unpatch package clean models export-model convert-embedding
 
 setup: _clean _install_uv _venv _deps _ensure_metal_toolchain
 	@echo "\n[OK] Setup complete. Run 'make start' to launch the server."
@@ -82,6 +88,12 @@ _deps:
 	@echo "=> Re-linking local forks (in case omlx deps overwrote them) ..."
 	PYPI_RELEASE=1 $(UV) pip install --quiet -e ./mlx --no-build-isolation --no-deps
 	$(UV) pip install --quiet -e ./mlx-lm --no-build-isolation --no-deps
+	@if [ -f "$(MLX_EMBEDDINGS_DIR)/pyproject.toml" ]; then \
+		echo "=> Re-linking local mlx-embeddings fork (in case omlx deps overwrote it) ..."; \
+		$(UV) pip install --quiet -e ./$(MLX_EMBEDDINGS_DIR) --no-build-isolation --no-deps; \
+	else \
+		echo "=> mlx-embeddings submodule missing - keeping installed version."; \
+	fi
 
 _embedding_deps: _install_uv _venv _ensure_metal_toolchain
 	@if [ ! -f "$(MLX_EMBEDDINGS_DIR)/pyproject.toml" ]; then \
@@ -97,6 +109,19 @@ _embedding_deps: _install_uv _venv _ensure_metal_toolchain
 		$(UV) pip install --quiet --python $(PYTHON) -e ./mlx-lm --no-build-isolation; \
 		$(UV) pip install --quiet --python $(PYTHON) mlx-vlm --no-deps; \
 		$(UV) pip install --quiet --python $(PYTHON) -e ./$(MLX_EMBEDDINGS_DIR) --no-build-isolation --no-deps; \
+	fi
+
+_omlx_embedding_deps: _install_uv _venv _ensure_metal_toolchain
+	@if [ ! -f "$(MLX_EMBEDDINGS_DIR)/pyproject.toml" ]; then \
+		echo "=> Missing mlx-embeddings submodule. Run 'git submodule update --init --recursive $(MLX_EMBEDDINGS_DIR)'."; \
+		exit 1; \
+	fi
+	@if $(PYTHON) tools/check_omlx_embedding_deps.py >/dev/null 2>&1; then \
+		echo "=> oMLX embedding HTTP dependencies already available in $(VENV); skipping install."; \
+	else \
+		echo "=> Installing oMLX + local embedding dependencies into $(VENV) ..."; \
+		$(MAKE) --no-print-directory _deps; \
+		$(MAKE) --no-print-directory _embedding_deps; \
 	fi
 
 MLX_LM_DIR = $$($(PYTHON) -c "import mlx_lm; print(mlx_lm.__path__[0])")
@@ -292,6 +317,16 @@ test-embed: _embedding_deps
 		--text "$(EMBED_TEXT)" \
 		--max-length $(EMBED_MAX_LENGTH) \
 		--preview-dims $(EMBED_PREVIEW_DIMS)
+
+test-embed-omlx: _omlx_embedding_deps
+	@echo "=> Smoke testing oMLX /v1/embeddings with $(OMLX_EMBED_MODEL_SOURCE) ..."
+	HF_HOME="$(HF_HOME)" $(PYTHON) test_embed_omlx.py \
+		--model-source "$(OMLX_EMBED_MODEL_SOURCE)" \
+		--text "$(OMLX_EMBED_TEXT)" \
+		--host "$(OMLX_EMBED_HOST)" \
+		--port $(OMLX_EMBED_PORT) \
+		--timeout $(OMLX_EMBED_TIMEOUT) \
+		--log-level "$(OMLX_EMBED_LOG_LEVEL)"
 
 # -- clean ------------------------------------------------------------
 clean:
