@@ -1,3 +1,6 @@
 [submodule "omlx"]
 	path = omlx
 	url = git@github.com:kyr0/omlx.git
+[submodule "mlx-embeddings"]
+	path = mlx-embeddings
+	url = https://github.com/kyr0/mlx-embeddings

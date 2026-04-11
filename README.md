@@ -200,6 +200,8 @@ Open any terminal, run:
 | `make bench` | Run 50 varied prompts and report tok/s |
 | `make models` | List downloaded models with size and location |
 | `make export-model` | Export a quantized Waldwicht model variant |
+| `make convert-embedding` | Convert and quantize an embedding model to MLX in the repo venv (8-bit by default) |
+| `make test-embed` | Load an embedding model and print one embedding smoke test |
 | `make clean` | Remove venv, logs, and caches |
 
 

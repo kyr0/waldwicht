@@ -11,11 +11,25 @@ HOST        := 127.0.0.1
 PORT        := 8432
 MODEL       ?= kyr0/Gemma-4-Waldwicht-Winzling
 DRAFT_MODEL ?=
+EMBEDDING_MODEL ?= microsoft/harrier-oss-v1-270m
+EMBEDDING_MLX_PATH ?= embeddings/$(notdir $(EMBEDDING_MODEL))-mlx
+EMBEDDING_DTYPE ?= bfloat16
+EMBEDDING_QUANTIZE ?= 1
+EMBEDDING_Q_GROUP_SIZE ?= 64
+EMBEDDING_Q_BITS ?= 8
+EMBEDDING_Q_MODE ?= affine
+EMBED_TEXT ?= The quick brown fox jumps over the lazy dog.
+EMBED_MAX_LENGTH ?= 512
+EMBED_PREVIEW_DIMS ?= 8
+MLX_EMBEDDINGS_DIR := mlx-embeddings
+EMBEDDING_SCAFFOLD_DIR := embeddings/model_scaffold
 MAX_BACKENDS := 2
 MAX_MEM_UTIL := 80
 HF_HOME     ?= $(HOME)/.cache/huggingface
 
-.PHONY: setup start stop status log test test-tools bench download patch unpatch package clean models export-model
+EMBEDDING_CONVERT_ARGS = $(if $(filter 1 true yes on,$(EMBEDDING_QUANTIZE)),--quantize --q-group-size $(EMBEDDING_Q_GROUP_SIZE) --q-bits $(EMBEDDING_Q_BITS) --q-mode $(EMBEDDING_Q_MODE),--dtype $(EMBEDDING_DTYPE))
+
+.PHONY: setup start stop status log test test-tools test-embed bench download patch unpatch package clean models export-model convert-embedding
 
 setup: _clean _install_uv _venv _deps _ensure_metal_toolchain
 	@echo "\n[OK] Setup complete. Run 'make start' to launch the server."
@@ -67,6 +81,22 @@ _deps:
 	@echo "=> Re-linking local forks (in case omlx deps overwrote them) ..."
 	PYPI_RELEASE=1 $(UV) pip install --quiet -e ./mlx --no-build-isolation --no-deps
 	$(UV) pip install --quiet -e ./mlx-lm --no-build-isolation --no-deps
+
+_embedding_deps: _install_uv _venv _ensure_metal_toolchain
+	@if [ ! -f "$(MLX_EMBEDDINGS_DIR)/pyproject.toml" ]; then \
+		echo "=> Missing mlx-embeddings submodule. Run 'git submodule update --init --recursive $(MLX_EMBEDDINGS_DIR)'."; \
+		exit 1; \
+	fi
+	@if $(PYTHON) tools/check_embedding_deps.py >/dev/null 2>&1; then \
+		echo "=> Embedding conversion dependencies already available in $(VENV); skipping install."; \
+	else \
+		echo "=> Installing embedding conversion dependencies into $(VENV) ..."; \
+		$(UV) pip install --quiet --python $(PYTHON) pip setuptools requests pillow; \
+		PYPI_RELEASE=1 $(UV) pip install --quiet --python $(PYTHON) -e ./mlx --no-build-isolation; \
+		$(UV) pip install --quiet --python $(PYTHON) -e ./mlx-lm --no-build-isolation; \
+		$(UV) pip install --quiet --python $(PYTHON) mlx-vlm --no-deps; \
+		$(UV) pip install --quiet --python $(PYTHON) -e ./$(MLX_EMBEDDINGS_DIR) --no-build-isolation --no-deps; \
+	fi
 
 MLX_LM_DIR = $$($(PYTHON) -c "import mlx_lm; print(mlx_lm.__path__[0])")
 
@@ -242,6 +272,25 @@ OUTPUT_DIR   ?= $(abspath $(HF_HOME)/../mlx)
 export-model:
 	@echo "=> Exporting $(EXPORT_MODEL) to $(OUTPUT_DIR) ..."
 	$(PYTHON) ablation_scripts/export.py --model $(EXPORT_MODEL) --output-dir $(OUTPUT_DIR)
+
+convert-embedding: _embedding_deps
+	@echo "=> Converting embedding model $(EMBEDDING_MODEL) to $(EMBEDDING_MLX_PATH) ..."
+	@echo "=> Embedding quantization: $(if $(filter 1 true yes on,$(EMBEDDING_QUANTIZE)),enabled ($(EMBEDDING_Q_MODE), $(EMBEDDING_Q_BITS)-bit g$(EMBEDDING_Q_GROUP_SIZE)),disabled (dtype $(EMBEDDING_DTYPE)))"
+	HF_HOME="$(HF_HOME)" $(PYTHON) -m mlx_embeddings.convert \
+		--hf-path $(EMBEDDING_MODEL) \
+		--mlx-path $(EMBEDDING_MLX_PATH) \
+		$(EMBEDDING_CONVERT_ARGS)
+	@echo "=> Copying embedding scaffold from $(EMBEDDING_SCAFFOLD_DIR) to $(EMBEDDING_MLX_PATH) ..."
+	@mkdir -p "$(EMBEDDING_MLX_PATH)"
+	rsync -a --exclude '.DS_Store' "$(EMBEDDING_SCAFFOLD_DIR)/" "$(EMBEDDING_MLX_PATH)/"
+
+test-embed: _embedding_deps
+	@echo "=> Embedding test text with $(EMBEDDING_MLX_PATH) ..."
+	HF_HOME="$(HF_HOME)" $(PYTHON) test_embed.py \
+		--model "$(EMBEDDING_MLX_PATH)" \
+		--text "$(EMBED_TEXT)" \
+		--max-length $(EMBED_MAX_LENGTH) \
+		--preview-dims $(EMBED_PREVIEW_DIMS)
 
 # -- clean ------------------------------------------------------------
 clean:
