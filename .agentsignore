@@ -4,3 +4,4 @@ ablation_scripts/**/*
 ablation_results/**/*
 omlx/**/*
 patches/**/*
+mlx-embeddings/**/*

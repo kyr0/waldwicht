@@ -1,4 +1,4 @@
-# waldwicht - MLX-powered LLM server
+# waldwicht - Makefile
 # Usage: make setup && make start
 
 SHELL       := /bin/zsh
