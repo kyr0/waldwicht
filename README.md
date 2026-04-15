@@ -78,7 +78,7 @@ Open a Terminal and run:
 make setup   # install uv, venv, deps, download model
 ```
 
-The repo-managed `.venv` is pinned to Python 3.12.8. If `.venv` was created with a different interpreter, `make setup` and `make package` will recreate it automatically.
+The repo-managed `.venv` is pinned to Python 3.12.8. Hugging Face tooling and other repo-level helper dependencies are synced from the repo `uv.lock`, so model downloads also run inside the same version-locked environment. If `.venv` was created with a different interpreter, `make setup` and `make package` will recreate it automatically.
 
 **Note**: The setup process includes downloading the `Waldwicht-Winzling` model from HuggingFace, which is around 3 GB in size. Make sure you have a stable internet connection and enough disk space. **The first-time installation process may take around 10-15 minutes, especially on the first run when it compiles the MLX extensions.**
 

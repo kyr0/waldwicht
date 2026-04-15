@@ -10,3 +10,7 @@ build
 *.pid
 .vscode
 .env
+models/*
+*.dmg
+# https://asdf-vm.com/
+.tool-versions
